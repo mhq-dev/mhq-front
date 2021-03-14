@@ -8,11 +8,19 @@ function Login() {
     const onFinish = values => {
         console.log('Received values of form: ', values);
     };
-    useEffect(()=>{
+    useEffect(() => {
         document.body.style.backgroundColor = '#282c34'
-    },[])
+    }, [])
     return (
-        <Card style={{ width: 300 }} className='login-card'>
+        <Card
+            style={{ width: 300, height: 400, alignContent: 'center' }}
+            className='login-card'
+            bodyStyle={{
+                position: 'relative',
+                top: '50%',
+                left: '50%',
+                transform: `translate(-50%, -50%)` 
+            }}>
             <Form
                 name="normal_login"
                 className="login-form"
@@ -30,7 +38,7 @@ function Login() {
                         },
                     ]}
                 >
-                    <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Username"/>
+                    <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Username" />
                 </Form.Item>
                 <Form.Item
                     name="password"
