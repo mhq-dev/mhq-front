@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import 'antd/dist/antd.css';
 import './Login.css';
-import { Form, Input, Button, Checkbox, Typography, Grid, Card } from 'antd';
+import { Form, Input, Button, Checkbox, Typography, Card } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 
 function Login() {
@@ -54,13 +54,13 @@ function Login() {
 
                     <a className="login-form-forgot" href="">
                         Forgot password
-              </a>
+                    </a>
                 </Form.Item>
 
                 <Form.Item>
                     <Button type="primary" htmlType="submit" className="login-form-button">
                         Log in
-              </Button>
+                    </Button>
                     <Typography style={{ margin: '8px' }}>
                         Or <a href="">register now!</a>
                     </Typography>
