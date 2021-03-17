@@ -13,10 +13,11 @@ function Login() {
             username: values.username
         })
         .then((response)=>{
-            if (response.status === 201){
+            if (response.status === 200){
                 message.success("Logged in!")
+                let token = response.data.auth_token;
+                localStorage.setItem('token', token);
                 window.location = '/dashboard'
-                console.log('ok')
             }
             else{
                 message.error("Wrong Credentials")
