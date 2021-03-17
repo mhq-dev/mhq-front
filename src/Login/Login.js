@@ -1,12 +1,31 @@
 import React, { useEffect } from 'react';
 import 'antd/dist/antd.css';
 import './Login.css';
-import { Form, Input, Button, Checkbox, Typography, Card } from 'antd';
+import { Form, Input, Button, Checkbox, Typography, Card, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import axios from 'axios';
 
 function Login() {
     const onFinish = values => {
         console.log('Received values of form: ', values);
+        axios.post('http://37.152.188.83/api/auth/token/login/',{
+            password: values.password,
+            username: values.username
+        })
+        .then((response)=>{
+            if (response.status === 201){
+                message.success("Logged in!")
+                window.location = '/dashboard'
+                console.log('ok')
+            }
+            else{
+                message.error("Wrong Credentials")
+            }
+        })
+        .catch((error)=>{
+            message.error("Wrong Credentials")
+            console.log(error)
+        })
     };
     useEffect(() => {
         document.body.style.backgroundColor = '#282c34'
@@ -70,7 +89,7 @@ function Login() {
                         Log in
                     </Button>
                     <Typography style={{ margin: '8px' }}>
-                        Or <a href="">register now!</a>
+                        Or <a href="/signup">register now!</a>
                     </Typography>
                 </Form.Item>
             </Form>
