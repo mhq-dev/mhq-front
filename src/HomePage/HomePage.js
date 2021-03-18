@@ -5,7 +5,7 @@ import 'antd/dist/antd.css';
 
 function HomePage() {
   return (
-    <div className="App">
+    <div className="Authentication-header">
       <header className="App-header">
         <Radio.Group>
           <Link to='/login'>
