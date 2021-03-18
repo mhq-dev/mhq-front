@@ -36,12 +36,14 @@ class Signup extends React.Component {
             }
             , {})
             .then(res => {
-                message.success("That's ok");            
+                let token = res.data.auth_token;
+                localStorage.setItem('token', token);                
+                localStorage.setItem('username',username);
+                window.location = '/login';            
             })
             .catch(err =>
             {
-                message.error(err.message);
-                console.log(err);        
+                message.error(err.message+email+username+password);
             });
             return "Correct";
 

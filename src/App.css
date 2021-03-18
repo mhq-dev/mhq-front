@@ -1,8 +1,10 @@
 .App {
     text-align: center;
-    background-color: #282c34;
 }
+.Authentication {
+    background-color: #282c34 !important;
 
+}
 .App-logo {
     height: 40vmin;
     pointer-events: none;
@@ -14,7 +16,7 @@
     }
 }
 
-.App-header {
+.Authentication-header {
     background-color: #282c34;
     min-height: 100vh;
     display: flex;
