@@ -1,6 +1,7 @@
 import React from 'react';
 import 'antd/dist/antd.css';
 import './Signup.css';
+import axios from 'axios';
 import { Form, Input, Button, Typography, Card,message } from 'antd';
 import {RedoOutlined, MailOutlined, UserOutlined, LockOutlined } from '@ant-design/icons';
 
@@ -12,21 +13,38 @@ class Signup extends React.Component {
         document.body.style.backgroundColor = '#282c34'
     }
     sumbitButton(){
-        const username=document.getElementById('username-signup').value
-        const email=document.getElementById('email-signup').value
-        const password=document.getElementById('password-signup').value
-        const repeatPass=document.getElementById('repeat-password-signup').value
+        const username=document.getElementById('username-signup').value;
+        const email=document.getElementById('email-signup').value;
+        const password=document.getElementById('password-signup').value;
+        const repeatPass=document.getElementById('repeat-password-signup').value;
         
-        this.CheckSubmission(password,repeatPass);
+        this.CheckSubmission(username,email,password,repeatPass);
     }
-    CheckSubmission(password,repeatPass){
+
+    CheckSubmission(username,email,password,repeatPass){
         if(password!=repeatPass){
             message.error("Please check the password");
             return "Wrong";
         }
         else{
-            message.success("That's ok");
+            axios.post(`http://37.152.188.83/api/auth/users/`, 
+            {
+                "email": email,
+                "username": username,
+                "password": password,
+                "re_password": repeatPass
+            }
+            , {})
+            .then(res => {
+                message.success("That's ok");            
+            })
+            .catch(err =>
+            {
+                message.error(err.message+email+username+password+repeatPass);
+                console.log(err);        
+            });
             return "Correct";
+
         }
     }
     render(){
