@@ -1,0 +1,19 @@
+.singup-form {
+    max-width: 500px;
+}
+
+.singup-form-forgot {
+    float: right;
+}
+
+.singup-form-button {
+    width: 100%;
+}
+
+.signup-card {
+    width: 300px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
