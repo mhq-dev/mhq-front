@@ -16,6 +16,7 @@ function Login() {
             if (response.status === 200){
                 message.success("Logged in!")
                 let token = response.data.auth_token;
+                localStorage.setItem('username',values.username);
                 localStorage.setItem('token', token);
                 window.location = '/dashboard'
             }
@@ -24,7 +25,7 @@ function Login() {
             }
         })
         .catch((error)=>{
-            message.error("Wrong Credentials")
+            message.error("This account is not activated")
             console.log(error)
         })
     };
