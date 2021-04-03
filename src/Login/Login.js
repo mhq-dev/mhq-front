@@ -14,7 +14,7 @@ function Login() {
         })
         .then((response)=>{
             if (response.status === 200){
-                message.success("Logged in!")
+                //message.success("Logged in!")
                 let token = response.data.auth_token;
                 localStorage.setItem('username',values.username);
                 localStorage.setItem('token', token);
