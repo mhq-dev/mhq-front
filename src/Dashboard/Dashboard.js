@@ -8,7 +8,7 @@ import {  Link, NavLink } from 'react-router-dom';
 import { DownOutlined,ClockCircleOutlined,ApiOutlined,NodeCollapseOutlined,BorderOutlined,
   FundProjectionScreenOutlined,LogoutOutlined} from '@ant-design/icons';
 const { TabPane } = Tabs;
-const { SubMenu } = Menu;
+const { SubMenu } = Menu;let a="";
 const { Header, Content, Footer, Sider } = Layout;
 const menu = (
   <Menu>
@@ -31,7 +31,7 @@ const menu = (
 );
 class Dashboard extends React.Component {
   state = {
-    
+    collections: [],
     theme: true
   };
   componentDidMount() {
@@ -39,7 +39,7 @@ class Dashboard extends React.Component {
       'Content-Type' : 'application/json',
       'Authorization' :`Token ${localStorage.getItem('token')}`
     }}).then((res)=>{
-
+      this.setState({ collections: res.data });
     })
     .catch((err)=>{
       //alert(localStorage.getItem('token'));
@@ -97,7 +97,7 @@ class Dashboard extends React.Component {
           </Col>
           <Col span={2} >
           <Dropdown overlay={menu}>
-    <a className="ant-dropdown-link" onClick={e => e.preventDefault()} style={{color: 'black'}}>
+    <a className="ant-dropdown-link" onClick={e => e.preventDefault()}style={{color: 'black'}} >
       Workspaces <DownOutlined />
     </a>
   </Dropdown>
@@ -133,12 +133,23 @@ class Dashboard extends React.Component {
               style={{ position: "sticky",height: '20vh' }}>
                 
              <SubMenu key="sub1" icon={<NodeCollapseOutlined />}  title={"Collection"}>
-                  <Menu.Item >
-                    Some items
-                    </Menu.Item>
-                    <Menu.Item >
-                      some other items
-                    </Menu.Item>
+             { this.state.collections.length===0?'':    <List
+size="small"
+itemLayout="horizontal"
+dataSource={this.state.collections}
+renderItem={item => (
+  
+  this.state.collections.forEach(item=> a=(item.name)),
+  <Menu.Item   key={item.name+item.id} >
+  <List.Item style={{borderColor: 'transparent'}}>
+    <List.Item.Meta  style={{borderColor: 'transparent'}}
+      description={<p style={{fontSize: '14px',marginLeft: '20%',marginTop: '4%' ,color: 'black' }} > {item.name}</p>}
+    
+    
+/>  
+  </List.Item></Menu.Item>
+)}
+/> }
                 </SubMenu>
                 <SubMenu key="sub2" icon={<ApiOutlined/>}  title={"APIs"}>
                   <Menu.Item >
