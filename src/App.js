@@ -4,6 +4,8 @@ import HomePage from './HomePage/HomePage';
 import Signup from './Signup/Signup';
 import Login from './Login/Login';
 import Dashboard from './Dashboard/Dashboard'
+import EmailConfirmation from './Signup/EmailVerification';
+
 function App() {
   return (
     <div className="App">
@@ -11,6 +13,7 @@ function App() {
         <Route path='/' exact component={HomePage} />
         <Route path='/signup' exact component={Signup} />
         <Route path='/login' exact component={Login} />
+        <Route path="/activate/*" exact component={EmailConfirmation} />
         <Route path='/dashboard' exact component={Dashboard}/>
       </Switch>
     </div>
