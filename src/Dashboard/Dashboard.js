@@ -126,12 +126,17 @@ class Dashboard extends React.Component {
         </Row>
         </Header>
         <Layout style={{width: '100%',backgroundColor: 'transparent'}}>
-        <Sider theme="light" collapsible style={{width: '20%' ,height: '100vh'}}>
+        <Sider theme={this.state.theme?"dark":"light"}  collapsible style={{width: '20%' ,height: '100vh'}}>
           <Menu
           mode="inline"
-          theme="light"
+          theme={this.state.theme?"dark":"light"}
               style={{ position: "sticky",height: '20vh' }}>
-                
+              
+              <Menu.Item disabled style={{cursor: 'default'}} key="switch" icon={this.state.theme?<FaMoon style={{ verticalAlign: 'middle', marginTop: '0.7%' }} />
+            :<FaSun style={{ verticalAlign: 'middle', marginTop: '1%' }} />}>
+            <Switch checkedChildren='Dark' unCheckedChildren='Light' defaultChecked={true} onClick={this.setDark} style={{width: '40%'}}/>
+
+              </Menu.Item>
              <SubMenu key="sub1" icon={<NodeCollapseOutlined />}  title={"Collection"}>
              { this.state.collections.length===0?'':    <List
 size="small"
