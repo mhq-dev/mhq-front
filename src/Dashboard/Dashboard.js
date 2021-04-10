@@ -1,12 +1,13 @@
 import React from 'react';
 import 'antd/dist/antd.css';
-import '../style/design.scss'
+//import '../style/design.scss'
 import Axios from 'axios';
-import { Layout, Menu, Dropdown , Avatar, Button ,List,Tabs,Select,Row,Col,Switch } from "antd";
-import {  FaMoon,FaSun } from "react-icons/fa";
+import { Layout, Menu, Dropdown , Avatar, Button ,List,Tabs,Select,Row,Col,Switch, Input } from "antd";
+//import {  FaMoon,FaSun } from "react-icons/fa";
 import {  Link, NavLink } from 'react-router-dom';
 import { DownOutlined,ClockCircleOutlined,ApiOutlined,NodeCollapseOutlined,BorderOutlined,
   FundProjectionScreenOutlined,LogoutOutlined} from '@ant-design/icons';
+import ApiContent from './ApiPage/ApiContent.js';
 const { TabPane } = Tabs;
 const { SubMenu } = Menu;let a="";
 const { Header, Content, Footer, Sider } = Layout;
@@ -29,10 +30,25 @@ const menu = (
   </Menu>
 
 );
+
+
+const initialPanes = [
+  { title: 'Create a request', content: 'Content of Tab 1', key: '1',closable: false },
+  { title: 'Create an API', content: 'Content of Tab 2', key: '2',closable: false },
+  {
+    title: 'Create an environment',
+    content: 'Content of Tab 3',
+    key: '3',
+    closable: false,
+  },
+];
 class Dashboard extends React.Component {
+  newTabIndex = 0;
   state = {
     collections: [],
-    theme: true
+    theme: true,
+    activeKey: initialPanes[0].key,
+    panes: initialPanes,
   };
   componentDidMount() {
     Axios.get('http://37.152.188.83/api/collections/'+localStorage.getItem('username'),{headers:{
@@ -46,6 +62,61 @@ class Dashboard extends React.Component {
 
     })
   }
+
+
+
+  onChange = activeKey => {
+    this.setState({ activeKey });
+  };
+
+  onEdit = (targetKey, action) => {
+    this[action](targetKey);
+  };
+
+  add = () => {
+    const { panes } = this.state;
+    const activeKey = `newTab${this.newTabIndex++}`;
+    const newPanes = [...panes];
+    newPanes.push({ title: 'New Tab', content: <ApiContent/>, key: activeKey });
+    this.setState({
+      panes: newPanes,
+      activeKey,
+    });
+  };
+
+  addClick = (name) => {
+    const { panes } = this.state;
+    const activeKey = `newTab${this.newTabIndex++}`;
+    const newPanes = [...panes];
+    newPanes.push({ title: name, content: <ApiContent/>, key: activeKey });
+    this.setState({
+      panes: newPanes,
+      activeKey,
+    });
+  };
+
+  remove = targetKey => {
+    const { panes, activeKey } = this.state;
+    let newActiveKey = activeKey;
+    let lastIndex;
+    panes.forEach((pane, i) => {
+      if (pane.key === targetKey) {
+        lastIndex = i - 1;
+      }
+    });
+    const newPanes = panes.filter(pane => pane.key !== targetKey);
+    if (newPanes.length && newActiveKey === targetKey) {
+      if (lastIndex >= 0) {
+        newActiveKey = newPanes[lastIndex].key;
+      } else {
+        newActiveKey = newPanes[0].key;
+      }
+    }
+    this.setState({
+      panes: newPanes,
+      activeKey: newActiveKey,
+    });
+  };
   setDark = () =>{
     if(this.state.theme)
     {
@@ -152,10 +223,10 @@ renderItem={item => (
 /> }
                 </SubMenu>
                 <SubMenu key="sub2" icon={<ApiOutlined/>}  title={"APIs"}>
-                  <Menu.Item >
+                  <Menu.Item onClick={()=>this.addClick("API One")} >
                     API one
                     </Menu.Item>
-                    <Menu.Item >
+                    <Menu.Item onClick={()=>this.addClick("API Two")} >
                       API two
                     </Menu.Item>
                 </SubMenu>
@@ -188,10 +259,20 @@ renderItem={item => (
                 </Menu.Item>
                </Menu>
           </Sider>
-          <Content style={{width: '100%' ,marginLeft: '1%'}}>
+          <Content style={{marginLeft: '1%'}}>
 
-            <Tabs defaultActiveKey="1"  >
-            <TabPane tab="Overview" key="1" >
+            <Tabs
+            type="editable-card"
+            onChange={this.onChange}
+            activeKey={this.state.activeKey}
+            onEdit={this.onEdit}
+            >
+              {this.state.panes.map(pane => (
+          <TabPane tab={pane.title} key={pane.key} closable={pane.closable}>
+            {pane.content}
+          </TabPane>
+        ))}
+            {/* <TabPane tab="Overview" key="1" >
                 
             </TabPane>
             <TabPane tab="Create a request" key="2" >
@@ -202,7 +283,7 @@ renderItem={item => (
             </TabPane>
             <TabPane tab="Create an environment" key="4" >
                 
-            </TabPane>
+            </TabPane> */}
           </Tabs>
 
           
