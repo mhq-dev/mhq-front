@@ -40,7 +40,7 @@ class Signup extends React.Component {
             })
             .catch(err =>
             {
-                message.error(err.message+email+username+password+repeatPass);
+                message.error(err.message);
                 console.log(err);        
             });
             return "Correct";
