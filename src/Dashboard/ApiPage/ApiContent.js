@@ -418,11 +418,58 @@ export default class ApiContent extends React.Component {
     };
 
     handleSend = ()=>{
-        axios.get('https://jsonplaceholder.typicode.com/posts')
-        .then((response)=>{
-            this.setState({json:response})
-        })
-    }
+        let dataBody = {}
+        if(this.state.selectedRowsBody.length !== 0){
+            this.state.selectedRowsBody.map((select)=>{
+                dataBody[select.the_key] = select.value
+            })
+        }
+        let dataHeader = {}
+        if(this.state.selectedRowsHeaders.length !== 0){
+            this.state.selectedRowsHeaders.map((select)=>{
+                dataHeader[select.the_key] = select.value
+            })
+        }
+        const config = {
+            headers: dataHeader,
+          };
+        if(this.state.method_tpye === 'post'){
+            axios.post(this.state.url,dataBody,config)
+            .then((response)=>{
+                this.setState({json:response})
+            })
+            .catch((error)=>{
+                this.setState({json:error.response})
+            })
+        }
+        else if(this.state.method_tpye === 'get'){
+            axios.get(this.state.url,config)
+            .then((response)=>{
+                this.setState({json:response})
+            })
+            .catch((error)=>{
+                this.setState({json:error.response})
+            })
+        }
+        else if(this.state.method_tpye === 'delete'){
+            axios.delete(this.state.url,config)
+            .then((response)=>{
+                this.setState({json:response})
+            })
+            .catch((error)=>{
+                this.setState({json:error.response})
+            })
+        }
+        else if(this.state.method_tpye === 'put'){
+            axios.put(this.state.url,dataBody,config)
+            .then((response)=>{
+                this.setState({json:response})
+            })
+            .catch((error)=>{
+                this.setState({json:error.response})
+            })
+        }
+}
 
     onChangeInputUrl = (input)=>{
         this.setState({url:input.target.value})
@@ -499,6 +546,7 @@ export default class ApiContent extends React.Component {
                             <Option value="post">POST</Option>
                             <Option value="get">GET</Option>
                             <Option value="delete">DELETE</Option>
+                            <Option value="put">PUT</Option>
                         </Select>
                     </Col>
                     <Col lg={14} xs={18} sm={12} md={10}>
