@@ -189,8 +189,84 @@ export default class ApiContent extends React.Component {
             selectedRowsHeaders:[],
             selectedRowsBody:[],
             json:{},
-            url:'https://jsonplaceholder.typicode.com/posts',
+            url:'',
+            id: props.id,
+            method_tpye: '',
         };
+    }
+    componentDidMount(){
+        const config = {
+            headers: { Authorization: `Token ${localStorage.getItem("token")}` },
+          };
+        axios.get(`http://37.152.188.83/api/request/${this.state.id}/`,config)
+        .then((response)=>{
+            console.log(response.data.http_method)
+            let fields = response.data.body;
+            let headers,body,params;
+            fields.map((field)=>{
+                if(field.headers !== undefined){
+                    headers = field.headers;
+                }
+                else if(field.body !== undefined){
+                    body = field.body;
+                }
+                else{
+                    params = field.params;
+                }
+            })
+            if(headers !== undefined){
+                headers.map((head)=>{
+                    Object.entries(head).map(([key,val])=>{
+                        let dataSourceHeaders= 
+                        {
+                            key: this.state.count,
+                            the_key: key,
+                            value: val,
+                        }
+                        this.setState({
+                            dataSourceHeaders: [dataSourceHeaders],
+                            count: this.state.count + 1
+                        })
+                    })
+                })
+            }
+            if(body !== undefined){
+                body.map((body)=>{
+                    Object.entries(body).map(([key,val])=>{
+                        let dataSourceBody= 
+                        {
+                            key: this.state.count,
+                            the_key: key,
+                            value: val,
+                        }
+                        this.setState({
+                            dataSourceBody: [dataSourceBody],
+                            count: this.state.count + 1
+                        })
+                    })
+                })
+            }
+            if(params !== undefined){
+                params.map((param)=>{
+                    Object.entries(param).map(([key,val])=>{
+                        let dataSourceParams= 
+                        {
+                            key: this.state.count,
+                            the_key: key,
+                            value: val,
+                        }
+                        this.setState({
+                            dataSourceParams: [dataSourceParams],
+                            count: this.state.count + 1
+                        })
+                    })
+                })
+            }
+            this.setState({
+                method_tpye:response.data.http_method,
+                url:response.data.url,
+            })
+        })
     }
     rowSelectionParams = {
         onChange: (selectedRowKeys, selectedRows) => {
@@ -397,7 +473,7 @@ export default class ApiContent extends React.Component {
             <div>
                 <Row align='middle'>
                     <Col lg={2} xs={2} sm={4} md={6}>
-                        <Select defaultValue='post' style={{ width: 100 }}>
+                        <Select value={this.state.method_tpye} style={{ width: 100 }}>
                             <Option value="post">POST</Option>
                             <Option value="get">GET</Option>
                             <Option value="delete">DELETE</Option>
