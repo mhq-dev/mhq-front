@@ -428,6 +428,10 @@ export default class ApiContent extends React.Component {
         this.setState({url:input.target.value})
     }
 
+    onChangeSelect = value=>{
+        this.setState({method_tpye:value})
+    }
+
     render() {
         const { dataSourceParams: dataSourceParams } = this.state;
         const { dataSourceHeaders: dataSourceHeaders } = this.state;
@@ -491,7 +495,7 @@ export default class ApiContent extends React.Component {
             <div>
                 <Row align='middle'>
                     <Col lg={2} xs={2} sm={4} md={6}>
-                        <Select value={this.state.method_tpye} style={{ width: 100 }}>
+                        <Select onChange={this.onChangeSelect} value={this.state.method_tpye} style={{ width: 100 }}>
                             <Option value="post">POST</Option>
                             <Option value="get">GET</Option>
                             <Option value="delete">DELETE</Option>
@@ -621,7 +625,7 @@ export default class ApiContent extends React.Component {
                 <Divider orientation='left'>Results</Divider>
                 <Row>
                     <Col flex='auto'>
-                        <Card style={{ height: '200px',overflow:'auto', marginBottom:'16px' }}>
+                        <Card style={{ height: '300px',overflow:'auto', marginBottom:'16px' }}>
                             <ReactJson style={{textAlign:'start'}} src={this.state.json}/>
                         </Card>
                     </Col>
