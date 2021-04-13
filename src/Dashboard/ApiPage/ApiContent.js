@@ -215,50 +215,68 @@ export default class ApiContent extends React.Component {
                 }
             })
             if(headers !== undefined){
-                headers.map((head)=>{
-                    Object.entries(head).map(([key,val])=>{
-                        let dataSourceHeaders= 
-                        {
-                            key: this.state.count,
-                            the_key: key,
-                            value: val,
-                        }
-                        this.setState({
-                            dataSourceHeaders: [dataSourceHeaders],
-                            count: this.state.count + 1
+                let dataSourceHeaders= []
+                Object.entries(headers).map(([key,val],index)=>{
+                    dataSourceHeaders.push(
+                    {
+                        key: this.state.count,
+                        the_key: key,
+                        value: val,
+                    })
+                    if(Object.entries(headers).length-1 === index){
+                        dataSourceHeaders.push({
+                            key: this.state.count + 1,
+                            the_key: '',
+                            value: '',
                         })
+                    }
+                    this.setState({
+                        dataSourceHeaders: [...dataSourceHeaders],
+                        count: this.state.count + 2
                     })
                 })
             }
             if(body !== undefined){
-                body.map((body)=>{
-                    Object.entries(body).map(([key,val])=>{
-                        let dataSourceBody= 
-                        {
-                            key: this.state.count,
-                            the_key: key,
-                            value: val,
-                        }
-                        this.setState({
-                            dataSourceBody: [dataSourceBody],
-                            count: this.state.count + 1
+                let dataSourceBody= []
+                Object.entries(body).map(([key,val],index)=>{
+                    dataSourceBody.push(
+                    {
+                        key: this.state.count,
+                        the_key: key,
+                        value: val,
+                    })
+                    if(Object.entries(body).length-1 === index){
+                        dataSourceBody.push({
+                            key: this.state.count + 1,
+                            the_key: '',
+                            value: '',
                         })
+                    }
+                    this.setState({
+                        dataSourceBody: [...dataSourceBody],
+                        count: this.state.count + 2
                     })
                 })
             }
             if(params !== undefined){
-                params.map((param)=>{
-                    Object.entries(param).map(([key,val])=>{
-                        let dataSourceParams= 
-                        {
-                            key: this.state.count,
-                            the_key: key,
-                            value: val,
-                        }
-                        this.setState({
-                            dataSourceParams: [dataSourceParams],
-                            count: this.state.count + 1
+                let dataSourceParams= []
+                Object.entries(params).map(([key,val],index)=>{
+                    dataSourceParams.push(
+                    {
+                        key: this.state.count,
+                        the_key: key,
+                        value: val,
+                    })
+                    if(Object.entries(params).length-1 === index){
+                        dataSourceParams.push({
+                            key: this.state.count + 1,
+                            the_key: '',
+                            value: '',
                         })
+                    }
+                    this.setState({
+                        dataSourceParams: [...dataSourceParams],
+                        count: this.state.count + 2
                     })
                 })
             }
