@@ -192,6 +192,9 @@ export default class ApiContent extends React.Component {
             url:'',
             id: props.id,
             method_tpye: '',
+            params: {},
+            headers: {},
+            body:{},
         };
     }
     componentDidMount(){
@@ -214,6 +217,7 @@ export default class ApiContent extends React.Component {
                     params = field.params;
                 }
             })
+            this.setState({headers:headers,body:body,params:params})
             if(headers !== undefined){
                 let dataSourceHeaders= []
                 Object.entries(headers).map(([key,val],index)=>{
@@ -337,20 +341,41 @@ export default class ApiContent extends React.Component {
     };
     handleDelete = (key) => {
         const dataSource = [...this.state.dataSourceParams];
+        let data = {}
+        dataSource.map((item)=>{
+            if (item.key !== key){
+                data[item.the_key] = item.value
+            }
+        })
         this.setState({
             dataSourceParams: dataSource.filter((item) => item.key !== key),
+            params: data
         });
     };
     handleDelete1 = (key) => {
         const dataSourceHeaders = [...this.state.dataSourceHeaders];
+        let data = {}
+        dataSourceHeaders.map((item)=>{
+            if (item.key !== key){
+                data[item.the_key] = item.value
+            }
+        })
         this.setState({
             dataSourceHeaders: dataSourceHeaders.filter((item) => item.key !== key),
+            headers: data
         });
     };
     handleDelete2 = (key) => {
         const dataSourceBody = [...this.state.dataSourceBody];
+        let data = {}
+        dataSourceBody.map((item)=>{
+            if (item.key !== key){
+                data[item.the_key] = item.value
+            }
+        })
         this.setState({
             dataSourceBody: dataSourceBody.filter((item) => item.key !== key),
+            body: data
         });
     };
     handleAdd = () => {
@@ -394,8 +419,11 @@ export default class ApiContent extends React.Component {
         const index = newData.findIndex((item) => row.key === item.key);
         const item = newData[index];
         newData.splice(index, 1, { ...item, ...row });
+        let data = this.state.params
+        data[row.the_key] = row.value
         this.setState({
             dataSourceParams: newData,
+            params: data
         });
     };
     handleSave1 = (row) => {
@@ -403,8 +431,11 @@ export default class ApiContent extends React.Component {
         const index = newData.findIndex((item) => row.key === item.key);
         const item = newData[index];
         newData.splice(index, 1, { ...item, ...row });
+        let data = this.state.headers
+        data[row.the_key] = row.value
         this.setState({
             dataSourceHeaders: newData,
+            headers: data
         });
     };
     handleSave2 = (row) => {
@@ -412,8 +443,11 @@ export default class ApiContent extends React.Component {
         const index = newData.findIndex((item) => row.key === item.key);
         const item = newData[index];
         newData.splice(index, 1, { ...item, ...row });
+        let data = this.state.body
+        data[row.the_key] = row.value
         this.setState({
             dataSourceBody: newData,
+            body: data
         });
     };
 
@@ -470,6 +504,29 @@ export default class ApiContent extends React.Component {
             })
         }
 }
+    handleSaveAPI = ()=>{
+        const config = {
+            headers: { Authorization: `Token ${localStorage.getItem("token")}` },
+        };
+        axios.put(`http://37.152.188.83/api/request/${this.state.id}/`,{
+            http_method:this.state.method_tpye,
+            url:this.state.url,
+            body:[
+                {
+                    headers:this.state.headers
+                },
+                {
+                    body:this.state.body
+                },
+                {
+                    params:this.state.params
+                }
+            ]
+        },config)
+        .then((response)=>{
+            console.log(response.data)
+        })
+    }
 
     onChangeInputUrl = (input)=>{
         this.setState({url:input.target.value})
@@ -558,7 +615,7 @@ export default class ApiContent extends React.Component {
                         </Button>
                     </Col>
                     <Col lg={6} xs={2} sm={4} md={4}>
-                        <Button htmlType="button" type='default'>
+                        <Button htmlType="button" type='default' onClick={this.handleSaveAPI}>
                             Save
                         </Button>
                     </Col>
