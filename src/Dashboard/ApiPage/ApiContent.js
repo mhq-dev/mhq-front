@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import 'antd/dist/antd.css';
-import { Button, Card, Col, Divider, Input,Form, Popconfirm, Row, Select, Table, Tabs } from 'antd';
+import { Button, Card, Col, Divider, Input,Form, Popconfirm, Row, Select, Table, Tabs, Spin } from 'antd';
 import { Option } from 'antd/lib/mentions';
 import './ApiContent.css'
 import ReactJson from 'react-json-view';
@@ -195,6 +195,7 @@ export default class ApiContent extends React.Component {
             params: {},
             headers: {},
             body:{},
+            isloading: false,
         };
     }
     componentDidMount(){
@@ -452,6 +453,7 @@ export default class ApiContent extends React.Component {
     };
 
     handleSend = ()=>{
+        this.onLodingChange(true)
         let dataBody = {}
         if(this.state.selectedRowsBody.length !== 0){
             this.state.selectedRowsBody.map((select)=>{
@@ -471,36 +473,44 @@ export default class ApiContent extends React.Component {
             axios.post(this.state.url,dataBody,config)
             .then((response)=>{
                 this.setState({json:response})
+                this.onLodingChange(false)
             })
             .catch((error)=>{
                 this.setState({json:error.response})
+                this.onLodingChange(false)
             })
         }
         else if(this.state.method_tpye === 'get'){
             axios.get(this.state.url,config)
             .then((response)=>{
                 this.setState({json:response})
+                this.onLodingChange(false)
             })
             .catch((error)=>{
                 this.setState({json:error.response})
+                this.onLodingChange(false)
             })
         }
         else if(this.state.method_tpye === 'delete'){
             axios.delete(this.state.url,config)
             .then((response)=>{
                 this.setState({json:response})
+                this.onLodingChange(false)
             })
             .catch((error)=>{
                 this.setState({json:error.response})
+                this.onLodingChange(false)
             })
         }
         else if(this.state.method_tpye === 'put'){
             axios.put(this.state.url,dataBody,config)
             .then((response)=>{
                 this.setState({json:response})
+                this.onLodingChange(false)
             })
             .catch((error)=>{
                 this.setState({json:error.response})
+                this.onLodingChange(false)
             })
         }
 }
@@ -534,6 +544,10 @@ export default class ApiContent extends React.Component {
 
     onChangeSelect = value=>{
         this.setState({method_tpye:value})
+    }
+
+    onLodingChange = (value)=>{
+        this.setState({ isloading: value });
     }
 
     render() {
@@ -731,7 +745,9 @@ export default class ApiContent extends React.Component {
                 <Row>
                     <Col flex='auto'>
                         <Card style={{ height: '300px',overflow:'auto', marginBottom:'16px' }}>
-                            <ReactJson style={{textAlign:'start'}} src={this.state.json}/>
+                            <Spin size='large' spinning={this.state.isloading}>
+                                <ReactJson style={{textAlign:'start',height: '200px'}} src={this.state.json}/>
+                            </Spin>
                         </Card>
                     </Col>
                 </Row>
