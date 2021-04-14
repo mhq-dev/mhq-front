@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import 'antd/dist/antd.css';
-import { Button, Card, Col, Divider, Input,Form, Popconfirm, Row, Select, Table, Tabs, Spin } from 'antd';
+import { Button, Card, Col, Divider, Input,Form, Popconfirm, Row, Select, Table, Tabs, Spin, message } from 'antd';
 import { Option } from 'antd/lib/mentions';
 import './ApiContent.css'
 import ReactJson from 'react-json-view';
@@ -196,6 +196,7 @@ export default class ApiContent extends React.Component {
             headers: {},
             body:{},
             isloading: false,
+            isloadingSave: false,
         };
     }
     componentDidMount(){
@@ -515,6 +516,7 @@ export default class ApiContent extends React.Component {
         }
 }
     handleSaveAPI = ()=>{
+        this.onLodingChangeSave(true)
         const config = {
             headers: { Authorization: `Token ${localStorage.getItem("token")}` },
         };
@@ -535,6 +537,11 @@ export default class ApiContent extends React.Component {
         },config)
         .then((response)=>{
             console.log(response.data)
+            this.onLodingChangeSave(false)
+            message.success('Saved successfuly')
+        })
+        .catch((response)=>{
+            message.error(response)
         })
     }
 
@@ -548,6 +555,10 @@ export default class ApiContent extends React.Component {
 
     onLodingChange = (value)=>{
         this.setState({ isloading: value });
+    }
+
+    onLodingChangeSave = (value)=>{
+        this.setState({ isloadingSave: value });
     }
 
     render() {
@@ -636,6 +647,7 @@ export default class ApiContent extends React.Component {
 
                 </Row>
                 <Divider orientation='left'>Details</Divider>
+                <Spin size='large' spinning={this.state.isloadingSave}>
                 <Row justify='center' align='middle'>
                     <Col flex='auto'>
                         <Tabs defaultActiveKey="1" style={{ padding: 8 }}>
@@ -741,6 +753,7 @@ export default class ApiContent extends React.Component {
                         </Tabs>
                     </Col>
                 </Row>
+                </Spin>
                 <Divider orientation='left'>Results</Divider>
                 <Row>
                     <Col flex='auto'>
