@@ -88,7 +88,7 @@ class Dashboard extends React.Component {
     const { panes } = this.state;
     const activeKey = `newTab${this.newTabIndex++}`;
     const newPanes = [...panes];
-    newPanes.push({ title: name, content: <ApiContent/>, key: activeKey });
+    newPanes.push({ title: name, content: <ApiContent id="1"/>, key: activeKey });
     this.setState({
       panes: newPanes,
       activeKey,
