@@ -20,6 +20,12 @@
     background-size: cover;
 }
 
+.lock-icon {
+    width: 150px;
+    height: 150px;
+    background-size: cover;
+}
+
 .name-profile {
     width: 300px;
     margin-bottom: 2px;
@@ -46,12 +52,34 @@
     padding-left: 10px;
     padding-right: 10px;
     background-color: rgb(35, 134, 54);
-}
-
-.profile-update-button {
     text-align: left;
     border-color: #282c34;
     border-radius: 5px;
     color: white;
     margin-top: 30px;
+}
+
+.change-password-button {
+    padding-left: 10px;
+    padding-right: 10px;
+    background-color: rgb(240, 98, 41);
+    text-align: left;
+    border-color: #282c34;
+    border-radius: 5px;
+    color: white;
+    margin-top: 30px;
+}
+
+.LeftDivOptions {
+    width: 300px !important;
+    color: white;
+    border-style: outset;
+    border-radius: 5px;
+}
+
+.LeftOption {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    width: 100%;
+    background-color: #282c34;
 }
