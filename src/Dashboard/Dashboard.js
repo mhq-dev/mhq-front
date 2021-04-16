@@ -1,6 +1,6 @@
 import React from 'react';
 import 'antd/dist/antd.css';
-//import '../style/design.scss'
+import '../style/design.scss'
 import Axios from 'axios';
 import CreateCollection from '../CreateCollection/CreateCollection'
 import Pro from './ava.png';
