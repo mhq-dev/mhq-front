@@ -514,7 +514,7 @@ class Dashboard extends React.Component {
         </Row>
         </Header>
         <Layout style={{width: '100%',backgroundColor: 'transparent',marginTop: '-0.05%'}}>
-        <Sider theme={this.state.theme?"dark":"light"}  collapsible style={{width: '20%' ,height: '100vh'}}>
+        <Sider theme={this.state.theme?"dark":"light"}  collapsible style={{width: '20%' ,minHeight: '100vh'}}>
           <Menu
           mode="inline"
           theme={this.state.theme?"dark":"light"}
