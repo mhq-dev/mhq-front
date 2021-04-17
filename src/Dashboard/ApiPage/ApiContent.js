@@ -208,6 +208,7 @@ export default class ApiContent extends React.Component {
             console.log(response.data.http_method)
             let fields = response.data.body;
             let headers,body,params;
+            console.log(response)
             fields.map((field)=>{
                 if(field.headers !== undefined){
                     headers = field.headers;
