@@ -59,6 +59,17 @@
     margin-top: 30px;
 }
 
+.profile-photo-button {
+    padding-left: 10px;
+    padding-right: 10px;
+    background-color: rgb(243, 178, 56);
+    text-align: left;
+    border-color: #282c34;
+    border-radius: 5px;
+    color: white;
+    margin-top: 5px;
+}
+
 .change-password-button {
     padding-left: 10px;
     padding-right: 10px;
@@ -81,5 +92,5 @@
     padding-top: 10px;
     padding-bottom: 10px;
     width: 100%;
-    background-color: #282c34;
+    background-color: rgb(40, 44, 52);
 }
