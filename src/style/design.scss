@@ -86,6 +86,30 @@ transition: all 0.4s ease-in;
 
 
   }
+  .ant-card, .ant-card-bordered{
+    color: var(--maintext) !important;
+    background-color: var(--layout1) !important;
+  }
+
+  .ant-divider-horizontal.ant-divider-with-text {
+    color: var(--maintext) !important;
+    border-top-color: var(--maintext) !important;
+  }
+
+  .ant-table, .ant-table-bordered{
+    color: var(--maintext) !important;
+    background-color: var(--layout1) !important;
+  }
+  .ant-table-tbody > tr.ant-table-row-selected > td{
+    background-color: var(--layout5) !important;
+  }
+  .ant-table-tbody > tr.ant-table-row:hover > td{
+    background-color: var(--layout4) !important;
+  }
+  .ant-table-thead > tr > th {
+    color: var(--maintext) !important;
+    background-color: var(--layout2) !important;
+  }
   .ant-layout-header{
       color: var(--maintext) !important  ;
     background-color: var(--layout2) !important;
