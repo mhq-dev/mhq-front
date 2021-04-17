@@ -16,7 +16,7 @@ class Profile extends React.Component {
         this.DeleteAccountClicked=this.DeleteAccountClicked.bind(this);
         this.CancelModal=this.CancelModal.bind(this);
         this.state={
-            EditProfileVisibility:false,
+            EditProfileVisibility:true,
             ChangePasswordVisibility:false,
             DeleteAccountVisibility:false,
         };
