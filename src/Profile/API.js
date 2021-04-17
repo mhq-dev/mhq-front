@@ -12,18 +12,22 @@ class APIBox extends React.Component {
         
     }
 
-    
     render(){
         return (
             <div STYLE="margin:20px;">
                 <Card STYLE="background-color:#282c34; border-color:#94c1ff;">
                     <Row>
                     <Col span={2}>
-                {(this.props.api_method=="GET") ? 
+                {(this.props.api_method.toUpperCase()=="GET") ? 
                         <p STYLE="text-align:left; color:#78c622; font-weight: bold;">GET</p>
                     : 
-                        ((this.props.api_method=="POST") ? <p STYLE="text-align:left; color:#f5a623; font-weight: bold;">POST</p>
-                        : <p STYLE="text-align:left;">{this.props.api_method}</p> )                        
+                        ((this.props.api_method.toUpperCase()=="POST") ? <p STYLE="text-align:left; color:#f5a623; font-weight: bold;">POST</p>
+                        : ((this.props.api_method.toUpperCase()=="PUT") ? <p STYLE="text-align:left; color:#4a90e2; font-weight: bold;">PUT</p>
+                        : 
+                        ((this.props.api_method.toUpperCase()=="DELETE") ?  <p STYLE="text-align:left; color:#ed4b48; font-weight: bold;">DELETE</p>
+                        :
+                        <p STYLE="text-align:left;">{this.props.api_method}</p>
+                        )))
                     }
                     </Col>
                     <Col span={5}>

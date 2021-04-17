@@ -760,7 +760,7 @@ export default class ApiContent extends React.Component {
                     <Col flex='auto'>
                         <Card style={{ height: '300px',overflow:'auto', marginBottom:'16px' }}>
                             <Spin size='large' spinning={this.state.isloading}>
-                                <ReactJson style={{textAlign:'start',height: '200px'}} src={this.state.json}/>
+                                <ReactJson theme='monokai' style={{textAlign:'start',minHeight: '250px'}} src={this.state.json}/>
                             </Spin>
                         </Card>
                     </Col>
