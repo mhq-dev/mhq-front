@@ -1,23 +1,25 @@
-import logo from './logo.svg';
 import './App.css';
+import { Route, Switch } from 'react-router';
+import HomePage from './HomePage/HomePage';
+import Signup from './Signup/Signup';
+import Login from './Login/Login';
+import Dashboard from './Dashboard/Dashboard'
+import EmailConfirmation from './Signup/EmailVerification';
+import Profile from './Profile/Profile';
+import OtherProfile from './Profile/OtherProfile';
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Switch>
+        <Route path='/' exact component={HomePage} />
+        <Route path='/signup' exact component={Signup} />
+        <Route path='/login' exact component={Login} />
+        <Route path="/activate/*" exact component={EmailConfirmation} />
+        <Route path='/dashboard' exact component={Dashboard}/>
+        <Route path='/Profile' exact component={Profile} />
+        <Route path='/Profile/*' exact component={OtherProfile} />
+      </Switch>
     </div>
   );
 }
