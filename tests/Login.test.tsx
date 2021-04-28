@@ -20,4 +20,9 @@ describe('Login Component tests', () =>{
         //Email and password input field should be present
         expect(wrapper.find('Input')).toHaveLength(2);
     });
+
+    it('should have password type input', ()=> {
+        expect(wrapper.find('Input#password').prop('type')).toBe('password');
+    });
+
 })
