@@ -92,7 +92,7 @@ function Login() {
                         Log in
                     </Button>
                     <Typography style={{ margin: '8px' }}>
-                        Or <a href="/signup">register now!</a>
+                        Or <a className="login-form-register" href="/signup">register now!</a>
                     </Typography>
                 </Form.Item>
             </Form>
