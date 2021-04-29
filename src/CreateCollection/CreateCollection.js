@@ -86,6 +86,7 @@ class CreateCollection extends React.Component {
         this.setState({type :e.target.value});
 
     }
+    
     render() {
             return(
                 <div style={{marginTop: '6%'}}>
