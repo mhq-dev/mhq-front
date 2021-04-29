@@ -25,12 +25,5 @@ describe('Login Component tests', () =>{
         expect(wrapper.find('Input#password').prop('type')).toBe('password');
     });
 
-    // it('should login', ()=> {
-    //     const vals = {
-    //         username:'ramtin',
-    //         password:'XXX12345'
-    //     }
-    //     wrapper.instance().onFinish()
-    // });
 
 })
