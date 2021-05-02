@@ -26,9 +26,9 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node-version }}
-    - run: npm install
+    - run: |
+        npm install
+        npm start & npx wait-on http://localhost:3000
     - run: npm test
     - name: Run Cypress tests
-      start: npm start
-      wait-on: http://localhost:3000
       run: npm run test:chrome
