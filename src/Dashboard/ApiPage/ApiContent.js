@@ -636,7 +636,7 @@ export default class ApiContent extends React.Component {
                         <Input value={this.state.url} defaultValue={this.state.url} placeholder='Url' onChange={this.onChangeInputUrl} />
                     </Col>
                     <Col lg={2} xs={2} sm={4} md={4}>
-                        <Button htmlType="button" type='primary' onClick={this.handleSend}>
+                        <Button htmlType="button" type='primary' onClick={this.handleSend} id='send'>
                             Send
                         </Button>
                     </Col>
