@@ -68,6 +68,7 @@ class CreateCollection extends React.Component {
   .then((response)=>{
       if (response.status === 201){
           message.success("Collection created successfully")
+          window.location.reload();
       }
       else{
           message.error("Please try again")
@@ -86,6 +87,7 @@ class CreateCollection extends React.Component {
         this.setState({type :e.target.value});
 
     }
+    
     render() {
             return(
                 <div style={{marginTop: '6%'}}>
