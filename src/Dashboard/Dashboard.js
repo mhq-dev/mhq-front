@@ -12,6 +12,7 @@ import {  Link, NavLink } from 'react-router-dom';
 import { DownOutlined,ClockCircleOutlined,ApiOutlined,NodeCollapseOutlined,BorderOutlined,CrownOutlined ,EditOutlined ,EyeOutlined,
   FundProjectionScreenOutlined,LogoutOutlined} from '@ant-design/icons';
 import ApiContent from './ApiPage/ApiContent.js';
+import SearchUser from '../Search/SearchUser'
 import Checkbox from 'antd/lib/checkbox/Checkbox';
 const { TabPane } = Tabs;
 const { SubMenu } = Menu;let a="";
@@ -112,8 +113,11 @@ onChangeInputUrl = (input)=>{
   }
   Exit=e=>{
     localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    localStorage.removeItem('username');
     localStorage.removeItem('theme');
+    localStorage.clear();
+    this.setState({theme: false});
+    this.setDark();
   }
   changeType=(e)=>{
     this.setState({method_tpye :e.target.value});
@@ -162,7 +166,7 @@ onChangeInputUrl = (input)=>{
   .then((response)=>{
       if (response.status === 201){
           message.success("Request created successfully")
-          this.getCollection()
+          window.location.reload();
       }
       else{
           message.error("Please try again")
@@ -272,7 +276,53 @@ onChangeInputUrl = (input)=>{
     localStorage.setItem("collection_id" , item.id)
     const activeKey = `newTab${this.newTabIndex++}`;
     panes.push({ title: item.name, content: 
+      <div>
       <Collection/>
+      <div style={{marginTop: '3%',marginLeft: '4%',width: '90%',borderTop: '1px solid gray'}}>
+            <Row>
+              <Col span={24}>
+              <h5 style={{fontSize: '20px',marginLeft: '5%',marginTop: '1%' ,float: 'left'}}>Requests</h5>
+
+              </Col>
+              </Row>
+              {item.requests.map(req=>(
+                <Row style={{marginTop: '2%',marginLeft: '6%',textAlign: 'left'}}>
+                <Col span= {6} style={{float: 'left',marginLeft: '1%'}}>
+                   <h5 style={{fontSize: '17px' }}>Name : {req.name}</h5>
+
+                </Col>
+                <Col span={6}>
+                <h5 style={{fontSize: '17px' }}>Method : {req.http_method}</h5>
+                </Col>
+                <Col span={6}>
+                <Button style={{backgroundColor: '#1890ff',color: 'white',border: 'none',width: '60%'}} onClick={()=>{this.addClick(req)}}>Open Request</Button>
+
+
+                </Col>
+                </Row>
+              ))}
+            </div>
+            <Row style={{marginTop: '3%',marginLeft: '4%',paddingBottom: '5%'}}>
+          <Col span={6} style={{marginTop: '3%'}}>
+          <h5 style={{fontSize: '20px' }}>Add a new request</h5>
+          </Col>
+          <Col span={4} style={{marginTop: '3%'}}>
+            <Input onChange={this.thirdChange} placeholder="request Name" style={{width: '80%'}}/>            
+          </Col>
+          <Col span={4} style={{marginTop: '3%'}}>
+            <Input onChange={this.changeType} placeholder="Request type" style={{width: '80%'}}/>            
+          </Col>
+          <Col span={6} style={{marginTop: '3%'}}>
+          <Input  style={{width: '100%'}}  placeholder='Url' onChange={this.onChangeInputUrl} />
+                    
+          </Col>
+          <Col span={4} style={{marginTop: '3%'}}>
+            <Button style={{backgroundColor: '#1890ff',color: 'white',border: 'none',width: '60%'}} onClick={()=>{this.Addreq(item)}}>Add Request</Button>
+
+            </Col>
+
+            </Row>
+      </div>
       , key: activeKey });
     this.setState({ panes, activeKey });
   };
@@ -421,19 +471,7 @@ onChangeInputUrl = (input)=>{
   </Dropdown>
           </Col>
           <Col span={4} style={{float: 'right' , marginLeft: '40%'}}>
-          <Select
-                    showSearch
-                    style={{ width: "80%"}}
-
-                    placeholder="Search"
-                    optionFilterProp="children"
-                    filterOption={(input, option) =>
-                        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                    }
-
-                >
-
-                </Select>   
+          <SearchUser/>
           </Col>
         </Row>
         </Header>
