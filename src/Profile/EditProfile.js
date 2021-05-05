@@ -34,21 +34,24 @@ class EditProfile extends React.Component {
       })
     }
 
-    sumbitButton(){
+    sumbitButton(bioValue,token){
+
         const config = {
-            headers: { 'Authorization': `Token ${localStorage.getItem('token')}` }
+            headers: { 'Authorization': `Token ${token}` }
           };
           axios.put('http://37.152.188.83/api/user/profile/update/', 
           {
-            "bio": document.getElementById("bio-profile").value
+            "bio": bioValue
           }
           , config)
           .then(res => {
             message.success("Bio Updated");
+            return "Updated";
           })
           .catch(err =>
           {
             message.error("Network Error");
+            return "Error";
           });
     }
 
@@ -147,7 +150,10 @@ class EditProfile extends React.Component {
                         
                         <Form.Item
                         className="button-profile">
-                            <Button onClick={this.sumbitButton} className="profile-update-button">
+                            <Button 
+                            onClick={d=>this.sumbitButton(document.getElementById("bio-profile").value,
+                                                          localStorage.getItem('token'))} 
+                            className="profile-update-button">
                                 Update Profile</Button>
                         </Form.Item>
                     </Form>

@@ -13,7 +13,11 @@ class OtherProfile extends React.Component {
         super(props);
         document.body.style.backgroundColor = '#282c34'
         this.sumbitButton=this.sumbitButton.bind(this);
+
+        this.ToggleFollow=this.ToggleFollow.bind(this);
+
         this.componentDidMount=this.componentDidMount.bind(this);
+
 
         this.state={
             follow_unfollow_button_value:"Follow",
@@ -104,19 +108,20 @@ class OtherProfile extends React.Component {
       };
 
     sumbitButton(){
+        const followStatus=this.ToggleFollow()
+        this.setState(()=>{
+            return {
+                follow_unfollow_button_value: followStatus
+            };
+          });
+        return followStatus;
+    }
+    ToggleFollow(){
         if(this.state.follow_unfollow_button_value=="Follow"){
-            this.setState(()=>{
-                return {
-                    follow_unfollow_button_value: "Unfollow"
-                };
-              });
+            return "Unfollow";
         }
         else{
-            this.setState(()=>{
-                return {
-                    follow_unfollow_button_value: "Follow"
-                };
-              });
+            return "Follow";
         }
     }
     renderCol(colID){
@@ -194,9 +199,11 @@ class OtherProfile extends React.Component {
                     </Menu>
                     {(this.state.current=="APIs") ? 
                     <div>
+
                     {this.state.apis.map(d=><p>
                         <APIBox api_method={d.http_method} api_address={d.url}></APIBox>    
                         </p>)}
+
                     </div>
                     :
                     <div></div>
