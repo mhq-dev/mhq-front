@@ -17,6 +17,7 @@ class EditProfile extends React.Component {
             selectedFile:""
         };
     }
+
     componentDidMount(){
         axios.get('http://37.152.188.83/api/user/profile/user/'+localStorage.getItem('username'),
         {headers:{
@@ -32,7 +33,9 @@ class EditProfile extends React.Component {
         message.error("Network Error");
       })
     }
+
     sumbitButton(bioValue,token){
+
         const config = {
             headers: { 'Authorization': `Token ${token}` }
           };
@@ -88,7 +91,6 @@ class EditProfile extends React.Component {
             
       };
 
-
     render(){
         return (
             <div className="profile-text">
@@ -103,6 +105,7 @@ class EditProfile extends React.Component {
                      src={this.state.ImageURL} >
                      </img>
                     }
+                    
                     
                     <Form
                     name="profile-form"

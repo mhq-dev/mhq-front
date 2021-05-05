@@ -1,0 +1,55 @@
+import Dashboard from "../src/Dashboard/Dashboard"
+describe('dashboard_get',()=>{
+    let wrapper=new Dashboard();
+    it('Did_Not_Get',()=>{
+        expect(wrapper.state.collections===[])
+    })
+    wrapper.getCollection();
+    it('Did_Get',()=>{
+        expect(wrapper.state.collections!==[])
+    })
+    it('Not_Changed_Input_Url',()=>{
+        expect(wrapper.state.url==="");
+    })
+    wrapper.onChangeInputUrl;
+    it('Changed_Input_Url',()=>{
+        expect(wrapper.state.url!=="");
+    })
+    it('Collection_Name_Not_Changed',()=>{
+        expect(wrapper.state.currentCollectionname==='')
+    })
+    wrapper.firstChange;
+    it('Collection_Name_Changed',()=>{
+        expect(wrapper.state.currentCollectionname!=='')
+    })
+    it('Type_Not_Changed',()=>{
+        expect(wrapper.state.type==='')
+    })
+    wrapper.onChange4;
+    it('Type_Changed',()=>{
+        expect(wrapper.state.type!=='')
+    })
+    it('New_User_Name_Has_Not_Been_Enterd',()=>{
+        expect(wrapper.state.newUser==='')
+    })
+    wrapper.secondChange;
+    it('New_User_Name_Has_Been_Enterd',()=>{
+        expect(wrapper.state.newUser!=='')
+    })
+    it('Method_Type_Not_Entered',()=>{
+        expect(wrapper.state.method_tpye==='')
+    })
+    wrapper.changeType;
+    it('Method_Type_Has_Been_Entered',()=>{
+        expect(wrapper.state.method_tpye!=='')
+    })
+    it('No_New_Request',()=>{
+        expect(wrapper.state.newreq==='')
+    })
+    wrapper.thirdChange;
+    it('New_Request',()=>{
+        expect(wrapper.state.newreq!=='')
+    })
+
+    
+})

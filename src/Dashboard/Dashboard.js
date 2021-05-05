@@ -2,46 +2,22 @@ import React from 'react';
 import 'antd/dist/antd.css';
 import '../style/design.scss'
 import Axios from 'axios';
+import Collection from './Collection'
 import CreateCollection from '../CreateCollection/CreateCollection'
 import Pro from './ava.png';
 import { Layout,Avatar, Menu, Dropdown , Form, Input, Button ,List,Tabs,Select,Row,Col,Switch,Radio ,message} from "antd";
+import { Option } from 'antd/lib/mentions';
 import {  FaMoon,FaSun } from "react-icons/fa";
 import {  Link, NavLink } from 'react-router-dom';
 import { DownOutlined,ClockCircleOutlined,ApiOutlined,NodeCollapseOutlined,BorderOutlined,CrownOutlined ,EditOutlined ,EyeOutlined,
   FundProjectionScreenOutlined,LogoutOutlined} from '@ant-design/icons';
 import ApiContent from './ApiPage/ApiContent.js';
+import SearchUser from '../Search/SearchUser'
 import Checkbox from 'antd/lib/checkbox/Checkbox';
 const { TabPane } = Tabs;
 const { SubMenu } = Menu;let a="";
 const { Header, Content, Footer, Sider } = Layout;
-function onFinish(v,name,status) {
-  let ar=""
-  if(status)
-  {
-    ar="public"
-  }
-  else{
-    ar="private"
-  }
-  Axios.put('http://37.152.188.83/api/collection/'+v.id,{
-      name, type: ar
-  },{headers:{
-    'Content-Type' : 'application/json',
-    'Authorization' :`Token ${localStorage.getItem('token')}`
-  }})
-  .then((response)=>{
-      if (response.status === 200){
-          message.success("changed successfully")
-          this.getCollection()
-      }
-      else{
-          message.error("Please try again")
-      }
-  })
-  .catch((error)=>{
-      message.error("please try again")
-  })
-} 
+
 const optionsWithDisabled = [
   { label: 'public', value: 'public' },
   { label: 'private', value: 'private' },
@@ -71,25 +47,61 @@ const panes = [
   { title: 'Create an API', content: '', key: '3',closable: false },
   { title: 'Create an environment', content: '', key: '4',closable: false },
 ];
+  let isPublic= false;
+  let isEditor= false;
 class Dashboard extends React.Component {
   newTabIndex = 0;
   state = {
-    activeKey: panes[0].key,
+    
+    collections: [],activeKey: panes[0].key,
     panes,
-    collections: [],
+    thisCollection: "",
     theme: true,
     currentCollectionname: '',
-    newUser: ''
+    newUser: '',
+    newreq: '',
+    method_tpye: '',
+    url: '',
+    type: '',
+
     
   };
-  isPublic= false;
-  isEditor= false;
+  
+  onFinish(v,name,status) {
+    let r="public"
+          if(this.state.type===false)
+          {
+              r="private"
+          }
+    Axios.put('http://37.152.188.83/api/collection/'+v.id+"/",{
+        name, type: r
+    },{headers:{
+      'Content-Type' : 'application/json',
+      'Authorization' :`Token ${localStorage.getItem('token')}`
+    }})
+    .then((response)=>{
+        if (response.status === 200){
+            message.success("changed successfully")
+            this.getCollection()
+        }
+        else{
+            message.error("Please try again")
+        }
+    })
+    .catch((error)=>{
+        message.error("please try again")
+    })
+  } 
+
+onChangeInputUrl = (input)=>{
+  this.setState({url:input.target.value})
+}
   onChange4=(e)=>{
-    this.isPublic=e.target.value;
+    this.setState({type :e.target.value});
 
   };
   onChange5=(e)=>{
-    this.isEditor=e.target.value;
+    isEditor=e.target.value;
 
   };
   firstChange=e=>{
@@ -98,7 +110,21 @@ class Dashboard extends React.Component {
   }
   secondChange=e=>{
     this.setState({newUser :e.target.value});
+  }
+  Exit=e=>{
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    localStorage.removeItem('theme');
+    localStorage.clear();
+    this.setState({theme: false});
+    this.setDark();
+  }
+  changeType=(e)=>{
+    this.setState({method_tpye :e.target.value});
 
+}
+  thirdChange=e=>{
+    this.setState({newreq :e.target.value});
   }
   power=""
   Promote(user,item){
@@ -129,9 +155,30 @@ class Dashboard extends React.Component {
       message.error("Something went wrong.")
   })
   }
+  Addreq(item){
+
+    Axios.post('http://37.152.188.83/api/request/',{
+    name: this.state.newreq ,http_method: this.state.method_tpye ,url: this.state.url ,body: [{headers:{"Authorization":""}}],collection: item.id
+  },{headers:{
+    'Content-Type' : 'application/json',
+    'Authorization' :`Token ${localStorage.getItem('token')}`
+  }})
+  .then((response)=>{
+      if (response.status === 201){
+          message.success("Request created successfully")
+          window.location.reload();
+      }
+      else{
+          message.error("Please try again")
+      }
+  })
+  .catch((error)=>{
+      message.error("Network error")
+  })
+  }
   Adduser(item){
     let r=""
-    if(this.isEditor){
+    if(isEditor){
       r="editor"
     }
     else
@@ -211,153 +258,70 @@ class Dashboard extends React.Component {
       message.error("Something went wrong.")
   })
   }
+  getthis(item) {
+    Axios.get('http://37.152.188.83/api/collection/'+item.id,{headers:{
+      'Content-Type' : 'application/json',
+      'Authorization' :`Token ${localStorage.getItem('token')}`
+    }}).then((res)=>{
+      item=res.data;
+    })
+    .catch((err)=>{
+      //alert(localStorage.getItem('token'));
+
+    })
+  }
   addNew(item) {
     const { panes } = this.state;
-    this.setState({currentCollectionname :item.name});
-    if(item.type==="public")
-    {
-      this.isPublic=true
-    }
-    else if(item.type==="private"){
-      this.isPublic=false
-    }
+    localStorage.removeItem("collection_id")
+    localStorage.setItem("collection_id" , item.id)
     const activeKey = `newTab${this.newTabIndex++}`;
     panes.push({ title: item.name, content: 
-      <div style={{marginTop: '6%'}}>
-        <Row >
+      <div>
+      <Collection/>
+      <div style={{marginTop: '3%',marginLeft: '4%',width: '90%',borderTop: '1px solid gray'}}>
+            <Row>
+              <Col span={24}>
+              <h5 style={{fontSize: '20px',marginLeft: '5%',marginTop: '1%' ,float: 'left'}}>Requests</h5>
 
-          <Col span={8} style={{marginLeft: '5%',alignContent: 'center',alignItems: 'center'}}>
-            <div className="collectinbox" style={{textAlign: 'left',marginLeft: '10%'}}>
-            <h5 style={{fontSize: '23px' ,marginLeft: '5%'}}>Name: {item.name}</h5>
-            <h5 style={{fontSize: '22px',marginLeft: '5%'}}>Status: {item.type}</h5>
-            <h5 style={{fontSize: '22px',paddingRight: '5%',marginLeft: '5%'}}>Users:</h5>
-            <h5 style={{fontSize: '18px',marginLeft: '5%'}}>{item.users.map(user=>(user.user+" : "+user.role+" , "))} </h5>
+              </Col>
+              </Row>
+              {item.requests.map(req=>(
+                <Row style={{marginTop: '2%',marginLeft: '6%',textAlign: 'left'}}>
+                <Col span= {6} style={{float: 'left',marginLeft: '1%'}}>
+                   <h5 style={{fontSize: '17px' }}>Name : {req.name}</h5>
+
+                </Col>
+                <Col span={6}>
+                <h5 style={{fontSize: '17px' }}>Method : {req.http_method}</h5>
+                </Col>
+                <Col span={6}>
+                <Button style={{backgroundColor: '#1890ff',color: 'white',border: 'none',width: '60%'}} onClick={()=>{this.addClick(req)}}>Open Request</Button>
+
+
+                </Col>
+                </Row>
+              ))}
             </div>
-            
+            <Row style={{marginTop: '3%',marginLeft: '4%',paddingBottom: '5%'}}>
+          <Col span={6} style={{marginTop: '3%'}}>
+          <h5 style={{fontSize: '20px' }}>Add a new request</h5>
           </Col>
-          <Col span={12}>
-            <Row style={{float: 'right',marginTop: '1%'}}>
-              <div style={{alignContent: 'center',alignItems: 'center'}}>
-            <h5 style={{fontSize: '22px'}}>Edit name and status:</h5>
-            <br/>
-            <div>
-            <Form
-                name="changecol"
-                className="login-form"
-                initialValues={{
-                    remember: true,
-                }}
-            >
-              <Row>
-              
-                <Col span={12} style={{paddingRight: "5%"}}>
-                <Form.Item
-                    name="Name"
+          <Col span={4} style={{marginTop: '3%'}}>
+            <Input onChange={this.thirdChange} placeholder="request Name" style={{width: '80%'}}/>            
+          </Col>
+          <Col span={4} style={{marginTop: '3%'}}>
+            <Input onChange={this.changeType} placeholder="Request type" style={{width: '80%'}}/>            
+          </Col>
+          <Col span={6} style={{marginTop: '3%'}}>
+          <Input  style={{width: '100%'}}  placeholder='Url' onChange={this.onChangeInputUrl} />
                     
-                >
-                    <Input onChange={this.firstChange} placeholder="Name" />
-                </Form.Item>
-                </Col>
-                <Col span={2}>
-                <Form.Item>
-                  
-                <Checkbox buttonStyle="solid" style={{float: 'right'}} onChange={() => this.onChange4} value={this.isPublic}>
-                </Checkbox>
-                </Form.Item>
-                </Col>
-                <Col span={10}>
-                <h5 style={{fontSize: '16px',marginLeft: '-10%',marginTop: '2%'}}>Public access</h5>
-                </Col>
-                
-              </Row>
-            
-                
-                
-                <Form.Item >
-                <Button htmlType="submit" name="submit"  style={{width: "50%",color: 'white',backgroundColor: '#1890ff'}} onClick={()=>onFinish(item,this.state.currentCollectionname,this.isPublic)}>
-           submit
-            </Button>
-          </Form.Item>
-                </Form>
-                </div>
-                </div>
-            </Row>
           </Col>
-         
-        </Row>
-        <div style={{marginTop: '3%',marginLeft: '5%',width: '90%',borderTop: '1px solid gray'}}>
-          <Row >
-                <Col span={2} style={{marginLeft: '1.8%'}}>
-                  <h4 style={{fontSize: '20px'}}>Users</h4>
-                </Col>
-          </Row>
-          <Row>
-          {item.users.map(user=>(
-            
-            <Col span={8}>
-              <Row>
-                <Col span={12} style={{float: 'right'}}>
-                <Avatar src={Pro} style={{width: '10vw',height: '10vw'}}></Avatar>
-                </Col>
-                <Col span={12} style={{alignContent: 'center',alignItems: 'center'}}>
-                <div className="collectinbox" style={{textAlign: 'left',marginLeft: '-1%',border: 'none',marginTop: '10%'}}>
-                <h5 style={{fontSize: '16px' }}>{user.user}</h5>
-               <h5 style={{fontSize: '16px'}}>{user.role==="owner"?<CrownOutlined style={{color: 'yellow',fontSize: '17px',paddingRight: '2px'}}></CrownOutlined>:''}
-              {user.role==="editor"?<EditOutlined style={{color: '#f19813',fontSize: '17px',paddingRight: '3px'}}></EditOutlined>:''}
-              {user.role==="visitor"?<EyeOutlined style={{color: '#5ef113',fontSize: '15px',paddingRight: '3px'}}></EyeOutlined>:''}
-              {user.user===localStorage.getItem('user')?this.power=user.role:user.role}</h5>
-              {localStorage.getItem('user')===user.user?'':<Row>
-                <Col span={12}>
-                <Button hidden={this.power==='visitor'||user.role==='owner'||(user.role==='editor'&&this.power==='editor')} style={{backgroundColor: 'green',border: 'none',color: 'white'}} onClick={()=>this.Promote(user,item)}>promote</Button>
-                </Col>
-                <Col span={12}>
-                <Button  hidden={this.power==='visitor'||user.role==='owner'||(user.role==='editor'&&this.power==='editor')} style={{backgroundColor: 'red',border: 'none',color: 'white'}} onClick={()=>this.Removeuser(user,item)}>remove</Button>
-
-                </Col>
-                </Row>}  
-            </div>
-                </Col>
-              </Row>
-             
-            </Col>))}
-         
-          </Row>
-          {this.power==="owner"?
-          <Row style={{marginLeft: '5%',marginTop: '5%'}}>
-          <Col span={6} style={{textAlign: 'left'}}>
-              <h5 style={{fontSize: '20px' }}>Add a new user:</h5>
-            </Col>
-            <Col span={6}>
-            <Input onChange={this.secondChange} placeholder="username" style={{width: '80%'}}/>            
-            </Col>
-            <Col span="1">
-            <Checkbox buttonStyle="solid" style={{float: 'right'}} onChange={() => this.onChange5} value={this.isEditor}>
-                </Checkbox>
-                </Col>
-                <Col span={4}>
-                <h5 style={{fontSize: '16px',marginLeft: '8%',float: 'left'}}>Give editor access</h5>
-                </Col>
-            <Col span={6}>
-            <Button style={{backgroundColor: '#1890ff',color: 'white',border: 'none',width: '60%'}} onClick={()=>{this.Adduser(item)}}>Add User</Button>
+          <Col span={4} style={{marginTop: '3%'}}>
+            <Button style={{backgroundColor: '#1890ff',color: 'white',border: 'none',width: '60%'}} onClick={()=>{this.Addreq(item)}}>Add Request</Button>
 
             </Col>
-          </Row>
-          :''}
-          
-          <Row style={{marginLeft: '5%',marginTop: '3%',borderTop: '1px solid gray',paddingBottom: '5%'}}>
-            <Col span={8}>
-            </Col>
-            <Col span={8} style={{marginTop: '3%'}}>
-            {this.power==="owner"?
-            <Button style={{backgroundColor: '#cc7d1c',color: 'white',border: 'none',width: '60%'}} onClick={()=>{this.deleCollection(item)}}>Delete</Button>
-            :
-            <Button style={{backgroundColor: '#cc7d1c',color: 'white',border: 'none',width: '60%'}} onClick={()=>{this.leaveCollection(item)}}>Leave</Button>
-          }
-            </Col>
-          </Row>
-          
-        </div>
-     
+
+            </Row>
       </div>
       , key: activeKey });
     this.setState({ panes, activeKey });
@@ -398,11 +362,21 @@ class Dashboard extends React.Component {
     });
   };
 
-  addClick = (name) => {
+  addClick(req) {
     const { panes } = this.state;
     const activeKey = `newTab${this.newTabIndex++}`;
     const newPanes = [...panes];
-    newPanes.push({ title: name, content: <ApiContent id="1"/>, key: activeKey });
+    newPanes.push({ title: req.name, content: <ApiContent id={req.id}/>, key: activeKey });
+    this.setState({
+      panes: newPanes,
+      activeKey,
+    });
+  };
+  addCol(req) {
+    const { panes } = this.state;
+    const activeKey = `newTab${this.newTabIndex++}`;
+    const newPanes = [...panes];
+    newPanes.push({ title: req.name, content: <ApiContent id={req.id}/>, key: activeKey });
     this.setState({
       panes: newPanes,
       activeKey,
@@ -481,10 +455,10 @@ class Dashboard extends React.Component {
         <Header  style={{ height: '8vh',backgroundColor: 'transparent',padding: '0px',borderBottom: '1px solid rgb(204 204 204)',lineHeight: '3.75'}}>
         <Row justify="start" style={{width: '100%',marginLeft: '-1%'}}>
           <Col span={2}>
-          <h4 >Home</h4>
+          <Link to="/dashboard"><h4 >Home</h4></Link>
           </Col>
           <Col span={3} >
-          <h4 >Reports</h4>
+          <Link to="/profile"><h4 >Profile</h4></Link>
           </Col>
           <Col span={3}>
           <h4>Explore</h4>
@@ -497,19 +471,7 @@ class Dashboard extends React.Component {
   </Dropdown>
           </Col>
           <Col span={4} style={{float: 'right' , marginLeft: '40%'}}>
-          <Select
-                    showSearch
-                    style={{ width: "80%"}}
-
-                    placeholder="Search"
-                    optionFilterProp="children"
-                    filterOption={(input, option) =>
-                        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                    }
-
-                >
-
-                </Select>   
+          <SearchUser/>
           </Col>
         </Row>
         </Header>
@@ -576,7 +538,7 @@ class Dashboard extends React.Component {
                       second item
                     </Menu.Item>
                 </SubMenu>
-                <Menu.Item icon={<LogoutOutlined />}>
+                <Menu.Item icon={<LogoutOutlined />} onClick={this.Exit}>
                  <Link to='./login'>Exit</Link>
                 </Menu.Item>
                </Menu>
