@@ -10,9 +10,11 @@ class EditProfile extends React.Component {
         super(props);
         document.body.style.backgroundColor = '#282c34'
         this.componentDidMount=this.componentDidMount.bind(this);
+        this.onFileChange=this.onFileChange.bind(this);
         // https://uupload.ir/files/xbdu_mhq.jpg
         this.state={
-            ImageURL:""
+            ImageURL:"",
+            selectedFile:""
         };
     }
     componentDidMount(){
@@ -30,23 +32,63 @@ class EditProfile extends React.Component {
         message.error("Network Error");
       })
     }
-    sumbitButton(){
+    sumbitButton(bioValue,token){
         const config = {
-            headers: { 'Authorization': `Token ${localStorage.getItem('token')}` }
+            headers: { 'Authorization': `Token ${token}` }
           };
           axios.put('http://37.152.188.83/api/user/profile/update/', 
           {
-            "bio": document.getElementById("bio-profile").value
+            "bio": bioValue
           }
           , config)
           .then(res => {
             message.success("Bio Updated");
+            return "Updated";
           })
           .catch(err =>
           {
             message.error("Network Error");
+            return "Error";
           });
     }
+
+    onFileChange = e => {
+        // this.setState({ selectedFile: event.target.files[0] });
+        // console.log(this.state.selectedFile);
+
+        // var fil = document.getElementById("myFile");
+        // alert(fil.value);
+            
+            const formData = new FormData(); 
+     
+            formData.append( 
+                "avatar", 
+                e.target.files[0]
+            ); 
+
+            axios.put('http://37.152.188.83/api/user/profile/update/'
+            
+            ,formData,
+            {headers:{
+                'Content-Type' : 'application/json',
+                'Authorization' :`Token ${localStorage.getItem('token')}`
+              }})
+            .then((res)=>{
+                console.log("Yeah");
+                console.log("Omid");
+                message.success("Image uploaded");
+                window.location.reload();
+            })
+            .catch((err)=>{
+                console.log(err);
+                console.log("Omid");
+                message.success("Bad network connection!");
+            });
+
+            
+      };
+
+
     render(){
         return (
             <div className="profile-text">
@@ -65,6 +107,7 @@ class EditProfile extends React.Component {
                     <Form
                     name="profile-form"
                     className="profile-form">
+                        <Input className="profile-photo-button" type="file" id="myFile" name="myFile" onChange={this.onFileChange}/>
                         <p className="name-profile">Name</p>
                         <Form.Item
                         name="Name"
@@ -104,7 +147,10 @@ class EditProfile extends React.Component {
                         
                         <Form.Item
                         className="button-profile">
-                            <Button onClick={this.sumbitButton} className="profile-update-button">
+                            <Button 
+                            onClick={d=>this.sumbitButton(document.getElementById("bio-profile").value,
+                                                          localStorage.getItem('token'))} 
+                            className="profile-update-button">
                                 Update Profile</Button>
                         </Form.Item>
                     </Form>
