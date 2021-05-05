@@ -253,3 +253,47 @@ body{
 .ant-layout-sider{
   background-color: var(--layout1);
 }
+.container {
+  position: relative;
+  width: 100%;
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border-radius: 50%;
+  height: 0%;
+  width: 0%;
+  opacity: 0;
+  margin-top: 22%;
+  margin-left: 41%;
+  transition: .5s ease;
+  background-color: transparent;
+}
+
+.container:hover .overlay {
+  opacity: 1;
+}
+
+
+.avatar_image{
+}
+.avatar_image :hover{
+  opacity: 0.4;
+  transition: all 0.15s ease-in;
+}
+.imagetext{
+  color: var(--maintext);
+  font-size: 20px;
+  position: absolute; 
+  text-align: center;
+}
