@@ -201,7 +201,7 @@ class OtherProfile extends React.Component {
                     <div>
 
                     {this.state.apis.map(d=><p>
-                        <APIBox api_method={d.http_method} api_address={d.url}></APIBox>    
+                        <APIBox api_method={d.http_method} api_address={d.url} api_id={d.id}></APIBox>    
                         </p>)}
 
                     </div>

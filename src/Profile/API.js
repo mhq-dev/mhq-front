@@ -20,6 +20,7 @@ class APIBox extends React.Component {
     ClickedAPI(){
         localStorage.setItem('apiUrl',this.props.api_address);
         localStorage.setItem('apiMethod',this.props.api_method);
+        localStorage.setItem('apiID',this.props.api_id);
         window.location.replace("/apiRunner")
     }
     
