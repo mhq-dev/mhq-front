@@ -282,7 +282,7 @@ class Collection extends React.Component {
         <Row >
 
           <Col span={8} style={{marginLeft: '5%',marginTop: '1%',alignContent: 'center',alignItems: 'center'}}>
-            <div className="collectinbox" style={{textAlign: 'left',marginLeft: '10%'}}>
+            <div className="collectinbox" style={{textAlign: 'left',marginLeft: '10%',borderRadius:'4px'}}>
             <h5 style={{fontSize: '23px' ,marginLeft: '5%'}}>Name: {item.name}</h5>
             <h5 style={{fontSize: '22px',marginLeft: '5%'}}>Status: {item.type==='private'? <FaLock style={{fill: 'gold', fontSize: '20px',marginTop: '-5%'}}/>:<FaUnlockAlt style={{fill: 'gold', fontSize: '20px',marginTop: '-5%'}}/>} {item.type}</h5>
             <h5 style={{fontSize: '22px',paddingRight: '5%',marginLeft: '5%'}}>Number of users : {this.state.users.length} </h5>
