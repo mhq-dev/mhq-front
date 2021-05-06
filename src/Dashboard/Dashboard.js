@@ -14,6 +14,7 @@ import { DownOutlined,ClockCircleOutlined,ApiOutlined,NodeCollapseOutlined,Borde
 import ApiContent from './ApiPage/ApiContent.js';
 import SearchUser from '../Search/SearchUser'
 import Checkbox from 'antd/lib/checkbox/Checkbox';
+import Scenario from '../Scenario/Scenario'
 const { TabPane } = Tabs;
 const { SubMenu } = Menu;let a="";
 const { Header, Content, Footer, Sider } = Layout;
@@ -405,6 +406,16 @@ onChangeInputUrl = (input)=>{
       activeKey: newActiveKey,
     });
   };
+  addScen = () => {
+    const { panes } = this.state;
+    const activeKey = `newTab${this.newTabIndex++}`;
+    const newPanes = [...panes];
+    newPanes.push({ title: 'Scenario', content: <Scenario/>, key: activeKey });
+    this.setState({
+      panes: newPanes,
+      activeKey,
+    });
+  };
   componentDidMount() {
     this.getCollection()
   }
@@ -461,7 +472,7 @@ onChangeInputUrl = (input)=>{
           <Link to="/profile"><h4 >Profile</h4></Link>
           </Col>
           <Col span={3}>
-          <h4>Explore</h4>
+          <Link onClick={this.addScen}><h4 >Scenario</h4></Link>
           </Col>
           <Col span={2} >
           <Dropdown overlay={menu}>
@@ -553,7 +564,7 @@ onChangeInputUrl = (input)=>{
           onEdit={this.onEdit}
         >
           {this.state.panes.map(pane => (
-            <TabPane tab={pane.title} key={pane.key} closable={pane.closable}>
+            <TabPane style={{minHeight:'100vh',width:'100%'}} tab={pane.title} key={pane.key} closable={pane.closable}>
               {pane.content}
             </TabPane>
           ))}
