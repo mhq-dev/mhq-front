@@ -8,7 +8,7 @@ import {InfoCircleOutlined, MailOutlined, UserOutlined } from '@ant-design/icons
 class EditProfile extends React.Component {
     constructor(props){
         super(props);
-        document.body.style.backgroundColor = '#282c34'
+        document.body.style.backgroundColor = '#212121'
         this.componentDidMount=this.componentDidMount.bind(this);
         this.onFileChange=this.onFileChange.bind(this);
         // https://uupload.ir/files/xbdu_mhq.jpg

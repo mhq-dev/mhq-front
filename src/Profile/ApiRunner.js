@@ -6,6 +6,8 @@ import './ApiRunner.css';
 import ReactJson from 'react-json-view';
 import axios from 'axios';
 import { DownOutlined} from '@ant-design/icons';
+import {  Link, NavLink } from 'react-router-dom';
+import SearchUser from '../Search/SearchUser'
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
 const { TabPane } = Tabs;
@@ -609,17 +611,17 @@ export default class ApiRunner extends React.Component {
         });
         
         return (
-            <div>
+            <div >
             <Header  style={{ height: '8vh',backgroundColor: 'transparent',padding: '0px',borderBottom: '1px solid rgb(204 204 204)',lineHeight: '3.75'}}>
                         <Row justify="start" style={{width: '100%',marginLeft: '-1%'}}>
                         <Col span={2}>
-                        <h4 >Home</h4>
+                        <Link to="/dashboard"><h4 >Home</h4></Link>
                         </Col>
                         <Col span={3} >
-                        <h4 >Reports</h4>
+                        <Link to="/profile"><h4 >Profile</h4></Link>
                         </Col>
                         <Col span={3}>
-                        <h4>Explore</h4>
+                        <Link onClick={this.addScen}><h4 >Scenario</h4></Link>
                         </Col>
                         <Col span={2} >
                         <Dropdown overlay={menu}>
@@ -629,23 +631,12 @@ export default class ApiRunner extends React.Component {
                 </Dropdown>
                         </Col>
                         <Col span={4} style={{float: 'right' , marginLeft: '40%'}}>
-                        <Select
-                                    showSearch
-                                    style={{ width: "80%"}}
-                
-                                    placeholder="Search"
-                                    optionFilterProp="children"
-                                    filterOption={(input, option) =>
-                                        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                                    }
-                
-                                >
-                
-                                </Select>   
-                        </Col>
+          <SearchUser/>
+          </Col>
+                        
                         </Row>
                         </Header>
-            <Row>
+            <Row STYLE="margin: 20px;">
                     <Col flex="0px">
                                 
                     </Col>

@@ -2,16 +2,38 @@ import React from 'react';
 import 'antd/dist/antd.css';
 import './OtherProfile.css';
 import axios from 'axios';
-import {Row, Col, Image, Menu , Input, Button,message } from 'antd';
-import {InfoCircleOutlined, MailOutlined, AppstoreOutlined, SettingOutlined } from '@ant-design/icons';
+import {Row, Col, Image, Menu , Dropdown,Layout, Button,message } from 'antd';
+import {InfoCircleOutlined, MailOutlined, DownOutlined, SettingOutlined } from '@ant-design/icons';
 import APIBox from './API';
+import {  Link, NavLink } from 'react-router-dom';
+import SearchUser from '../Search/SearchUser';
+const { Header, Content, Footer, Sider } = Layout;
 
 const { SubMenu } = Menu;
-
+let a="";
+const menu = (
+    <Menu>
+      <Menu.Item >
+        <h5>New</h5>
+      </Menu.Item>
+      <Menu.Item >
+        <h5 target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">
+        Edit 
+        </h5>
+      </Menu.Item>
+      <Menu.Item >
+        <h5 target="_blank" rel="noopener noreferrer" href="https://www.luohanacademy.com">
+        Delete
+        </h5>
+      </Menu.Item >
+      <Menu.Item >Search</Menu.Item>
+    </Menu>
+  
+  );
 class OtherProfile extends React.Component {
     constructor(props){
         super(props);
-        document.body.style.backgroundColor = '#282c34'
+        document.body.style.backgroundColor = '#212121'
         this.sumbitButton=this.sumbitButton.bind(this);
 
         this.ToggleFollow=this.ToggleFollow.bind(this);
@@ -137,7 +159,30 @@ class OtherProfile extends React.Component {
     render(){
         return (
             <div>
-            <Row>
+            <Header  style={{ height: '8vh',backgroundColor: 'transparent',padding: '0px',borderBottom: '1px solid rgb(204 204 204)',lineHeight: '3.75'}}>
+                <Row justify="start" style={{width: '100%',marginLeft: '-1%'}}>
+                <Col span={2}>
+                <Link to="/dashboard"><h4 >Home</h4></Link>
+                </Col>
+                <Col span={3} >
+                <Link to="/profile"><h4 >Profile</h4></Link>
+                </Col>
+                <Col span={3}>
+                <Link onClick={this.addScen}><h4 >Scenario</h4></Link>
+                </Col>
+                <Col span={2} >
+                <Dropdown overlay={menu}>
+            <h4 className="ant-dropdown-link" onClick={e => e.preventDefault()}style={{color: 'black'}} >
+            Workspaces <DownOutlined />
+            </h4>
+        </Dropdown>
+                </Col>
+                <Col span={4} style={{float: 'right' , marginLeft: '40%'}}>
+          <SearchUser/>
+          </Col>
+                </Row>
+                </Header>
+            <Row STYLE="background-color: #212121;">
                 <Col span={6}> 
                     <div className="LeftPage">
                         {(this.state.imgURL==null) ? 
@@ -191,12 +236,7 @@ class OtherProfile extends React.Component {
                     </div>
                 </Col>
                 <Col span={18}>
-                    <Menu onClick={this.handleClick} selectedKeys={[this.state.current]} mode="horizontal" STYLE="background-color: #282c34; color:#ffffff;">
-                        <Menu.Item key="APIs" icon={<MailOutlined />}>
-                            APIs
-                        </Menu.Item>
-                        
-                    </Menu>
+                    
                     {(this.state.current=="APIs") ? 
                     <div>
 
@@ -215,12 +255,9 @@ class OtherProfile extends React.Component {
     }
 }
 export default OtherProfile;
-// <SubMenu key="SubMenu" icon={<AppstoreOutlined />} title="Collections">
-//                         {this.state.collectionsName.map(d=>
-//                             <Menu.ItemGroup title={d.name}>
-//                                 <Menu.Item key="col:1:1">{this.renderCol(d.id)}</Menu.Item>
-//                                 <Menu.Item key="col:1:2">Coll 2</Menu.Item>
-//                             </Menu.ItemGroup>
-//                         )}
+// <Menu onClick={this.handleClick} selectedKeys={[this.state.current]} mode="horizontal" STYLE="background-color: #212121; color:#ffffff;">
+//                         <Menu.Item key="APIs" icon={<MailOutlined />}>
+//                             APIs
+//                         </Menu.Item>
                         
-//                         </SubMenu>
+//                     </Menu>
