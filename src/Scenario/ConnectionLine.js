@@ -14,12 +14,12 @@ export default ({
     <g>
       <path
         fill="none"
-        stroke="#fff"
+        stroke="gold"
         strokeWidth={2}
         className="animated"
         d={`M${sourceX},${sourceY} C ${sourceX} ${targetY} ${sourceX} ${targetY} ${targetX},${targetY}`}
       />
-      <circle cx={targetX} cy={targetY} fill="#222" r={3} stroke="#fff" strokeWidth={1.5} />
+      <circle cx={targetX} cy={targetY} fill="#222" r={3} stroke="red" strokeWidth={1.5} />
     </g>
   );
 };
