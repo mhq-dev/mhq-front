@@ -14,6 +14,7 @@ import './layouting.css';
 import inputNode from './CustomInputNode';
 import defaultNode from './CustomDefaultNode';
 import outputNode from './CustomOutputNode';
+import { Input ,Modal,Button} from 'antd';
 
 
 const initialElements = [
@@ -41,28 +42,49 @@ const nodeTypes = {
     defaultNode: defaultNode,
     outputNode: outputNode,
   };
+  
+
 
 const flowKey = 'example-flow';
 const DnDFlow = () => {
+    const [visible_edge, setvisible_edge] = useState(false);
+    const edgeOk = () => {
+    setvisible_edge(false) ;
+    };
+    const showModalEdge = () => {
+        
+    setvisible_edge(true);
+    };
     const reactFlowWrapper = useRef(null);
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
     const [elements, setElements] = useState(initialElements);
     let [id, setID] = useState(1);
     const getId = () => `${id+1}`;
+
     const onConnect = (params) => {
         params = {
             ...params,
             animated: true,
             arrowHeadType: 'arrow',
+            id: '12',
             style: {strokeWidth:3},
+            
             // label:'Setting',
             // labelStyle:{fill:'#fff',fontWeight: 800},
             // labelShowBg:false,
-        }
-        console.log(params)
-
+        };
+        showModalEdge();
+        alert(JSON.stringify(params))
         setElements((els) => addEdge(params, els));
     }
+
+  const onEdge = (params) => {
+
+  }
+   
+    const prevent = (e) => {
+        e.preventDefault()
+        }
     const onElementsRemove = (elementsToRemove) =>
         setElements((els) => removeElements(elementsToRemove, els));
 
@@ -136,12 +158,27 @@ const DnDFlow = () => {
 
     return (
         <div className="dndflow">
+            <Modal
+                visible={visible_edge}
+                title="Set condition"
+                style={{height: '36vh'}}
+                footer={[
+                <Button key="ok" className="btn btn-primary" onClick={edgeOk}>Set
+                </Button>
+                ]}
+            >
+        <div style={{alignContent: 'center' ,marginLeft: 'auto',marginRight: 'auto',alignItems: 'center',textAlign: 'center'}}>
+        <h5 >input</h5>
+        </div>
+      </Modal>
             <ReactFlowProvider>
                 <div className="reactflow-wrapper" ref={reactFlowWrapper}>
+                
                     <ReactFlow
                         style = {{height:'550px'}}
                         elements={elements}
                         onConnect={onConnect}
+                        onDoubleClick={prevent}
                         onElementsRemove={onElementsRemove}
                         onLoad={onLoad}
                         onDrop={onDrop}
@@ -153,6 +190,7 @@ const DnDFlow = () => {
                         <Controls />
                     </ReactFlow>
                 </div>
+                
                 <Sidebar onSave={onSave} onRestore={onRestore} />
                 <div className="controls">
         </div>
