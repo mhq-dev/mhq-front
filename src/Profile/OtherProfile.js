@@ -195,6 +195,13 @@ class OtherProfile extends React.Component {
             })
             return "Unfollow";
         }
+        else{
+            axios.delete(`http://37.152.180.213/api/user/unfollow/${this.state.name}`,config
+            ).then((res)=>{
+                this.setState({followers:this.state.followers-1})
+            })
+            return "Follow";
+        }
     }
     renderCol(colID){
         console.log(this.state.collectionDetails[colID]);
