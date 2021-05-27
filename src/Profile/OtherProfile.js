@@ -273,7 +273,34 @@ class OtherProfile extends React.Component {
             )}
             />
             </Modal>
-            
+            <Modal
+            title="Followings" 
+            visible={this.state.isModalVisibleFollowing}
+            onCancel={this.handleCancelFollowing}
+            footer={[]}>
+            <List
+                dataSource={this.state.list_following}
+                bordered
+                renderItem={item => (
+                <List.Item
+                key={item.id}
+                actions={[
+                <a key={`a-${item.id}`} onClick={()=>{window.location = `/Profile/${item.username}`}}>
+                View Profile
+                </a>,
+                ]}
+                >
+                <List.Item.Meta
+                avatar={
+                  <Avatar icon={<UserOutlined />} src={"http://37.152.180.213"+item.avatar} />
+                }
+                title={<Typography>{item.username}</Typography>}
+                description={item.bio === null ? `${item.username}'s bio` : item.bio}
+              />
+            </List.Item>
+            )}
+            />
+            </Modal>
             <Row STYLE="background-color: #212121;">
                 <Col span={6}> 
                     <div className="LeftPage">
