@@ -2,11 +2,14 @@ import React from 'react';
 import 'antd/dist/antd.css';
 import './OtherProfile.css';
 import axios from 'axios';
-import {Row, Col, Image, Menu , Dropdown,Layout, Button,message } from 'antd';
+import {Row, Col, Image, Menu , Dropdown,Layout, Button,message, List, Typography } from 'antd';
 import {InfoCircleOutlined, MailOutlined, DownOutlined, SettingOutlined } from '@ant-design/icons';
 import APIBox from './API';
 import {  Link, NavLink } from 'react-router-dom';
 import SearchUser from '../Search/SearchUser';
+import Modal from 'antd/lib/modal/Modal';
+import Avatar from 'antd/lib/avatar/avatar';
+import { UserOutlined } from '@ant-design/icons';
 const { Header, Content, Footer, Sider } = Layout;
 
 const { SubMenu } = Menu;
@@ -50,7 +53,13 @@ class OtherProfile extends React.Component {
             email:"",
             bio:"",
             collectionsName:[],
-            collectionDetails:{}
+            collectionDetails:{},
+            followers:0,
+            following:0,
+            list_follow:[],
+            list_following:[],
+            isModalVisibleFollow:false,
+            isModalVisibleFollowing:false,
         };
     }
     componentDidMount() {
@@ -118,12 +127,49 @@ class OtherProfile extends React.Component {
                     imgURL: res.data.avatar
                 };
               });
-
+            axios.get(`http://37.152.180.213/api/user/followers/${this.state.name}`,
+            {headers:{
+                'Content-Type' : 'application/json',
+                'Authorization' :`Token ${localStorage.getItem('token')}`
+            }}).then((res)=>{
+                const user_local = localStorage.getItem('username')
+                this.setState({followers:res.data.length, list_follow:res.data})
+                let flag = false;
+                res.data.map((user)=>{
+                    if (user.username === user_local) {
+                        flag = true
+                    }
+                })
+                if (flag) {
+                    this.setState({follow_unfollow_button_value:"Unfollow"})
+                }
+                else{
+                    this.setState({follow_unfollow_button_value:"Follow"})
+                }
+            })
+            
         })
         .catch((err)=>{
             message.error(err);
         })
       }
+    showModalFollow = () => {
+        this.setState({isModalVisibleFollow:true})
+        console.log(this.state.list_follow)
+    };
+
+    handleCancelFollow = () => {
+        this.setState({isModalVisibleFollow:false})
+    };
+
+    showModalFollowing = () => {
+        this.setState({isModalVisibleFollowing:true})
+    };
+
+    handleCancelFollowing = () => {
+        this.setState({isModalVisibleFollowing:false})
+    };
+
     handleClick = e => {
         console.log('click ', e);
         this.setState({ current: e.key });
@@ -139,11 +185,15 @@ class OtherProfile extends React.Component {
         return followStatus;
     }
     ToggleFollow(){
+        const config = {
+            headers: { Authorization: `Token ${localStorage.getItem("token")}` },
+        };
         if(this.state.follow_unfollow_button_value=="Follow"){
+            axios.post(`http://37.152.180.213/api/user/follow/${this.state.name}`,{},config
+            ).then((res)=>{
+                this.setState({followers:this.state.followers+1})
+            })
             return "Unfollow";
-        }
-        else{
-            return "Follow";
         }
     }
     renderCol(colID){
@@ -207,12 +257,12 @@ class OtherProfile extends React.Component {
                                     {this.state.follow_unfollow_button_value}</Button>
                         
                         <Row>
-                            <Col flex={1}>
-                                <p STYLE="color: #dfdfdf;">0 followers</p>
+                            <Col style={{marginBottom:'1em'}} flex={1}>
+                                <a onClick={this.showModalFollow} STYLE="color: #dfdfdf;">{this.state.followers} followers</a>
                             </Col>
                             
-                            <Col flex={1}>
-                                <p STYLE="color: #dfdfdf;">0 followings</p>
+                            <Col style={{marginBottom:'1em'}} flex={1}>
+                                <a onClick={this.showModalFollowing} STYLE="color: #dfdfdf;">{this.state.following} followings</a>
                             </Col>
                         </Row>
 
