@@ -147,7 +147,13 @@ class OtherProfile extends React.Component {
                     this.setState({follow_unfollow_button_value:"Follow"})
                 }
             })
-            
+            axios.get(`http://37.152.180.213/api/user/followings/${this.state.name}`,
+            {headers:{
+                'Content-Type' : 'application/json',
+                'Authorization' :`Token ${localStorage.getItem('token')}`
+            }}).then((res)=>{
+                this.setState({following:res.data.length, list_following:res.data})
+            })
         })
         .catch((err)=>{
             message.error(err);
