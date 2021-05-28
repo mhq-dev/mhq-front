@@ -19,7 +19,7 @@ class EditProfile extends React.Component {
     }
 
     componentDidMount(){
-        axios.get('http://37.152.188.83/api/user/profile/user/'+localStorage.getItem('username'),
+        axios.get('http://37.152.180.213/api/user/profile/user/'+localStorage.getItem('username'),
         {headers:{
             'Content-Type' : 'application/json',
             'Authorization' :`Token ${localStorage.getItem('token')}`
@@ -39,7 +39,7 @@ class EditProfile extends React.Component {
         const config = {
             headers: { 'Authorization': `Token ${token}` }
           };
-          axios.put('http://37.152.188.83/api/user/profile/update/', 
+          axios.put('http://37.152.180.213/api/user/profile/update/', 
           {
             "bio": bioValue
           }
@@ -69,7 +69,7 @@ class EditProfile extends React.Component {
                 e.target.files[0]
             ); 
 
-            axios.put('http://37.152.188.83/api/user/profile/update/'
+            axios.put('http://37.152.180.213/api/user/profile/update/'
             
             ,formData,
             {headers:{

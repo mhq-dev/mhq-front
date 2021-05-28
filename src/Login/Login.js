@@ -8,7 +8,7 @@ import axios from 'axios';
 function Login() {
     const onFinish = values => {
         console.log('Received values of form: ', values);
-        axios.post('http://37.152.188.83/api/auth/token/login/',{
+        axios.post('http://37.152.180.213/api/auth/token/login/',{
             password: values.password,
             username: values.username
         })

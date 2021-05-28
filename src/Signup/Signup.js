@@ -27,7 +27,7 @@ class Signup extends React.Component {
             return "Wrong";
         }
         else{
-            axios.post(`http://37.152.188.83/api/auth/users/`, 
+            axios.post(`http://37.152.180.213/api/auth/users/`, 
             {
                 "email": email,
                 "username": username,

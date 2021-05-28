@@ -225,7 +225,7 @@ export default class ApiRunner extends React.Component {
         const config = {
             headers: { Authorization: `Token ${localStorage.getItem("token")}` },
           };
-        axios.get(`http://37.152.188.83/api/request/${this.state.id}/`,config)
+        axios.get(`http://37.152.180.213/api/request/${this.state.id}/`,config)
         .then((response)=>{
             console.log(response.data.http_method)
             let fields = response.data;
@@ -517,7 +517,7 @@ export default class ApiRunner extends React.Component {
         const config = {
         headers: { Authorization: `Token ${localStorage.getItem("token")}` },
         };
-        axios.get(`http://37.152.188.83/api/request/${this.state.id}/execute/`,config)
+        axios.get(`http://37.152.180.213/api/request/${this.state.id}/execute/`,config)
         .then((response)=>{
             this.setState({json:response})
             this.onLodingChange(false)

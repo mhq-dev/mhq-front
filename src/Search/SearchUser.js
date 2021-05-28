@@ -19,7 +19,7 @@ class CommunitySearch extends Component {
 
     }
     onSearch = (value) => {
-        axios.get("http://37.152.188.83/api/user/search_users/" + value,{headers:{
+        axios.get("http://37.152.180.213/api/user/search_users/" + value,{headers:{
             'Content-Type' : 'application/json',
             'Authorization' :`Token ${localStorage.getItem('token')}`
           }})

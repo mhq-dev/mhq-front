@@ -12,7 +12,7 @@ class ChangePassword extends React.Component {
         const config = {
             headers: { 'Authorization': `Token ${localStorage.getItem('token')}` }
           };
-          axios.post('http://37.152.188.83/api/auth/users/set_password/', 
+          axios.post('http://37.152.180.213/api/auth/users/set_password/', 
           {
             "new_password": document.getElementById("new-pass-change").value,
             "re_new_password": document.getElementById("re-new-pass-change").value,

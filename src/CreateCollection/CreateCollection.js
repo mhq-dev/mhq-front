@@ -59,7 +59,7 @@ class CreateCollection extends React.Component {
         {
             r="private"
         }
-        axios.post('http://37.152.188.83/api/collection/',{
+        axios.post('http://37.152.180.213/api/collection/',{
       type: r, name: this.state.title
   },{headers:{
     'Content-Type' : 'application/json',

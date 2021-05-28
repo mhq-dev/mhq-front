@@ -74,7 +74,7 @@ class Dashboard extends React.Component {
           {
               r="private"
           }
-    Axios.put('http://37.152.188.83/api/collection/'+v.id+"/",{
+    Axios.put('http://37.152.180.213/api/collection/'+v.id+"/",{
         name, type: r
     },{headers:{
       'Content-Type' : 'application/json',
@@ -137,7 +137,7 @@ onChangeInputUrl = (input)=>{
     else if(user.role==="editor"){
       st="owner"
     }
-    Axios.put('http://37.152.188.83/api/collection/'+item.id+"/promote_user/"+user.user,{
+    Axios.put('http://37.152.180.213/api/collection/'+item.id+"/promote_user/"+user.user,{
       user: user.user,role: st
   },{headers:{
     'Content-Type' : 'application/json',
@@ -158,7 +158,7 @@ onChangeInputUrl = (input)=>{
   }
   Addreq(item){
 
-    Axios.post('http://37.152.188.83/api/request/',{
+    Axios.post('http://37.152.180.213/api/request/',{
     name: this.state.newreq ,http_method: this.state.method_tpye ,url: this.state.url ,body: {},params: [],headers: [],collection: item.id
   },{headers:{
     'Content-Type' : 'application/json',
@@ -186,7 +186,7 @@ onChangeInputUrl = (input)=>{
     {
       r="visitor"
     }
-    Axios.post('http://37.152.188.83/api/collection/'+item.id+"/add_user/"+this.state.newUser,{
+    Axios.post('http://37.152.180.213/api/collection/'+item.id+"/add_user/"+this.state.newUser,{
       user: this.state.newUser, role: r
   },{headers:{
     'Content-Type' : 'application/json',
@@ -206,7 +206,7 @@ onChangeInputUrl = (input)=>{
   })
   }
   deleCollection(item){
-    Axios.delete('http://37.152.188.83/api/collection/'+item.id+"/",{headers:{
+    Axios.delete('http://37.152.180.213/api/collection/'+item.id+"/",{headers:{
       'Content-Type' : 'application/json',
       'Authorization' :`Token ${localStorage.getItem('token')}`
     }})
@@ -224,7 +224,7 @@ onChangeInputUrl = (input)=>{
     })
   }
   leaveCollection(item){
-    Axios.delete('http://37.152.188.83/api/collection/'+item.id+"/left/",{headers:{
+    Axios.delete('http://37.152.180.213/api/collection/'+item.id+"/left/",{headers:{
     'Content-Type' : 'application/json',
     'Authorization' :`Token ${localStorage.getItem('token')}`
   }})
@@ -242,7 +242,7 @@ onChangeInputUrl = (input)=>{
   })
   }
   Removeuser(user,item){
-    Axios.delete('http://37.152.188.83/api/collection/'+item.id+"/remove_user/"+user.user,{headers:{
+    Axios.delete('http://37.152.180.213/api/collection/'+item.id+"/remove_user/"+user.user,{headers:{
     'Content-Type' : 'application/json',
     'Authorization' :`Token ${localStorage.getItem('token')}`
   }})
@@ -260,7 +260,7 @@ onChangeInputUrl = (input)=>{
   })
   }
   getthis(item) {
-    Axios.get('http://37.152.188.83/api/collection/'+item.id,{headers:{
+    Axios.get('http://37.152.180.213/api/collection/'+item.id,{headers:{
       'Content-Type' : 'application/json',
       'Authorization' :`Token ${localStorage.getItem('token')}`
     }}).then((res)=>{
@@ -330,7 +330,7 @@ onChangeInputUrl = (input)=>{
 
   getCollection=()=>
   {
-    Axios.get('http://37.152.188.83/api/collection/user/'+localStorage.getItem('username'),{headers:{
+    Axios.get('http://37.152.180.213/api/collection/user/'+localStorage.getItem('username'),{headers:{
       'Content-Type' : 'application/json',
       'Authorization' :`Token ${localStorage.getItem('token')}`
     }}).then((res)=>{
