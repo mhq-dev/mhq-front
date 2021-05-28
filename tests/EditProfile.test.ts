@@ -2,7 +2,7 @@ import EditProfile from "../src/Profile/EditProfile";
 import axios from 'axios';
 describe('EditProfile_Submission',()=>{
     it('Bio Updating',()=>{
-        axios.post('http://37.152.188.83/api/auth/token/login/',{
+        axios.post('http://37.152.180.213/api/auth/token/login/',{
             password: "mmmmmmm3",
             username: "mmd"
         })

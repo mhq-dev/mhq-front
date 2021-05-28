@@ -43,15 +43,7 @@ const menu = (
   );
 
 const initialElements = [
-    {
-        id: '0',
-        type: 'inputNode',
-        data: { label: 'input node' },
-        style: { width: '100px',height: '100px',borderRadius: '50px', backgroundColor:'white'},
-        targetPosition :  'left',
-        sourcePosition : 'right',
-        position: { x: 250, y: 5 },
-    },
+    
 ];
 const onNodeContextMenu = (event, node) => {
     event.preventDefault();
@@ -96,7 +88,11 @@ const DnDFlow = () => {
     const [myCols, setmyCols] = useState(initialCols);
     const [myScenarios, setmyScenarios] = useState([]);
     const [selectedScenario, setSelectedScenario] = useState(-1);
-    let [id, setID] = useState(1);
+    const [selectedRequest, setSelectedRequest] = useState(-1);
+    const [newModule, setnewModule] = useState(-1);
+    const [xPosition, setxPosition] = useState(-1);
+    const [yPosition, setyPosition] = useState(-1);
+    let [id, setID] = useState(0);
     const componentDidMount=()=>{
         alert("hiii");
       } 
@@ -130,7 +126,7 @@ const DnDFlow = () => {
 
     const onDrop = (event) => {
         event.preventDefault();
-        message.error("Moved");
+        message.error("Moved"+id);
         setVis(true);
         ListOfReuqests();
 
@@ -141,6 +137,8 @@ const DnDFlow = () => {
             x: event.clientX - reactFlowBounds.left,
             y: event.clientY - reactFlowBounds.top,
         });
+        setxPosition(event.clientX - reactFlowBounds.left);
+        setyPosition(event.clientY - reactFlowBounds.top);
         const newNode = {
             id: getId(),
             type,
@@ -154,6 +152,8 @@ const DnDFlow = () => {
         console.log(id)
 
         setElements((es) => es.concat(newNode));
+
+        
     };
     const onSave = useCallback(() => {
         if (reactFlowInstance) {
@@ -190,9 +190,7 @@ const DnDFlow = () => {
         restoreFlow();
     }, [setElements]);
 
-    function cancelModal(){
-        setVis(false);
-    }
+    
 
     const ListOfReuqests = () => {
         axios.get('http://37.152.180.213/api/collection/user/'+localStorage.getItem('username'),
@@ -225,22 +223,52 @@ const DnDFlow = () => {
     };
 
     const methodAndUrl = (d) =>{
-        return d.http_method+"_"+d.url;
+        return d.id+"_"+d.http_method+"_"+d.url;
     }
 
     const onSelect = value=>{
         var splitedValue=value.split("_");
+        setSelectedRequest(parseInt(splitedValue[0]));
         var x="";
         var j;
-        for (j = 1; j < splitedValue.length; j++) { 
+        for (j = 2; j < splitedValue.length; j++) { 
             x=x+splitedValue[j]+"_";
         }
         x=x.substring(0,x.length-1);
-        document.getElementById("scenario_method").value = splitedValue[0];
+        document.getElementById("scenario_method").value = splitedValue[1];
         document.getElementById("scenario_url").value = x;
 
     }
-    const doneModal = ()=>{
+    const doneNodeModal = ()=>{       
+        axios.post('http://37.152.180.213/api/module/',
+        {
+            "x_position":parseInt(xPosition),
+            "y_position":parseInt(yPosition),
+            "scenario":parseInt(selectedScenario),
+            "request":parseInt(selectedRequest)
+        },
+        {headers:{
+          'Content-Type' : 'application/json',
+          'Authorization' :`Token ${localStorage.getItem('token')}`
+        }}).then((resDimo)=>{
+            message.success("Added");
+            setnewModule(resDimo.data.id);
+        })
+        .catch((err)=>{
+            message.error(err.message);
+        });    
+        setVis(false);
+
+    }
+    const cancelNodeModal=()=>{
+        setVis(false);
+        var tempElements=[];
+        var j;
+        for (j = 0; j < elements.length-1; j++) { 
+            tempElements.push(elements[j]);            
+        }
+        setElements(tempElements);
+        setID(parseInt(getId())-2);
         
     }
     const ClickedMenuForCol=(theID)=>{
@@ -251,6 +279,7 @@ const DnDFlow = () => {
           'Authorization' :`Token ${localStorage.getItem('token')}`
         }}).then((resDimo)=>{
             var i;        
+            setmyScenarios([]);
             for (i = 0; i < resDimo.data.length; i++) {
                 setmyScenarios((es) => es.concat(resDimo.data[i]));                
             }
@@ -269,6 +298,52 @@ const DnDFlow = () => {
             message.error("Please select a scenario or create new one!");
         } else{
             setScenarioModal(false);
+           
+            const type = 'inputNode';
+            const position = reactFlowInstance.project({
+                x: 100,
+                y: 100,
+            });
+            const newNode = {
+                id: getId(),
+                type,
+                position,
+                style: { width: '100px',height: '100px',borderRadius: '50px', backgroundColor:'white'},
+                targetPosition :  'left',
+                sourcePosition : 'right',
+                data: { label: `${type} node` },
+            };
+            setID(parseInt(getId()))
+            console.log(id)
+    
+            setElements((es) => es.concat(newNode));
+            var dndflow=document.getElementById('dndflow');
+                if(!dndflow.classList.contains('visib')){                
+                dndflow.classList.toggle('visib');
+                var noScenario=document.getElementById('no-scenario');
+                noScenario.classList.toggle('hidden');
+            }
+            
+
+            // axios.get('http://37.152.180.213/api/scenario/'+localStorage.getItem('selectedCollection')+"/"+selectedScenario,
+            // {headers:{
+            // 'Content-Type' : 'application/json',
+            // 'Authorization' :`Token ${localStorage.getItem('token')}`
+            // }}).then((resDimo)=>{
+            //     message.success("Loaded Successfully");
+            //     console.log(resDimo);
+            //     setScenarioModal(false);
+                
+            //     var dndflow=document.getElementById('dndflow');
+            //     if(!dndflow.classList.contains('visib')){                
+            //     dndflow.classList.toggle('visib');
+            //     var noScenario=document.getElementById('no-scenario');
+            //     noScenario.classList.toggle('hidden');
+            //     }
+            // })
+            // .catch((err)=>{
+            //     message.error(err.message);
+            // });   
         }
     }
     const createScenarioModal=()=>{
@@ -284,9 +359,10 @@ const DnDFlow = () => {
           'Content-Type' : 'application/json',
           'Authorization' :`Token ${localStorage.getItem('token')}`
         }}).then((resDimo)=>{
-            message.error("Created Successfully");
+            setSelectedScenario(resDimo.data.id);
+            message.success("Created Successfully");
             setScenarioModal(false);
-            var dndflow=document.getElementById('dndflow');
+            var dndflow=document.getElementById('dndflow');        
             dndflow.classList.toggle('visib');
             var noScenario=document.getElementById('no-scenario');
             noScenario.classList.toggle('hidden');
@@ -321,25 +397,25 @@ const DnDFlow = () => {
             name="normal_singup"
             STYLE="background-color:#fcfcfc;"
         >
-            <Select STYLE="width:100%; background-color:#ffffff;" onSelect={onSelectScenario}>
-                {myScenarios.map(d=><Option value={d.id}>{d.name}</Option>)}
-            </Select>
+        <Row>
+            <Col span={20}>
+                <Input id="new_scenario_name" placeholder="New scenario's name"></Input>
+            </Col>
+            <Col span={4}>
+                <button className="create-scenario-button" key="Create" type="primary" onClick={createScenarioModal}>
+                Create
+                </button>
+            </Col>                
+        </Row>
             <Row>
                 <Col span={11}></Col>
                 <Col span={2}><p STYLE="margin:10px; font-weight: bold;">Or</p></Col>
                 <Col span={11}></Col>
             </Row>
+            <Select STYLE="width:100%; background-color:#ffffff;" onSelect={onSelectScenario}>
+                {myScenarios.map(d=><Option value={d.id}>{d.name}</Option>)}
+            </Select>
             
-            <Row>
-                        <Col span={20}>
-                            <Input id="new_scenario_name" placeholder="New scenario's name"></Input>
-                        </Col>
-                        <Col span={4}>
-                            <button className="create-scenario-button" key="Create" type="primary" onClick={createScenarioModal}>
-                            Create
-                            </button>
-                        </Col>                
-            </Row>
         </Form>
    
         </div>
@@ -403,10 +479,10 @@ const DnDFlow = () => {
                 title="Enter your api information"
                 closable={false}
                 footer={[
-                    <button className="cancel-account-button" key="cancel" type="secondary" onClick={cancelModal}>
+                    <button className="cancel-account-button" key="cancel" type="secondary" onClick={cancelNodeModal}>
                         Cancel
                     </button>,
-                    <button className="done-scenario-button" key="Done" type="primary" onClick={doneModal}>
+                    <button className="done-scenario-button" key="Done" type="primary" onClick={doneNodeModal}>
                         Done
                     </button>
                 ]}>

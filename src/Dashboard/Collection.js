@@ -36,7 +36,7 @@ class Collection extends React.Component {
         this.setState({newUser :e.target.value});
       }
     deleCollection(item){
-        Axios.delete('http://37.152.188.83/api/collection/'+item.id+"/",{headers:{
+        Axios.delete('http://37.152.180.213/api/collection/'+item.id+"/",{headers:{
           'Content-Type' : 'application/json',
           'Authorization' :`Token ${localStorage.getItem('token')}`
         }})
@@ -55,7 +55,7 @@ class Collection extends React.Component {
         })
       }
       leaveCollection(item){
-        Axios.delete('http://37.152.188.83/api/collection/'+localStorage.getItem("collection_id")+"/left/",{headers:{
+        Axios.delete('http://37.152.180.213/api/collection/'+localStorage.getItem("collection_id")+"/left/",{headers:{
         'Content-Type' : 'application/json',
         'Authorization' :`Token ${localStorage.getItem('token')}`
       }})
@@ -74,7 +74,7 @@ class Collection extends React.Component {
       }
     Addreq(item){
 
-        Axios.post('http://37.152.188.83/api/request/',{
+        Axios.post('http://37.152.180.213/api/request/',{
         name: this.state.newreq ,http_method: this.state.method_tpye ,url: this.state.url ,body: [{headers:{"Authorization":""}}],collection: item.id
       },{headers:{
         'Content-Type' : 'application/json',
@@ -114,7 +114,7 @@ class Collection extends React.Component {
         {
           r="visitor"
         }
-        Axios.post('http://37.152.188.83/api/collection/'+item.id+"/add_user/"+this.state.newUser,{
+        Axios.post('http://37.152.180.213/api/collection/'+item.id+"/add_user/"+this.state.newUser,{
           user: this.state.newUser, role: r
       },{headers:{
         'Content-Type' : 'application/json',
@@ -134,7 +134,7 @@ class Collection extends React.Component {
       })
       }
     Removeuser(user,item){
-        Axios.delete('http://37.152.188.83/api/collection/'+item.id+"/remove_user/"+user.user,{headers:{
+        Axios.delete('http://37.152.180.213/api/collection/'+item.id+"/remove_user/"+user.user,{headers:{
         'Content-Type' : 'application/json',
         'Authorization' :`Token ${localStorage.getItem('token')}`
       }})
@@ -160,7 +160,7 @@ class Collection extends React.Component {
         else if(user.role==="editor"){
           st="owner"
         }
-        Axios.put('http://37.152.188.83/api/collection/'+item.id+"/promote_user/"+user.user,{
+        Axios.put('http://37.152.180.213/api/collection/'+item.id+"/promote_user/"+user.user,{
           user: user.user,role: st
       },{headers:{
         'Content-Type' : 'application/json',
@@ -182,7 +182,7 @@ class Collection extends React.Component {
       Demote(user,item){
         let st="visitor"
         
-        Axios.put('http://37.152.188.83/api/collection/'+item.id+"/promote_user/"+user.user,{
+        Axios.put('http://37.152.180.213/api/collection/'+item.id+"/promote_user/"+user.user,{
           user: user.user,role: st
       },{headers:{
         'Content-Type' : 'application/json',
@@ -207,7 +207,7 @@ class Collection extends React.Component {
               {
                   r="private"
               }
-        Axios.put('http://37.152.188.83/api/collection/'+v.id+"/",{
+        Axios.put('http://37.152.180.213/api/collection/'+v.id+"/",{
             name, type: r
         },{headers:{
           'Content-Type' : 'application/json',
@@ -235,7 +235,7 @@ class Collection extends React.Component {
     
       }
     getthis=()=> {
-        Axios.get('http://37.152.188.83/api/collection/'+localStorage.getItem("collection_id"),{headers:{
+        Axios.get('http://37.152.180.213/api/collection/'+localStorage.getItem("collection_id"),{headers:{
           'Content-Type' : 'application/json',
           'Authorization' :`Token ${localStorage.getItem('token')}`
         }}).then((res)=>{

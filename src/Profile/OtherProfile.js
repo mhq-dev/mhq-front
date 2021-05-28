@@ -56,7 +56,7 @@ class OtherProfile extends React.Component {
     componentDidMount() {
         const addressArray = window.location.href.split("/").reverse();
 
-        axios.get('http://37.152.188.83/api/collection/user/'+addressArray[0],
+        axios.get('http://37.152.180.213/api/collection/user/'+addressArray[0],
         {headers:{
           'Content-Type' : 'application/json',
           'Authorization' :`Token ${localStorage.getItem('token')}`
@@ -65,7 +65,7 @@ class OtherProfile extends React.Component {
             var colNameArray=this.state.collectionsName;
             for (i = 0; i < resDimo.data.length; i++) {
                 colNameArray.push(resDimo.data[i]);
-                axios.get("http://37.152.188.83/api/request/collection/"+resDimo.data[i].id,
+                axios.get("http://37.152.180.213/api/request/collection/"+resDimo.data[i].id,
                 {headers:{
                 'Content-Type' : 'application/json',
                 'Authorization' :`Token ${localStorage.getItem('token')}`
@@ -105,7 +105,7 @@ class OtherProfile extends React.Component {
             message.error(err);
         })
 
-        axios.get('http://37.152.188.83/api/user/profile/user/'+addressArray[0],
+        axios.get('http://37.152.180.213/api/user/profile/user/'+addressArray[0],
         {headers:{
           'Content-Type' : 'application/json',
           'Authorization' :`Token ${localStorage.getItem('token')}`
