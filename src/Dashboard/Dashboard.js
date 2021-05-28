@@ -12,9 +12,9 @@ import {  Link, NavLink } from 'react-router-dom';
 import { DownOutlined,ClockCircleOutlined,ApiOutlined,NodeCollapseOutlined,BorderOutlined,CrownOutlined ,EditOutlined ,EyeOutlined,
   FundProjectionScreenOutlined,LogoutOutlined} from '@ant-design/icons';
 import ApiContent from './ApiPage/ApiContent.js';
-import SearchUser from '../Search/SearchUser'
+import SearchUser from '../Search/SearchUser';
 import Checkbox from 'antd/lib/checkbox/Checkbox';
-import Scenario from '../Scenario/Scenario'
+import Scenario from '../Scenario/Scenario';
 const { TabPane } = Tabs;
 const { SubMenu } = Menu;let a="";
 const { Header, Content, Footer, Sider } = Layout;
@@ -472,7 +472,7 @@ onChangeInputUrl = (input)=>{
           <Link to="/profile"><h4 >Profile</h4></Link>
           </Col>
           <Col span={3}>
-          <Link onClick={this.addScen}><h4 >Scenario</h4></Link>
+          <Link to="/scenario"><h4 >Scenario</h4></Link>
           </Col>
           <Col span={2} >
           <Dropdown overlay={menu}>
@@ -510,8 +510,6 @@ onChangeInputUrl = (input)=>{
               <List.Item style={{borderColor: 'transparent'}}>
               <List.Item.Meta  style={{borderColor: 'transparent'}}
               description={<p className="colect" onClick={()=>this.addNew(item)} style={{fontSize: '14px',cursor: 'pointer',marginLeft: '20%',marginTop: '4%' ,color: 'black' }} > {item.name}</p>}
-    
-    
             />  
             </List.Item></Menu.Item>
           )}

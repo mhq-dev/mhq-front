@@ -272,12 +272,13 @@ class Collection extends React.Component {
       }
     componentDidMount(){
         this.getthis();
-
-      }
+      }    
        
     render() {
         const item=this.state.thisCollection;
             return(
+              <div>
+
                 <div style={{marginTop: '6%'}}>
         <Row >
 
@@ -413,7 +414,8 @@ class Collection extends React.Component {
         </div>
      
       </div>
-        );
+              </div>  
+      );
     }
 }
 export default Collection;

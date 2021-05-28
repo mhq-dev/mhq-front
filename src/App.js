@@ -8,6 +8,7 @@ import EmailConfirmation from './Signup/EmailVerification';
 import Profile from './Profile/Profile';
 import OtherProfile from './Profile/OtherProfile';
 import ApiRunner from './Profile/ApiRunner';
+import Scenario from './Scenario/Scenario';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path='/Profile' exact component={Profile} />
         <Route path='/Profile/*' exact component={OtherProfile} />
         <Route path='/apiRunner' exact component={ApiRunner} />
+        <Route path='/scenario' exact component={Scenario} />
       </Switch>
     </div>
   );

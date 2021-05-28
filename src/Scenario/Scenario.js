@@ -9,12 +9,38 @@ import ConnectionLine from './ConnectionLine';
 import './dnd.css';
 import Sidebar from './Sidebar';
 import localforage from 'localforage';
-import {SettingTwoTone, ToolOutlined} from '@ant-design/icons';
+import {DeleteOutlined, LockOutlined, EditOutlined, DownOutlined } from '@ant-design/icons';
 import './layouting.css';
 import inputNode from './CustomInputNode';
 import defaultNode from './CustomDefaultNode';
 import outputNode from './CustomOutputNode';
+import { message,Modal,Form,Select,Row,Col, Input, Dropdown ,Layout,Menu,Button } from 'antd';
+import axios from 'axios';
+import {  Link, NavLink } from 'react-router-dom';
+import SearchUser from '../Search/SearchUser';
 
+const { Header, Content, Footer, Sider } = Layout;
+const { Option } = Select;
+
+const menu = (
+    <Menu>
+      <Menu.Item >
+        <h5>New</h5>
+      </Menu.Item>
+      <Menu.Item >
+        <h5 target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">
+        Edit 
+        </h5>
+      </Menu.Item>
+      <Menu.Item >
+        <h5 target="_blank" rel="noopener noreferrer" href="https://www.luohanacademy.com">
+        Delete
+        </h5>
+      </Menu.Item >
+      <Menu.Item >Search</Menu.Item>
+    </Menu>
+  
+  );
 
 const initialElements = [
     {
@@ -43,11 +69,37 @@ const nodeTypes = {
   };
 
 const flowKey = 'example-flow';
+
+const initialCols=[];
+axios.get('http://37.152.180.213/api/collection/user/'+localStorage.getItem('username'),
+        {headers:{
+          'Content-Type' : 'application/json',
+          'Authorization' :`Token ${localStorage.getItem('token')}`
+        }}).then((resDimo)=>{
+            var i;        
+            for (i = 0; i < resDimo.data.length; i++) {
+                initialCols.push(resDimo.data[i]);
+            }
+        })
+        .catch((err)=>{
+            message.error(err.message);
+        });
+
+
 const DnDFlow = () => {
     const reactFlowWrapper = useRef(null);
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
     const [elements, setElements] = useState(initialElements);
+    const [vis, setVis] = useState(false);
+    const [scenarioModal, setScenarioModal] = useState(false);
+    const [myRequests, setmyRequests] = useState([]);
+    const [myCols, setmyCols] = useState(initialCols);
+    const [myScenarios, setmyScenarios] = useState([]);
+    const [selectedScenario, setSelectedScenario] = useState(-1);
     let [id, setID] = useState(1);
+    const componentDidMount=()=>{
+        alert("hiii");
+      } 
     const getId = () => `${id+1}`;
     const onConnect = (params) => {
         params = {
@@ -78,7 +130,11 @@ const DnDFlow = () => {
 
     const onDrop = (event) => {
         event.preventDefault();
+        message.error("Moved");
+        setVis(true);
+        ListOfReuqests();
 
+        console.log(elements);
         const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
         const type = event.dataTransfer.getData('application/reactflow');
         const position = reactFlowInstance.project({
@@ -134,31 +190,283 @@ const DnDFlow = () => {
         restoreFlow();
     }, [setElements]);
 
-    return (
-        <div className="dndflow">
-            <ReactFlowProvider>
-                <div className="reactflow-wrapper" ref={reactFlowWrapper}>
-                    <ReactFlow
-                        style = {{height:'550px'}}
-                        elements={elements}
-                        onConnect={onConnect}
-                        onElementsRemove={onElementsRemove}
-                        onLoad={onLoad}
-                        onDrop={onDrop}
-                        onDragOver={onDragOver}
-                        onNodeContextMenu={onNodeContextMenu}
-                        connectionLineComponent={ConnectionLine}
-                        nodeTypes={nodeTypes}
-                    >
-                        <Controls />
-                    </ReactFlow>
-                </div>
-                <Sidebar onSave={onSave} onRestore={onRestore} />
-                <div className="controls">
-        </div>
-            </ReactFlowProvider>
-        </div>
+    function cancelModal(){
+        setVis(false);
+    }
+
+    const ListOfReuqests = () => {
+        axios.get('http://37.152.180.213/api/collection/user/'+localStorage.getItem('username'),
+        {headers:{
+          'Content-Type' : 'application/json',
+          'Authorization' :`Token ${localStorage.getItem('token')}`
+        }}).then((resDimo)=>{
+            var i;        
+            setmyRequests([]); 
+            for (i = 0; i < resDimo.data.length; i++) {
+                axios.get("http://37.152.180.213/api/request/collection/"+resDimo.data[i].id,
+                {headers:{
+                'Content-Type' : 'application/json',
+                'Authorization' :`Token ${localStorage.getItem('token')}`
+                }}).then((res)=>{  
+                    var j;
+                    for (j = 0; j < res.data.length; j++) { 
+                        setmyRequests((es) => es.concat(res.data[j]));
+                    }
+                })
+                .catch((err)=>{
+                    message.error("errssssss");
+                })
+            }
+            console.log(myRequests);        
+        })
+        .catch((err)=>{
+            message.error(err.message);
+        })
+    };
+
+    const methodAndUrl = (d) =>{
+        return d.http_method+"_"+d.url;
+    }
+
+    const onSelect = value=>{
+        var splitedValue=value.split("_");
+        var x="";
+        var j;
+        for (j = 1; j < splitedValue.length; j++) { 
+            x=x+splitedValue[j]+"_";
+        }
+        x=x.substring(0,x.length-1);
+        document.getElementById("scenario_method").value = splitedValue[0];
+        document.getElementById("scenario_url").value = x;
+
+    }
+    const doneModal = ()=>{
         
+    }
+    const ClickedMenuForCol=(theID)=>{
+        localStorage.setItem('selectedCollection',theID);
+        axios.get('http://37.152.180.213/api/scenario/collection/'+theID,
+        {headers:{
+          'Content-Type' : 'application/json',
+          'Authorization' :`Token ${localStorage.getItem('token')}`
+        }}).then((resDimo)=>{
+            var i;        
+            for (i = 0; i < resDimo.data.length; i++) {
+                setmyScenarios((es) => es.concat(resDimo.data[i]));                
+            }
+            setSelectedScenario(-1);
+            setScenarioModal(true);
+        })
+        .catch((err)=>{
+            message.error(err.message);
+        });       
+    }
+    const cancelScenarioModal=()=>{
+        setScenarioModal(false);
+    }
+    const doneScenarioModal=()=>{
+        if(selectedScenario==(-1)){
+            message.error("Please select a scenario or create new one!");
+        } else{
+            setScenarioModal(false);
+        }
+    }
+    const createScenarioModal=()=>{
+        console.log(localStorage.getItem('token'));
+        var newScenarioName=document.getElementById('new_scenario_name').value;
+        // alert(newScenarioName+"***"+localStorage.getItem('selectedCollection'));
+        axios.post('http://37.152.180.213/api/scenario/create_scenario',
+        {
+            "name":newScenarioName,
+            "collection":localStorage.getItem('selectedCollection')
+        },
+        {headers:{
+          'Content-Type' : 'application/json',
+          'Authorization' :`Token ${localStorage.getItem('token')}`
+        }}).then((resDimo)=>{
+            message.error("Created Successfully");
+            setScenarioModal(false);
+            var dndflow=document.getElementById('dndflow');
+            dndflow.classList.toggle('visib');
+            var noScenario=document.getElementById('no-scenario');
+            noScenario.classList.toggle('hidden');
+        })
+        .catch((err)=>{
+            message.error(err.message);
+        });       
+
+        
+    }
+    const onSelectScenario = value=>{
+        setSelectedScenario(value);
+    }
+    return (
+        <div STYLE="overflow-y: hidden;">
+        <Modal
+        className='signup-card'
+        visible={scenarioModal}
+        title="Select a scenario or create new one!"
+        closable={false}
+        footer={[
+            <button className="cancel-account-button" key="cancel" type="secondary" onClick={cancelScenarioModal}>
+                Cancel
+            </button>,
+            <button className="done-scenario-button" key="Done" type="primary" onClick={doneScenarioModal}>
+                Done
+            </button>
+        ]}>
+        <div>
+        
+        <Form
+            name="normal_singup"
+            STYLE="background-color:#fcfcfc;"
+        >
+            <Select STYLE="width:100%; background-color:#ffffff;" onSelect={onSelectScenario}>
+                {myScenarios.map(d=><Option value={d.id}>{d.name}</Option>)}
+            </Select>
+            <Row>
+                <Col span={11}></Col>
+                <Col span={2}><p STYLE="margin:10px; font-weight: bold;">Or</p></Col>
+                <Col span={11}></Col>
+            </Row>
+            
+            <Row>
+                        <Col span={20}>
+                            <Input id="new_scenario_name" placeholder="New scenario's name"></Input>
+                        </Col>
+                        <Col span={4}>
+                            <button className="create-scenario-button" key="Create" type="primary" onClick={createScenarioModal}>
+                            Create
+                            </button>
+                        </Col>                
+            </Row>
+        </Form>
+   
+        </div>
+        </Modal>
+
+
+
+
+
+
+
+            <Header  style={{width:'100%', height: '8vh',backgroundColor: 'transparent',padding: '0px',borderBottom: '1px solid rgb(204 204 204)',lineHeight: '3.75'}}>
+            <Row justify="start" style={{width: '100%',marginLeft: '-1%'}}>
+            <Col span={2}>
+            <Link to="/dashboard"><h4 >Home</h4></Link>
+            </Col>
+            <Col span={3} >
+            <Link to="/profile"><h4 >Profile</h4></Link>
+            </Col>
+            <Col span={3}>
+            <Link to="/scenario"><h4 >Scenario</h4></Link>
+            </Col>
+            <Col span={2} >
+            <Dropdown overlay={menu}>
+            <h4 className="ant-dropdown-link" onClick={e => e.preventDefault()}style={{color: 'black'}} >
+            Workspaces <DownOutlined />
+            </h4>
+            </Dropdown>
+            </Col>
+            <Col span={4} style={{float: 'right' , marginLeft: '40%'}}>
+            <SearchUser/>
+            </Col>
+            </Row>
+            </Header>
+            
+            <Row >
+                <Col flex={2}>
+            <Sider theme={"dark"}  collapsible style={{width: '20%' ,minHeight: '90vh'}} 
+            STYLE="text-align:left; color:#ffffff; font-weight: bold; background-color:#282828;">
+                <Menu
+                    mode="inline"
+                    theme={"dark"}
+                    style={{ position: "sticky",height: '20vh' }}
+                    STYLE="text-align:left; color:#78c622; font-weight: bold; background-color:#282828;">
+                
+                    {myCols.map(d=>
+                        <Menu.Item onClick={()=>ClickedMenuForCol(d.id)} STYLE="text-align:left; color:#ffffff; font-weight: bold; background-color:#282828;">
+                        {d.name}
+                        </Menu.Item>    
+                        )}
+                    
+                </Menu>
+            </Sider>
+        </Col>
+                <Col flex={8}>
+                <p className="no-scenario" id="no-scenario">Please Select A Scenario!</p>
+                <div className="dndflow" id="dndflow">
+                <Modal
+                className='signup-card'
+                visible={vis}
+                title="Enter your api information"
+                closable={false}
+                footer={[
+                    <button className="cancel-account-button" key="cancel" type="secondary" onClick={cancelModal}>
+                        Cancel
+                    </button>,
+                    <button className="done-scenario-button" key="Done" type="primary" onClick={doneModal}>
+                        Done
+                    </button>
+                ]}>
+                <div>
+                
+                <Form
+                    name="normal_singup"
+                    STYLE="background-color:#fcfcfc;"
+                >
+                    <Select STYLE="width:100%; background-color:#ffffff;" onSelect={onSelect}>
+                        {myRequests.map(d=><Option value={methodAndUrl(d)}>{d.name}</Option>)}
+                    </Select>
+                    <Row STYLE="margin-top:10px;">
+                        <Col span={6}>
+                            <p STYLE="margin-right:5px;">Method</p>
+                        </Col>
+                        <Col span={18}>
+                            <p STYLE="margin-left:5px;">URL</p>
+                        </Col>                
+                    </Row>
+                    <Row STYLE="margin-top:-15px;">
+                        <Col span={6}>
+                            <Input id="scenario_method" disabled={true} STYLE="margin-right:5px;"></Input>
+                        </Col>
+                        <Col span={18}>
+                            <Input id="scenario_url" disabled={true} STYLE="margin-left:5px;" ></Input>
+                        </Col>                
+                    </Row>
+                </Form>
+           
+                </div>
+                </Modal>
+                
+                <ReactFlowProvider>
+                    <div className="reactflow-wrapper" ref={reactFlowWrapper}>
+                        <ReactFlow
+                            style = {{height:'550px'}}
+                            elements={elements}
+                            onConnect={onConnect}
+                            onElementsRemove={onElementsRemove}
+                            onLoad={onLoad}
+                            onDrop={onDrop}
+                            onDragOver={onDragOver}
+                            onNodeContextMenu={onNodeContextMenu}
+                            connectionLineComponent={ConnectionLine}
+                            nodeTypes={nodeTypes}
+                        >
+                            <Controls />
+                        </ReactFlow>
+                    </div>
+                    <Sidebar onSave={onSave} onRestore={onRestore} />
+                    <div className="controls">
+                    </div>
+                </ReactFlowProvider>
+                
+                </div>
+                </Col>
+            </Row>
+       
+        </div>
     );
 };
 

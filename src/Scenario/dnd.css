@@ -1,21 +1,38 @@
 .dndflow {
+    visibility: hidden;
+    overflow-y: hidden;
     flex-direction: column;
     display: flex;
     height: 100%;
-  }
-  
-  .dndflow aside {
+}
+
+.dndflow.visib {
+    visibility: visible;
+}
+
+.no-scenario {
+    width: 100%;
+    text-align: center;
+    color: #ffffff;
+    vertical-align: middle;
+}
+
+.no-scenario.hidden {
+    visibility: hidden;
+}
+
+.dndflow aside {
     border-right: 1px solid #eee;
     padding: 15px 10px;
     font-size: 12px;
     background: #fcfcfc;
-  }
-  
-  .dndflow aside .description {
+}
+
+.dndflow aside .description {
     margin-bottom: 10px;
-  }
-  
-  .dndflow .dndnode {
+}
+
+.dndflow .dndnode {
     height: 20px;
     padding: 4px;
     border: 1px solid #1a192b;
@@ -25,29 +42,27 @@
     justify-content: center;
     align-items: center;
     cursor: grab;
-  }
-  
-  .dndflow .dndnode.input {
+}
+
+.dndflow .dndnode.input {
     border-color: #0041d0;
-  }
-  
-  .dndflow .dndnode.output {
+}
+
+.dndflow .dndnode.output {
     border-color: #ff0072;
-  }
-  
-  .dndflow .reactflow-wrapper {
+}
+
+.dndflow .reactflow-wrapper {
     flex-grow: 1;
     height: 100%;
-  }
-  
-  @media screen and (min-width: 768px) {
+}
+
+@media screen and (min-width: 768px) {
     .dndflow {
-      flex-direction: row;
+        flex-direction: row;
     }
-  
     .dndflow aside {
-      width: 20%;
-      max-width: 250px;
+        width: 20%;
+        max-width: 250px;
     }
-  }
-  
+}
