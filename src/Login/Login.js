@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import 'antd/dist/antd.css';
 import './Login.css';
 import { Form, Input, Button, Checkbox, Typography, Card, message } from 'antd';
@@ -59,7 +59,7 @@ function Login() {
                         },
                     ]}
                 >
-                    <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Username" />
+                    <Input id='username' prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Username" />
                 </Form.Item>
                 <Form.Item
                     name="password"
@@ -71,6 +71,7 @@ function Login() {
                     ]}
                 >
                     <Input
+                        id='password'
                         prefix={<LockOutlined className="site-form-item-icon" />}
                         type="password"
                         placeholder="Password"
@@ -91,7 +92,7 @@ function Login() {
                         Log in
                     </Button>
                     <Typography style={{ margin: '8px' }}>
-                        Or <a href="/signup">register now!</a>
+                        Or <a className="login-form-register" href="/signup">register now!</a>
                     </Typography>
                 </Form.Item>
             </Form>

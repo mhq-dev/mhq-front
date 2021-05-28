@@ -1,11 +1,15 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import 'antd/dist/antd.css';
-import { Button, Card, Col, Divider, Input,Form, Popconfirm, Row, Select, Table, Tabs, Spin, message } from 'antd';
+import { Button, Card, Col, Divider, Input,Form, Popconfirm, Row, Select, Table, Tabs, Spin, Layout,Menu,Dropdown } from 'antd';
 import { Option } from 'antd/lib/mentions';
-import './ApiContent.css'
+import './ApiRunner.css';
 import ReactJson from 'react-json-view';
 import axios from 'axios';
-
+import { DownOutlined} from '@ant-design/icons';
+import {  Link, NavLink } from 'react-router-dom';
+import SearchUser from '../Search/SearchUser'
+const { Header, Content, Footer, Sider } = Layout;
+const { SubMenu } = Menu;
 const { TabPane } = Tabs;
 const EditableContext = React.createContext(null);
 
@@ -19,6 +23,25 @@ const EditableRow = ({ index, ...props }) => {
         </Form>
     );
 };
+const menu = (
+    <Menu>
+      <Menu.Item >
+        <h5>New</h5>
+      </Menu.Item>
+      <Menu.Item >
+        <h5 target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">
+        Edit 
+        </h5>
+      </Menu.Item>
+      <Menu.Item >
+        <h5 target="_blank" rel="noopener noreferrer" href="https://www.luohanacademy.com">
+        Delete
+        </h5>
+      </Menu.Item >
+      <Menu.Item >Search</Menu.Item>
+    </Menu>
+  
+  );
 
 const EditableCell = ({
     title,
@@ -85,8 +108,7 @@ const EditableCell = ({
 };
 
 
-
-export default class ApiContent extends React.Component {
+export default class ApiRunner extends React.Component {
     constructor(props) {
         super(props);
         this.columnsParams = [
@@ -168,8 +190,6 @@ export default class ApiContent extends React.Component {
                     key: '0',
                     the_key: '',
                     value: '',
-                    enable:false,
-                    description:''
                 },
             ],
             dataSourceHeaders: [
@@ -177,8 +197,6 @@ export default class ApiContent extends React.Component {
                     key: '0',
                     the_key: '',
                     value: '',
-                    enable:false,
-                    description:''
                 },
             ],
             dataSourceBody: [
@@ -193,9 +211,9 @@ export default class ApiContent extends React.Component {
             selectedRowsHeaders:[],
             selectedRowsBody:[],
             json:{},
-            url:'',
-            id: props.id,
-            method_tpye: '',
+            url:localStorage.getItem('apiUrl'),
+            id: localStorage.getItem('apiID'),
+            method_tpye: localStorage.getItem('apiMethod').toUpperCase(),
             params: {},
             headers: {},
             body:{},
@@ -505,60 +523,6 @@ export default class ApiContent extends React.Component {
             this.onLodingChange(false)
         })
 }
-    handleSaveAPI = ()=>{
-        this.onLodingChangeSave(true)
-        let dataParams = []
-        this.state.dataSourceParams.map((param)=>{
-            if (param.the_key !== ""){
-                const newdata = {
-                    "enable": param.enable,
-                    "key": param.the_key,
-                    "value": param.value,
-                    "description": "description",
-                }
-                dataParams.push(newdata)
-            }
-        })
-        let dataHeader = []
-        this.state.dataSourceHeaders.map((header)=>{
-            if (header.the_key !== ""){
-                const newdata = {
-                    "enable": header.enable,
-                    "key": header.the_key,
-                    "value": header.value,
-                    "description": "description",
-                }
-                dataHeader.push(newdata)
-            }
-        })
-        let dataBody = {}
-        Object.entries(this.state.body).map(([key,val],index)=>{
-            if (key !== ""){
-                dataBody[key] = val
-            }
-        })
-        console.log(dataBody)
-        console.log(dataParams)
-        console.log(dataHeader)
-        const config = {
-            headers: { Authorization: `Token ${localStorage.getItem("token")}` },
-        };
-        axios.put(`http://37.152.188.83/api/request/${this.state.id}/`,{
-            http_method:this.state.method_tpye,
-            url:this.state.url,
-            body:this.state.body,
-            headers:dataHeader,
-            params:dataParams
-        },config)
-        .then((response)=>{
-            console.log(response.data)
-            this.onLodingChangeSave(false)
-            message.success('Saved successfuly')
-        })
-        .catch((response)=>{
-            message.error(response)
-        })
-    }
 
     onChangeInputUrl = (input)=>{
         this.setState({url:input.target.value})
@@ -575,6 +539,8 @@ export default class ApiContent extends React.Component {
     onLodingChangeSave = (value)=>{
         this.setState({ isloadingSave: value });
     }
+
+
 
     render() {
         const { dataSourceParams: dataSourceParams } = this.state;
@@ -636,29 +602,51 @@ export default class ApiContent extends React.Component {
         });
         
         return (
-            <div>
-                <Row align='middle'>
+            <div >
+            <Header  style={{ height: '8vh',backgroundColor: 'transparent',padding: '0px',borderBottom: '1px solid rgb(204 204 204)',lineHeight: '3.75'}}>
+                        <Row justify="start" style={{width: '100%',marginLeft: '-1%'}}>
+                        <Col span={2}>
+                        <Link to="/dashboard"><h4 >Home</h4></Link>
+                        </Col>
+                        <Col span={3} >
+                        <Link to="/profile"><h4 >Profile</h4></Link>
+                        </Col>
+                        <Col span={3}>
+                        <Link onClick={this.addScen}><h4 >Scenario</h4></Link>
+                        </Col>
+                        <Col span={2} >
+                        <Dropdown overlay={menu}>
+                    <h4 className="ant-dropdown-link" onClick={e => e.preventDefault()}style={{color: 'black'}} >
+                    Workspaces <DownOutlined />
+                    </h4>
+                </Dropdown>
+                        </Col>
+                        <Col span={4} style={{float: 'right' , marginLeft: '40%'}}>
+          <SearchUser/>
+          </Col>
+                        
+                        </Row>
+                        </Header>
+            <Row STYLE="margin: 20px;">
+                    <Col flex="0px">
+                                
+                    </Col>
+                    <Col flex="auto" id="profile-text">
+                    <Row align='middle'>
                     <Col lg={2} xs={2} sm={4} md={6}>
-                        <Select onChange={this.onChangeSelect} value={this.state.method_tpye} style={{ width: 100 }}>
-                            <Option value="post">POST</Option>
-                            <Option value="get">GET</Option>
-                            <Option value="delete">DELETE</Option>
-                            <Option value="put">PUT</Option>
+                        <Select disabled="true" onChange={this.onChangeSelect} value={this.state.method_tpye} style={{ width: 100 }}>
+                            <Option>{this.state.method_tpye}</Option>
                         </Select>
                     </Col>
                     <Col lg={14} xs={18} sm={12} md={10}>
                         <Input value={this.state.url} defaultValue={this.state.url} placeholder='Url' onChange={this.onChangeInputUrl} />
                     </Col>
                     <Col lg={2} xs={2} sm={4} md={4}>
-                        <Button htmlType="button" type='primary' onClick={this.handleSend} id='send'>
+                        <Button htmlType="button" type='primary' onClick={this.handleSend}>
                             Send
                         </Button>
                     </Col>
-                    <Col lg={6} xs={2} sm={4} md={4}>
-                        <Button htmlType="button" type='default' onClick={this.handleSaveAPI}>
-                            Save
-                        </Button>
-                    </Col>
+                    
 
                 </Row>
                 <Divider orientation='left'>Details</Divider>
@@ -779,6 +767,12 @@ export default class ApiContent extends React.Component {
                         </Card>
                     </Col>
                 </Row>
+                </Col>
+                </Row>
+                
+
+
+                
             </div>
 
         );
