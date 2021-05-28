@@ -168,6 +168,8 @@ export default class ApiContent extends React.Component {
                     key: '0',
                     the_key: '',
                     value: '',
+                    enable:false,
+                    description:''
                 },
             ],
             dataSourceHeaders: [
@@ -175,6 +177,8 @@ export default class ApiContent extends React.Component {
                     key: '0',
                     the_key: '',
                     value: '',
+                    enable:false,
+                    description:''
                 },
             ],
             dataSourceBody: [
@@ -206,43 +210,38 @@ export default class ApiContent extends React.Component {
         axios.get(`http://37.152.188.83/api/request/${this.state.id}/`,config)
         .then((response)=>{
             console.log(response.data.http_method)
-            let fields = response.data.body;
+            let fields = response.data;
             let headers,body,params;
             console.log(response)
-            fields.map((field)=>{
-                if(field.headers !== undefined){
-                    headers = field.headers;
-                }
-                else if(field.body !== undefined){
-                    body = field.body;
-                }
-                else{
-                    params = field.params;
-                }
-            })
+            headers = fields.headers;
+            body = fields.body;
+            params = fields.params;
+
             this.setState({headers:headers,body:body,params:params})
-            if(headers !== undefined){
-                let dataSourceHeaders= []
-                Object.entries(headers).map(([key,val],index)=>{
-                    dataSourceHeaders.push(
+            let dataSourceHeaders= []
+            headers.map((header, index)=>{
+                dataSourceHeaders.push(
                     {
                         key: this.state.count,
-                        the_key: key,
-                        value: val,
+                        the_key: header.key,
+                        value: header.value,
+                        enable:false,
+                        description:''
                     })
-                    if(Object.entries(headers).length-1 === index){
-                        dataSourceHeaders.push({
-                            key: this.state.count + 1,
-                            the_key: '',
-                            value: '',
-                        })
-                    }
-                    this.setState({
-                        dataSourceHeaders: [...dataSourceHeaders],
-                        count: this.state.count + 2
+                if(headers.length-1 === index ){
+                    dataSourceHeaders.push({
+                        key: this.state.count + 1,
+                        the_key: '',
+                        value: '',
+                        enable:false,
+                        description:''
                     })
+                }
+                this.setState({
+                    dataSourceHeaders: [...dataSourceHeaders],
+                    count: this.state.count + 2
                 })
-            }
+            })
             if(body !== undefined){
                 let dataSourceBody= []
                 Object.entries(body).map(([key,val],index)=>{
@@ -265,28 +264,30 @@ export default class ApiContent extends React.Component {
                     })
                 })
             }
-            if(params !== undefined){
-                let dataSourceParams= []
-                Object.entries(params).map(([key,val],index)=>{
-                    dataSourceParams.push(
+            let dataSourceParams= []
+            params.map((param, index)=>{
+                dataSourceParams.push(
                     {
                         key: this.state.count,
-                        the_key: key,
-                        value: val,
+                        the_key: param.key,
+                        value: param.value,
+                        enable:false,
+                        description:''
                     })
-                    if(Object.entries(params).length-1 === index){
-                        dataSourceParams.push({
-                            key: this.state.count + 1,
-                            the_key: '',
-                            value: '',
-                        })
-                    }
-                    this.setState({
-                        dataSourceParams: [...dataSourceParams],
-                        count: this.state.count + 2
+                if(params.length-1 === index ){
+                    dataSourceParams.push({
+                        key: this.state.count + 1,
+                        the_key: '',
+                        value: '',
+                        enable:false,
+                        description:''
                     })
+                }
+                this.setState({
+                    dataSourceParams: [...dataSourceParams],
+                    count: this.state.count + 2
                 })
-            }
+            })
             this.setState({
                 method_tpye:response.data.http_method,
                 url:response.data.url,
@@ -298,6 +299,20 @@ export default class ApiContent extends React.Component {
             console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
             this.setState({selectedRowsParams: selectedRows})
             console.log(this.state.selectedRowsParams);
+            let flag = false;
+            let params = this.state.dataSourceParams;
+            params.map((param)=>{
+                selectedRowKeys.map((n)=>{
+                    if (param.key === n){
+                        param.enable = true
+                        flag = true
+                    }
+                })
+                if (!flag){
+                    param.enable = false
+                }
+                flag = false
+            })
             let url = this.state.url
             url = url.split('?')[0]
             selectedRows.map((row,index)=>{
@@ -309,7 +324,7 @@ export default class ApiContent extends React.Component {
                     url += '&'
                 }
             })
-            this.setState({url:url})
+            this.setState({url:url,dataSourceParams:params})
             console.log(this.state.url);
           },
           getCheckboxProps: (record) => ({
@@ -323,6 +338,21 @@ export default class ApiContent extends React.Component {
             console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
             this.setState({selectedRowsHeaders: selectedRows})
             console.log(this.state.selectedRowsHeaders);
+            let flag = false;
+            let headers = this.state.dataSourceHeaders;
+            headers.map((header)=>{
+                selectedRowKeys.map((n)=>{
+                    if (header.key === n){
+                        header.enable = true
+                        flag = true
+                    }
+                })
+                if (!flag){
+                    header.enable = false
+                }
+                flag = false
+            })
+            this.setState({dataSourceHeaders:headers})
           },
           getCheckboxProps: (record) => ({
             disabled: record.the_key === '', disabled: record.value === '',
@@ -347,7 +377,10 @@ export default class ApiContent extends React.Component {
         let data = {}
         dataSource.map((item)=>{
             if (item.key !== key){
-                data[item.the_key] = item.value
+                data["value"] = item.value
+                data["key"] = item.the_key
+                data["enable"] = item.enable
+                data["description"] = item.description
             }
         })
         this.setState({
@@ -360,7 +393,10 @@ export default class ApiContent extends React.Component {
         let data = {}
         dataSourceHeaders.map((item)=>{
             if (item.key !== key){
-                data[item.the_key] = item.value
+                data["value"] = item.value
+                data["key"] = item.the_key
+                data["enable"] = item.enable
+                data["description"] = item.description
             }
         })
         this.setState({
@@ -387,6 +423,8 @@ export default class ApiContent extends React.Component {
             key: count,
             the_key: ``,
             value: '',
+            enable:false,
+            description:''
         };
         this.setState({
             dataSourceParams: [...dataSourceParams, newData],
@@ -399,6 +437,8 @@ export default class ApiContent extends React.Component {
             key: count,
             the_key: ``,
             value: '',
+            enable:false,
+            description:''
         };
         this.setState({
             dataSourceHeaders: [...dataSourceHeaders, newData],
@@ -456,85 +496,59 @@ export default class ApiContent extends React.Component {
 
     handleSend = ()=>{
         this.onLodingChange(true)
-        let dataBody = {}
-        if(this.state.selectedRowsBody.length !== 0){
-            this.state.selectedRowsBody.map((select)=>{
-                dataBody[select.the_key] = select.value
-            })
-        }
-        let dataHeader = {}
-        if(this.state.selectedRowsHeaders.length !== 0){
-            this.state.selectedRowsHeaders.map((select)=>{
-                dataHeader[select.the_key] = select.value
-            })
-        }
         const config = {
-            headers: dataHeader,
-          };
-        if(this.state.method_tpye === 'post'){
-            axios.post(this.state.url,dataBody,config)
-            .then((response)=>{
-                this.setState({json:response})
-                this.onLodingChange(false)
-            })
-            .catch((error)=>{
-                this.setState({json:error.response})
-                this.onLodingChange(false)
-            })
-        }
-        else if(this.state.method_tpye === 'get'){
-            axios.get(this.state.url,config)
-            .then((response)=>{
-                this.setState({json:response})
-                this.onLodingChange(false)
-            })
-            .catch((error)=>{
-                this.setState({json:error.response})
-                this.onLodingChange(false)
-            })
-        }
-        else if(this.state.method_tpye === 'delete'){
-            axios.delete(this.state.url,config)
-            .then((response)=>{
-                this.setState({json:response})
-                this.onLodingChange(false)
-            })
-            .catch((error)=>{
-                this.setState({json:error.response})
-                this.onLodingChange(false)
-            })
-        }
-        else if(this.state.method_tpye === 'put'){
-            axios.put(this.state.url,dataBody,config)
-            .then((response)=>{
-                this.setState({json:response})
-                this.onLodingChange(false)
-            })
-            .catch((error)=>{
-                this.setState({json:error.response})
-                this.onLodingChange(false)
-            })
-        }
+        headers: { Authorization: `Token ${localStorage.getItem("token")}` },
+        };
+        axios.get(`http://37.152.188.83/api/request/${this.state.id}/execute/`,config)
+        .then((response)=>{
+            this.setState({json:response})
+            this.onLodingChange(false)
+        })
 }
     handleSaveAPI = ()=>{
         this.onLodingChangeSave(true)
+        let dataParams = []
+        this.state.dataSourceParams.map((param)=>{
+            if (param.the_key !== ""){
+                const newdata = {
+                    "enable": param.enable,
+                    "key": param.the_key,
+                    "value": param.value,
+                    "description": "description",
+                }
+                dataParams.push(newdata)
+            }
+        })
+        let dataHeader = []
+        this.state.dataSourceHeaders.map((header)=>{
+            if (header.the_key !== ""){
+                const newdata = {
+                    "enable": header.enable,
+                    "key": header.the_key,
+                    "value": header.value,
+                    "description": "description",
+                }
+                dataHeader.push(newdata)
+            }
+        })
+        let dataBody = {}
+        Object.entries(this.state.body).map(([key,val],index)=>{
+            if (key !== ""){
+                dataBody[key] = val
+            }
+        })
+        console.log(dataBody)
+        console.log(dataParams)
+        console.log(dataHeader)
         const config = {
             headers: { Authorization: `Token ${localStorage.getItem("token")}` },
         };
         axios.put(`http://37.152.188.83/api/request/${this.state.id}/`,{
             http_method:this.state.method_tpye,
             url:this.state.url,
-            body:[
-                {
-                    headers:this.state.headers
-                },
-                {
-                    body:this.state.body
-                },
-                {
-                    params:this.state.params
-                }
-            ]
+            body:this.state.body,
+            headers:dataHeader,
+            params:dataParams
         },config)
         .then((response)=>{
             console.log(response.data)
