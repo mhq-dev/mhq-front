@@ -82,7 +82,7 @@ class Profile extends React.Component {
                 <Link to="/profile"><h4 >Profile</h4></Link>
                 </Col>
                 <Col span={3}>
-                <Link onClick={this.addScen}><h4 >Scenario</h4></Link>
+                <Link to="/scenario"><h4 >Scenario</h4></Link>
                 </Col>
                 <Col span={2} >
                 <Dropdown overlay={menu}>

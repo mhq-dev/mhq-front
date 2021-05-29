@@ -94,9 +94,7 @@ const DnDFlow = () => {
     const [yPosition, setyPosition] = useState(-1);
     const [typeReactFlow, setTypeReactFlow] = useState(null);
     let [id, setID] = useState(0);
-    const componentDidMount=()=>{
-        alert("hiii");
-      } 
+    
     const getId = () => `${id+1}`;
     const onConnect = (params) => {
         console.log(params);
@@ -113,12 +111,34 @@ const DnDFlow = () => {
 
         setElements((els) => addEdge(params, els));
     }
-    const onElementsRemove = (elementsToRemove) =>
-        setElements((els) => removeElements(elementsToRemove, els));
+    const onElementsRemove = (elementsToRemove) => {
+        console.log(elementsToRemove[0].id);
+        var tempEl=[];
+        var j;
+        for(j=0;j<elements.length;j++){
+            if(elements[j].id!=elementsToRemove[0].id){
+                tempEl.push(elements[j]);
+            }
+        }
+        
+        setElements(tempEl);
 
+        axios.delete('http://37.152.180.213/api/module/'+elementsToRemove[0].id,
+        {headers:{
+          'Content-Type' : 'application/json',
+          'Authorization' :`Token ${localStorage.getItem('token')}`
+        }}).then((resDimo)=>{
+            message.success("Removed!");
+        })
+        .catch((err)=>{
+            message.error(err.message);
+        });   
+
+        // setElements((els) => removeElements(elementsToRemove, els));
+    }
         const onLoad = (_reactFlowInstance) =>{
         setReactFlowInstance(_reactFlowInstance);
-
+        
         }
 
     const onDragOver = (event) => {
@@ -130,11 +150,11 @@ const DnDFlow = () => {
         event.preventDefault();
         setVis(true);
         ListOfReuqests();
-
+        const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
         setxPosition(event.clientX - reactFlowBounds.left);
         setyPosition(event.clientY - reactFlowBounds.top);
         setTypeReactFlow(event.dataTransfer.getData('application/reactflow'));
-        
+
     };
     const onSave = useCallback(() => {
         if (reactFlowInstance) {
@@ -278,6 +298,7 @@ const DnDFlow = () => {
           'Content-Type' : 'application/json',
           'Authorization' :`Token ${localStorage.getItem('token')}`
         }}).then((resDimo)=>{
+            
             var i;        
             setmyScenarios([]);
             for (i = 0; i < resDimo.data.length; i++) {
@@ -298,79 +319,43 @@ const DnDFlow = () => {
             message.error("Please select a scenario or create new one!");
         } else{
             setScenarioModal(false);
-           
-            const type = 'inputNode';
-            const position = reactFlowInstance.project({
-                x: 100,
-                y: 100,
-            });
-            setElements([]);
-            const newNode = {
-                id: 0,
-                type,
-                position,
-                style: { width: '100px',height: '100px',borderRadius: '50px', backgroundColor:'white'},
-                targetPosition :  'left',
-                sourcePosition : 'right',
-                data: { label: `${type} node` },
-            };            
-            setElements((es) => es.concat(newNode));
-
-            const type1 = 'inputNode'; 
-            var x,y;
-            const position1 = reactFlowInstance.project({
-                x: 200,
-                y: 200,
-            });
-            const newNode1 = {
-                id: 1,
-                type1,
-                position1,
-                style: { width: '100px',height: '100px',borderRadius: '50px', backgroundColor:'white'},
-                targetPosition :  'left',
-                sourcePosition : 'right',
-                data: { label: `${type1} node` },
-            };
-            setElements((es) => es.concat(newNode1));
-            // params = {
-            //     ...params,
-            //     animated: true,
-            //     arrowHeadType: 'arrow',
-            //     style: {strokeWidth:3},
-            //     // label:'Setting',
-            //     // labelStyle:{fill:'#fff',fontWeight: 800},
-            //     // labelShowBg:false,
-            // }
-            // console.log(params);
-    
-            // setElements((els) => addEdge(params, els));
-            var dndflow=document.getElementById('dndflow');
-            if(!dndflow.classList.contains('visib')){                
-                dndflow.classList.toggle('visib');
-                var noScenario=document.getElementById('no-scenario');
-                noScenario.classList.toggle('hidden');
-            }
             
+            axios.get('http://37.152.180.213/api/scenario/all_modules/'+selectedScenario,
+            {headers:{
+            'Content-Type' : 'application/json',
+            'Authorization' :`Token ${localStorage.getItem('token')}`
+            }}).then((resDimo)=>{
+                message.success("Loaded Successfully");
+                console.log(resDimo);
+                setScenarioModal(false);
+                var thisElements=[];
 
-            // axios.get('http://37.152.180.213/api/scenario/'+localStorage.getItem('selectedCollection')+"/"+selectedScenario,
-            // {headers:{
-            // 'Content-Type' : 'application/json',
-            // 'Authorization' :`Token ${localStorage.getItem('token')}`
-            // }}).then((resDimo)=>{
-            //     message.success("Loaded Successfully");
-            //     console.log(resDimo);
-            //     setScenarioModal(false);
-                
-            //     var dndflow=document.getElementById('dndflow');
-            //     if(!dndflow.classList.contains('visib')){                
-            //     dndflow.classList.toggle('visib');
-            //     var noScenario=document.getElementById('no-scenario');
-            //     noScenario.classList.toggle('hidden');
-            //     }
-            // })
-            // .catch((err)=>{
-            //     message.error(err.message);
-            // });   
+                var i;
+                for (i = 0; i < resDimo.data.length; i++) {
+                    thisElements.push(
+                        {
+                            id: resDimo.data[i].id,
+                            type: 'defaultNode',
+                            data: { label: 'input node' },
+                            style: { width: '100px',height: '100px',borderRadius: '50px', backgroundColor:'white'},
+                            targetPosition :  'left',
+                            sourcePosition : 'right',
+                            position: { x: resDimo.data[i].x_position, y: resDimo.data[i].y_position },
+                        }
+                    );           
+                }
+                setElements(thisElements);
+
+                var dndflow=document.getElementById('dndflow');
+                if(!dndflow.classList.contains('visib')){                
+                    dndflow.classList.toggle('visib');
+                    var noScenario=document.getElementById('no-scenario');
+                    noScenario.classList.toggle('hidden');
+                }
+            })
+            .catch((err)=>{
+                message.error(err.message);
+            });   
         }
     }
     const createScenarioModal=()=>{
