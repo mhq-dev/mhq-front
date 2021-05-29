@@ -41,7 +41,7 @@ const menu = (
     </Menu>
   
   );
-
+console.log(localStorage.getItem('token'));
 const initialElements = [
     
 ];
@@ -92,12 +92,14 @@ const DnDFlow = () => {
     const [newModule, setnewModule] = useState(-1);
     const [xPosition, setxPosition] = useState(-1);
     const [yPosition, setyPosition] = useState(-1);
+    const [typeReactFlow, setTypeReactFlow] = useState(null);
     let [id, setID] = useState(0);
     const componentDidMount=()=>{
         alert("hiii");
       } 
     const getId = () => `${id+1}`;
     const onConnect = (params) => {
+        console.log(params);
         params = {
             ...params,
             animated: true,
@@ -107,7 +109,7 @@ const DnDFlow = () => {
             // labelStyle:{fill:'#fff',fontWeight: 800},
             // labelShowBg:false,
         }
-        console.log(params)
+        console.log(params);
 
         setElements((els) => addEdge(params, els));
     }
@@ -126,33 +128,12 @@ const DnDFlow = () => {
 
     const onDrop = (event) => {
         event.preventDefault();
-        message.error("Moved"+id);
         setVis(true);
         ListOfReuqests();
 
-        console.log(elements);
-        const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
-        const type = event.dataTransfer.getData('application/reactflow');
-        const position = reactFlowInstance.project({
-            x: event.clientX - reactFlowBounds.left,
-            y: event.clientY - reactFlowBounds.top,
-        });
         setxPosition(event.clientX - reactFlowBounds.left);
         setyPosition(event.clientY - reactFlowBounds.top);
-        const newNode = {
-            id: getId(),
-            type,
-            position,
-            style: { width: '100px',height: '100px',borderRadius: '50px', backgroundColor:'white'},
-            targetPosition :  'left',
-            sourcePosition : 'right',
-            data: { label: `${type} node` },
-        };
-        setID(parseInt(getId()))
-        console.log(id)
-
-        setElements((es) => es.concat(newNode));
-
+        setTypeReactFlow(event.dataTransfer.getData('application/reactflow'));
         
     };
     const onSave = useCallback(() => {
@@ -253,6 +234,25 @@ const DnDFlow = () => {
         }}).then((resDimo)=>{
             message.success("Added");
             setnewModule(resDimo.data.id);
+
+            const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
+            const type = typeReactFlow;
+            const position = reactFlowInstance.project({
+                x: xPosition,
+                y: yPosition,
+            });
+            
+            const newNode = {
+                id: resDimo.data.id,
+                type,
+                position,
+                style: { width: '100px',height: '100px',borderRadius: '50px', backgroundColor:'white'},
+                targetPosition :  'left',
+                sourcePosition : 'right',
+                data: { label: `${type} node` },
+            };                        
+
+            setElements((es) => es.concat(newNode));
         })
         .catch((err)=>{
             message.error(err.message);
@@ -268,7 +268,7 @@ const DnDFlow = () => {
             tempElements.push(elements[j]);            
         }
         setElements(tempElements);
-        setID(parseInt(getId())-2);
+        
         
     }
     const ClickedMenuForCol=(theID)=>{
@@ -304,21 +304,48 @@ const DnDFlow = () => {
                 x: 100,
                 y: 100,
             });
+            setElements([]);
             const newNode = {
-                id: getId(),
+                id: 0,
                 type,
                 position,
                 style: { width: '100px',height: '100px',borderRadius: '50px', backgroundColor:'white'},
                 targetPosition :  'left',
                 sourcePosition : 'right',
                 data: { label: `${type} node` },
-            };
-            setID(parseInt(getId()))
-            console.log(id)
-    
+            };            
             setElements((es) => es.concat(newNode));
+
+            const type1 = 'inputNode'; 
+            var x,y;
+            const position1 = reactFlowInstance.project({
+                x: 200,
+                y: 200,
+            });
+            const newNode1 = {
+                id: 1,
+                type1,
+                position1,
+                style: { width: '100px',height: '100px',borderRadius: '50px', backgroundColor:'white'},
+                targetPosition :  'left',
+                sourcePosition : 'right',
+                data: { label: `${type1} node` },
+            };
+            setElements((es) => es.concat(newNode1));
+            // params = {
+            //     ...params,
+            //     animated: true,
+            //     arrowHeadType: 'arrow',
+            //     style: {strokeWidth:3},
+            //     // label:'Setting',
+            //     // labelStyle:{fill:'#fff',fontWeight: 800},
+            //     // labelShowBg:false,
+            // }
+            // console.log(params);
+    
+            // setElements((els) => addEdge(params, els));
             var dndflow=document.getElementById('dndflow');
-                if(!dndflow.classList.contains('visib')){                
+            if(!dndflow.classList.contains('visib')){                
                 dndflow.classList.toggle('visib');
                 var noScenario=document.getElementById('no-scenario');
                 noScenario.classList.toggle('hidden');
@@ -422,11 +449,6 @@ const DnDFlow = () => {
         </Modal>
 
 
-
-
-
-
-
             <Header  style={{width:'100%', height: '8vh',backgroundColor: 'transparent',padding: '0px',borderBottom: '1px solid rgb(204 204 204)',lineHeight: '3.75'}}>
             <Row justify="start" style={{width: '100%',marginLeft: '-1%'}}>
             <Col span={2}>
@@ -454,12 +476,12 @@ const DnDFlow = () => {
             <Row >
                 <Col flex={2}>
             <Sider theme={"dark"}  collapsible style={{width: '20%' ,minHeight: '90vh'}} 
-            STYLE="text-align:left; color:#ffffff; font-weight: bold; background-color:#282828;">
+            STYLE="text-align:left; color:#ffffff; font-weight: bold; background-color:#282828; margin-right:-550px;">
                 <Menu
                     mode="inline"
                     theme={"dark"}
                     style={{ position: "sticky",height: '20vh' }}
-                    STYLE="text-align:left; color:#78c622; font-weight: bold; background-color:#282828;">
+                    STYLE="text-align:left; color:#78c622; font-weight: bold; background-color:#282828; padding-right:-500px;">
                 
                     {myCols.map(d=>
                         <Menu.Item onClick={()=>ClickedMenuForCol(d.id)} STYLE="text-align:left; color:#ffffff; font-weight: bold; background-color:#282828;">
@@ -519,7 +541,6 @@ const DnDFlow = () => {
                 <ReactFlowProvider>
                     <div className="reactflow-wrapper" ref={reactFlowWrapper}>
                         <ReactFlow
-                            style = {{height:'550px'}}
                             elements={elements}
                             onConnect={onConnect}
                             onElementsRemove={onElementsRemove}

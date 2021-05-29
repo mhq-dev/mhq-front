@@ -23,6 +23,20 @@ const optionsWithDisabled = [
   { label: 'public', value: 'public' },
   { label: 'private', value: 'private' },
 ];
+const initialHistory=[];
+Axios.get('http://37.152.180.213/api/request/history/',
+        {headers:{
+          'Content-Type' : 'application/json',
+          'Authorization' :`Token ${localStorage.getItem('token')}`
+        }}).then((resDimo)=>{
+            var i;        
+            for (i = 0; i < resDimo.data.length; i++) {
+              initialHistory.push(resDimo.data[i]);
+            }
+        })
+        .catch((err)=>{
+            message.error(err.message);
+        });
 const menu = (
   <Menu>
     <Menu.Item >
@@ -540,12 +554,11 @@ onChangeInputUrl = (input)=>{
                     </Menu.Item>
                 </SubMenu>
                 <SubMenu key="sub5" icon={<ClockCircleOutlined />}  title={"History"}>
+                {initialHistory.map(history=>
                   <Menu.Item >
-                    First item
-                    </Menu.Item>
-                    <Menu.Item >
-                      second item
-                    </Menu.Item>
+                    {history.url}
+                  </Menu.Item>
+                  )}                  
                 </SubMenu>
                 <Menu.Item icon={<LogoutOutlined />} onClick={this.Exit}>
                  <Link to='./login'>Exit</Link>
