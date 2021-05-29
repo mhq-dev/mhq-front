@@ -1,12 +1,14 @@
-import React, { useState, useRef, useCallback  } from 'react';
+import React, { useState, useRef, useCallback, useEffect  } from 'react';
 import ReactFlow, {
     ReactFlowProvider,
     addEdge,
     removeElements,
     Controls,
 } from 'react-flow-renderer';
+import axios from 'axios';
 import ConnectionLine from './ConnectionLine';
 import './dnd.css';
+import '../style/design.scss'
 import Sidebar from './Sidebar';
 import localforage from 'localforage';
 import {DeleteOutlined, LockOutlined, EditOutlined, DownOutlined } from '@ant-design/icons';
@@ -59,6 +61,8 @@ const nodeTypes = {
     defaultNode: defaultNode,
     outputNode: outputNode,
   };
+  
+let edge_data= []
 
 const flowKey = 'example-flow';
 
@@ -79,6 +83,45 @@ axios.get('http://37.152.180.213/api/collection/user/'+localStorage.getItem('use
 
 
 const DnDFlow = () => {
+  
+    const [condition_set, setcondition_set] = useState("");
+    const [firstedge_set, setfirstedge_set] = useState("");
+    const [secondedge_set, setsecondedge_set] = useState("");
+    const [edge_operator, setedge_operator] = useState("");
+
+    const [source_set, setsource_set] = useState("");
+    //localforage.setItem("edge_data",[])
+    //const [edge_data, setedge_data] = useState([]);
+    const [target_set, settarget_set] = useState("");
+    const [edge_id, setedge_id] = useState("");
+    const [visible_edge, setvisible_edge] = useState(false);
+    const [visible_edge_edit, setvisible_edge_edit] = useState(false);
+    const edgeOk = () => {
+    const data={source: source_set ,target: target_set , condition: condition_set,
+        first: firstedge_set, operator: edge_operator , second: secondedge_set}
+    //const newone = localforage.getItem("edge_data")
+    edge_data.push(data)
+    alert(JSON.stringify(edge_data))
+    setvisible_edge(false) ;
+    setsource_set("");
+    settarget_set("");
+    setcondition_set("");
+    setedge_operator("");
+    setfirstedge_set("");
+    setsecondedge_set("");
+    };
+    const edgeEditOk = () => {
+        setvisible_edge_edit(false) ;
+    };
+    const showModalEdge = () => {
+        
+    setvisible_edge(true);
+    };
+    const showModalEdgeEdit = useCallback(() => {
+            setvisible_edge_edit(true);
+        
+      });
+
     const reactFlowWrapper = useRef(null);
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
     const [elements, setElements] = useState(initialElements);
@@ -96,23 +139,90 @@ const DnDFlow = () => {
     let [id, setID] = useState(0);
     
     const getId = () => `${id+1}`;
+
     const onConnect = (params) => {
         console.log(params);
         params = {
             ...params,
             animated: true,
             arrowHeadType: 'arrow',
+            id: params.source+","+params.target,
             style: {strokeWidth:3},
+            
             // label:'Setting',
             // labelStyle:{fill:'#fff',fontWeight: 800},
             // labelShowBg:false,
+        };
+        setsource_set(params.source)
+        settarget_set(params.target)
+        conditionEmpty();
+        axios.post('http://37.152.180.213/api/edge/',{
+        source: params.source, dist: params.target
+        },{headers:{
+        'Content-Type' : 'application/json',
+        'Authorization' :`Token ${localStorage.getItem('token')}`
+        }})
+        .then((response)=>{
+        if (response.status === 201){
+          //message.success("Collection created successfully")
+          setedge_id(response.id)
+          showModalEdge();
+          setElements((els) => addEdge(params, els));
         }
-        console.log(params);
-
-        setElements((els) => addEdge(params, els));
+        else{
+            message.error("Please try again")
+          }})
+          alert(params.target)
+          showModalEdge();
+          setElements((els) => addEdge(params, els));
+      }
+      const conditionSet = (e) => {
+          setcondition_set(e.target.value);
+        };
+      const firstEdgeSet = (e) => {
+          setfirstedge_set(e.target.value);
+      };
+      const secondEdgeSet = (e) => {
+          setsecondedge_set(e.target.value);
+      };   
+      const edgeOperatorSet = (e) => {
+          setedge_operator(e.target.value);
+      };
+      function editCondition(edge,e){
+          const x=edge
+          const index = edge_data.indexOf(edge);
+          edge_data.splice(index,1)
+          const new_data = {source: x.source , target: x.target , condition : e.target.value}
+          edge_data.push(new_data)
+        };
+      const conditionEmpty = () => {
+          setcondition_set("");
+        };  
+  
+    const onEdge = (params) => {
+  
     }
-    const onElementsRemove = (elementsToRemove) => {
-        console.log(elementsToRemove[0].id);
+     
+      const prevent = (e) => {
+          e.preventDefault()
+          }
+
+    const onElementsRemove = (elementsToRemove) =>{
+        elementsToRemove.forEach(e=>{
+            try{
+
+                const new_source = e.source
+                const new_target = e.target
+                edge_data.forEach(element => {
+                    if(element.source===new_source && element.target===new_target)
+                    {
+                      const ind = edge_data.indexOf(element);
+                      edge_data.splice(ind,1)
+                    }
+                });
+          }
+          catch{}
+        })
         var tempEl=[];
         var j;
         for(j=0;j<elements.length;j++){
@@ -133,10 +243,15 @@ const DnDFlow = () => {
         .catch((err)=>{
             message.error(err.message);
         });   
+        
+        //setElements((els) => removeElements(elementsToRemove, els));
+    
+    }
 
         // setElements((els) => removeElements(elementsToRemove, els));
     }
         const onLoad = (_reactFlowInstance) =>{
+        
         setReactFlowInstance(_reactFlowInstance);
         
         }
@@ -389,7 +504,8 @@ const DnDFlow = () => {
         setSelectedScenario(value);
     }
     return (
-        <div STYLE="overflow-y: hidden;">
+       <div>
+      <div STYLE="overflow-y: hidden;">
         <Modal
         className='signup-card'
         visible={scenarioModal}
@@ -403,7 +519,6 @@ const DnDFlow = () => {
                 Done
             </button>
         ]}>
-        <div>
         
         <Form
             name="normal_singup"
@@ -429,11 +544,35 @@ const DnDFlow = () => {
             </Select>
             
         </Form>
-   
-        </div>
         </Modal>
+        </div>
+        
 
 
+            
+            
+            <Row >
+                <Col flex={2}>
+            <Sider theme={"dark"}  collapsible style={{width: '20%' ,minHeight: '90vh'}} 
+            STYLE="text-align:left; color:#ffffff; font-weight: bold; background-color:#282828; margin-right:-550px;">
+                <Menu
+                    mode="inline"
+                    theme={"dark"}
+                    style={{ position: "sticky",height: '20vh' }}
+                    STYLE="text-align:left; color:#78c622; font-weight: bold; background-color:#282828; padding-right:-500px;">
+                
+                    {myCols.map(d=>
+                        <Menu.Item onClick={()=>ClickedMenuForCol(d.id)} STYLE="text-align:left; color:#ffffff; font-weight: bold; background-color:#282828;">
+                        {d.name}
+                        </Menu.Item>    
+                        )}
+                    
+                </Menu>
+            </Sider>
+        </Col>
+                <Col flex={8}>
+                <p className="no-scenario" id="no-scenario">Please Select A Scenario!</p>
+                <div className="dndflow" id="dndflow">
             <Header  style={{width:'100%', height: '8vh',backgroundColor: 'transparent',padding: '0px',borderBottom: '1px solid rgb(204 204 204)',lineHeight: '3.75'}}>
             <Row justify="start" style={{width: '100%',marginLeft: '-1%'}}>
             <Col span={2}>
@@ -458,28 +597,96 @@ const DnDFlow = () => {
             </Row>
             </Header>
             
-            <Row >
-                <Col flex={2}>
-            <Sider theme={"dark"}  collapsible style={{width: '20%' ,minHeight: '90vh'}} 
-            STYLE="text-align:left; color:#ffffff; font-weight: bold; background-color:#282828; margin-right:-550px;">
-                <Menu
-                    mode="inline"
-                    theme={"dark"}
-                    style={{ position: "sticky",height: '20vh' }}
-                    STYLE="text-align:left; color:#78c622; font-weight: bold; background-color:#282828; padding-right:-500px;">
+            <Modal width={"24vw"}
+                visible={visible_edge}
+                title="Set condition"
+                style={{height: '36vh'}}
+                footer={[
+                <Button key="ok" className="btn btn-primary" onClick={edgeOk} >Set
+                </Button>
+                ]}
+            >
+        <div style={{alignContent: 'center' ,marginLeft: 'auto',marginRight: 'auto',alignItems: 'center',textAlign: 'center'}}>
+        <h5 style={{textAlign: 'left',marginLeft: '10%'}}>
+            Statement
+        </h5>
+        <Input
+        style={{width: '80%'}}
+                  required
+                  name="Statement"
+                  placeholder="statement"
+                  value={condition_set}
+                  onChange={conditionSet}
+                />
+        <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
+            First Set
+        </h5>
+        <Input
+                style={{width: '80%'}}
+                  required
+                  name="first"
+                  placeholder="first set"
+                  value={firstedge_set}
+                  onChange={firstEdgeSet}
+                />
+        <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
+            Operator
+        </h5>
+        <Input
+                 style={{width: '80%'}}
+                 required
+                  name="Operator"
+                  placeholder="operator"
+                  value={edge_operator}
+                  onChange={edgeOperatorSet}
+                />
+        <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
+            Second Set
+        </h5>
+        <Input
+                style={{width: '80%'}}
+                required
+                  name="second"
+                  placeholder="second set"
+                  value={secondedge_set}
+                  onChange={secondEdgeSet}
+                />
+        </div>
+      </Modal>
+      <Modal
+                visible={visible_edge_edit}
+                title="Edit Edges"
+                style={{height: '36vh'}}
+                footer={[
+                <Button key="ok" className="btn btn-primary" onClick={edgeEditOk} >Done
+                </Button>
+                ]}
+            >
+        <div style={{alignContent: 'center' ,marginLeft: 'auto',marginRight: 'auto',alignItems: 'center',textAlign: 'center'}}>
+        {edge_data.length===0?
+        <h5>There is no edge in this scenario</h5>:
+        edge_data.map(e=>(
+            <Row>
+                <Col span={4}><h5>Source : {e.source}</h5></Col>
+                <Col span={4}><h5>Target : {e.target}</h5></Col>
+                <Col span={4}><h5>Condition : </h5></Col>
+
+                <Col span = {8}><Input
+                  required
+                  name="edit_condition"
+                  defaultValue={e.condition}
+                  onChange={(er) => editCondition(e,er)}
+                  style={{height: '3vh'}}
+                />
+                </Col>
+                <Col span={4}><Button style={{backgroundColor: '#1890ff',color: 'white',
+                border: 'none',lineHeight: '0.5',width: '90%',height: '3vh'}}>Edit</Button></Col>
                 
-                    {myCols.map(d=>
-                        <Menu.Item onClick={()=>ClickedMenuForCol(d.id)} STYLE="text-align:left; color:#ffffff; font-weight: bold; background-color:#282828;">
-                        {d.name}
-                        </Menu.Item>    
-                        )}
-                    
-                </Menu>
-            </Sider>
-        </Col>
-                <Col flex={8}>
-                <p className="no-scenario" id="no-scenario">Please Select A Scenario!</p>
-                <div className="dndflow" id="dndflow">
+            </Row>
+        ))
+        }
+        </div>
+      </Modal>
                 <Modal
                 className='signup-card'
                 visible={vis}
@@ -535,11 +742,12 @@ const DnDFlow = () => {
                             onNodeContextMenu={onNodeContextMenu}
                             connectionLineComponent={ConnectionLine}
                             nodeTypes={nodeTypes}
+
                         >
                             <Controls />
                         </ReactFlow>
                     </div>
-                    <Sidebar onSave={onSave} onRestore={onRestore} />
+                    <Sidebar onSave={onSave} onRestore={onRestore} showModalEdgeEdit={showModalEdgeEdit}/>
                     <div className="controls">
                     </div>
                 </ReactFlowProvider>
@@ -550,6 +758,4 @@ const DnDFlow = () => {
        
         </div>
     );
-};
-
 export default DnDFlow;

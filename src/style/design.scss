@@ -297,3 +297,36 @@ body{
   position: absolute; 
   text-align: center;
 }
+.ant-modal-confirm-body .ant-modal-confirm-title
+{
+  color: var(--maintext);
+}
+.ant-modal-title{
+  text-align: center;
+  color: var(--maintext) !important;
+  font-size: 21px !important;
+  font-family: "Times New Roman", Times, serif !important;
+}
+.ant-modal-content {
+  background-color: var(--layout4) !important;
+  border-bottom: 1px solid var(--layout5) !important;
+
+}
+.ant-modal-body {
+ background-color: var(--layout4) !important;
+ border-bottom: 1px solid var(--layout5) !important;
+
+}
+.ant-modal-header {
+ background-color: var(--layout4) !important;
+ border-bottom: 1px solid var(--layout5) !important;
+}
+.ant-modal-footer{
+ border-top: 1px solid var(--layout5) !important;
+}
+.dndflow aside {
+  border-right: 1px solid var(--layout4) !important;
+  padding: 15px 10px;
+  font-size: 12px;
+  background: var(--layout4) !important;
+}

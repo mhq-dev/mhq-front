@@ -173,7 +173,8 @@ onChangeInputUrl = (input)=>{
   Addreq(item){
 
     Axios.post('http://37.152.180.213/api/request/',{
-    name: this.state.newreq ,http_method: this.state.method_tpye ,url: this.state.url ,body: [{headers:{"Authorization":""}}],collection: item.id
+    //name: this.state.newreq ,http_method: this.state.method_tpye ,url: this.state.url ,body: [{headers:{"Authorization":""}}],collection: item.id
+    name: this.state.newreq ,http_method: this.state.method_tpye ,url: this.state.url ,body: {},params: [],headers: [],collection: item.id
   },{headers:{
     'Content-Type' : 'application/json',
     'Authorization' :`Token ${localStorage.getItem('token')}`
