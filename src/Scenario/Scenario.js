@@ -5,6 +5,7 @@ import ReactFlow, {
     removeElements,
     Controls,
 } from 'react-flow-renderer';
+import axios from 'axios';
 import ConnectionLine from './ConnectionLine';
 import './dnd.css';
 import '../style/design.scss'
@@ -50,14 +51,20 @@ const flowKey = 'example-flow';
 const DnDFlow = () => {
   
     const [condition_set, setcondition_set] = useState("");
+    const [firstedge_set, setfirstedge_set] = useState("");
+    const [secondedge_set, setsecondedge_set] = useState("");
+    const [edge_operator, setedge_operator] = useState("");
+
     const [source_set, setsource_set] = useState("");
     //localforage.setItem("edge_data",[])
     //const [edge_data, setedge_data] = useState([]);
     const [target_set, settarget_set] = useState("");
+    const [edge_id, setedge_id] = useState("");
     const [visible_edge, setvisible_edge] = useState(false);
     const [visible_edge_edit, setvisible_edge_edit] = useState(false);
     const edgeOk = () => {
-    const data={source: source_set ,target: target_set , condition: condition_set}
+    const data={source: source_set ,target: target_set , condition: condition_set,
+        first: firstedge_set, operator: edge_operator , second: secondedge_set}
     //const newone = localforage.getItem("edge_data")
     edge_data.push(data)
     alert(JSON.stringify(edge_data))
@@ -65,6 +72,9 @@ const DnDFlow = () => {
     setsource_set("");
     settarget_set("");
     setcondition_set("");
+    setedge_operator("");
+    setfirstedge_set("");
+    setsecondedge_set("");
     };
     const edgeEditOk = () => {
         setvisible_edge_edit(false) ;
@@ -99,13 +109,38 @@ const DnDFlow = () => {
         setsource_set(params.source)
         settarget_set(params.target)
         conditionEmpty();
+        axios.post('http://37.152.180.213/api/edge/',{
+        source: params.source, dist: params.target
+        },{headers:{
+        'Content-Type' : 'application/json',
+        'Authorization' :`Token ${localStorage.getItem('token')}`
+        }})
+        .then((response)=>{
+        if (response.status === 201){
+          //message.success("Collection created successfully")
+          setedge_id(response.id)
+          showModalEdge();
+          setElements((els) => addEdge(params, els));
+        }
+        else{
+          message.error("Please try again")
+        }})
+        alert(params.target)
         showModalEdge();
         setElements((els) => addEdge(params, els));
     }
     const conditionSet = (e) => {
         setcondition_set(e.target.value);
       };
-    
+    const firstEdgeSet = (e) => {
+        setfirstedge_set(e.target.value);
+    };
+    const secondEdgeSet = (e) => {
+        setsecondedge_set(e.target.value);
+    };   
+    const edgeOperatorSet = (e) => {
+        setedge_operator(e.target.value);
+    };
     function editCondition(edge,e){
         const x=edge
         const index = edge_data.indexOf(edge);
@@ -216,7 +251,7 @@ const DnDFlow = () => {
 
     return (
         <div className="dndflow">
-            <Modal
+            <Modal width={"24vw"}
                 visible={visible_edge}
                 title="Set condition"
                 style={{height: '36vh'}}
@@ -226,11 +261,49 @@ const DnDFlow = () => {
                 ]}
             >
         <div style={{alignContent: 'center' ,marginLeft: 'auto',marginRight: 'auto',alignItems: 'center',textAlign: 'center'}}>
+        <h5 style={{textAlign: 'left',marginLeft: '10%'}}>
+            Statement
+        </h5>
         <Input
+        style={{width: '80%'}}
                   required
-                  name="condition"
-                  placeholder="condition for set"
+                  name="Statement"
+                  placeholder="statement"
+                  value={condition_set}
                   onChange={conditionSet}
+                />
+        <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
+            First Set
+        </h5>
+        <Input
+                style={{width: '80%'}}
+                  required
+                  name="first"
+                  placeholder="first set"
+                  value={firstedge_set}
+                  onChange={firstEdgeSet}
+                />
+        <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
+            Operator
+        </h5>
+        <Input
+                 style={{width: '80%'}}
+                 required
+                  name="Operator"
+                  placeholder="operator"
+                  value={edge_operator}
+                  onChange={edgeOperatorSet}
+                />
+        <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
+            Second Set
+        </h5>
+        <Input
+                style={{width: '80%'}}
+                required
+                  name="second"
+                  placeholder="second set"
+                  value={secondedge_set}
+                  onChange={secondEdgeSet}
                 />
         </div>
       </Modal>
