@@ -25,7 +25,6 @@ const Sidebar =  (props) => {
           <button onClick={props.onRestore}>restore</button>
         </div>
         <div className="save__controls" style={{marginTop: '6%'}}>
-          <button style={{width: '44%'}} onClick={props.showModalEdgeEdit}>Edit Edges</button>
         </div>
     </aside>
   );

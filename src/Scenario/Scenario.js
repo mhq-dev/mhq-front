@@ -61,7 +61,7 @@ const nodeTypes = {
     outputNode: outputNode,
   };
 let edge_data= []
-
+let node_numbers= []
 const flowKey = 'example-flow';
 
 const initialCols=[];
@@ -96,11 +96,35 @@ const DnDFlow = () => {
     const [visible_edge_edit, setvisible_edge_edit] = useState(false);
 
     const edgeOk = () => {
+        axios.post('http://37.152.180.213/api/edge/statement',{
+        edge: edge_id,name: condition_set
+        },{headers:{
+        'Content-Type' : 'application/json',
+        'Authorization' :`Token ${localStorage.getItem('token')}`
+        }})
+        .then((response)=>{
+        if (response.status === 201){
+          //message.success("Collection created successfully")
+          axios.post('http://37.152.180.213/api/condition/',{
+            operator: edge_operator, first: firstedge_set ,second: secondedge_set,statement: response.data.id
+        },{headers:{
+        'Content-Type' : 'application/json',
+        'Authorization' :`Token ${localStorage.getItem('token')}`
+        }})
+        .then((response)=>{
+        if (response.status === 201){
+          message.success("Statement and Condition created successfully")
+          
+        }
+        
+        else{
+          message.error("Something went wrong.")
+        }}).catch({})}})
         const data={source: source_set ,target: target_set , condition: condition_set,
             first: firstedge_set, operator: edge_operator , second: secondedge_set}
         //const newone = localforage.getItem("edge_data")
         edge_data.push(data)
-        alert(JSON.stringify(edge_data))
+        //alert(JSON.stringify(edge_data))
         setvisible_edge(false) ;
         setsource_set("");
         settarget_set("");
@@ -139,7 +163,6 @@ const DnDFlow = () => {
     
     const getId = () => `${id+1}`;
     const onConnect = (params) => {
-        console.log(params);
         params = {
             ...params,
             animated: true,
@@ -149,12 +172,23 @@ const DnDFlow = () => {
             // labelStyle:{fill:'#fff',fontWeight: 800},
             // labelShowBg:false,
         }
-        console.log(params);
         setsource_set(params.source)
         settarget_set(params.target)
         conditionEmpty();
+        let s = "0"
+        let t = "1"
+        node_numbers.forEach(element => {
+            if(element.first_id==params.source-1)
+            {
+                s = element.second_id
+            }
+            if(element.first_id==params.target-1)
+            {
+                t = element.second_id
+            }
+        });
         axios.post('http://37.152.180.213/api/edge/',{
-        source: params.source, dist: params.target
+        source: s, dist: t
         },{headers:{
         'Content-Type' : 'application/json',
         'Authorization' :`Token ${localStorage.getItem('token')}`
@@ -162,16 +196,13 @@ const DnDFlow = () => {
         .then((response)=>{
         if (response.status === 201){
           //message.success("Collection created successfully")
-          setedge_id(response.id)
+          setedge_id(response.data.id)
           showModalEdge();
           setElements((els) => addEdge(params, els));
         }
         else{
           message.error("Please try again")
         }})
-        alert(params.target)
-        showModalEdge();
-        setElements((els) => addEdge(params, els));
     
     }
     const conditionSet = (e) => {
@@ -205,43 +236,61 @@ const DnDFlow = () => {
         e.preventDefault()
         }
     const onElementsRemove = (elementsToRemove) => {
-        elementsToRemove.forEach(e=>{
+        try{if(elementsToRemove[0].id>=0)
+        {
+            var tempEl=[];
+            var j;
+            for(j=0;j<elements.length;j++){
+                if(elements[j].id!=elementsToRemove[0].id){
+                    tempEl.push(elements[j]);
+                }
+            }
+            
+            setElements(tempEl);
+            let x=0
+            node_numbers.forEach(element => {
+                if(element.first_id==elementsToRemove[0].id-1)
+                {
+                x = element.second_id
+                }
+            
+            });
+            axios.delete('http://37.152.180.213/api/module/'+x,
+            {headers:{
+              'Content-Type' : 'application/json',
+              'Authorization' :`Token ${localStorage.getItem('token')}`
+            }}).then((resDimo)=>{
+                message.success("Removed!");
+            })
+            .catch((err)=>{
+                message.error(err.message);
+            });        }
+        }
+        catch{
+            const e = elementsToRemove[0]
             try{
 
-                const new_source = e.source
-                const new_target = e.target
-                edge_data.forEach(element => {
-                    if(element.source===new_source && element.target===new_target)
-                    {
-                      const ind = edge_data.indexOf(element);
-                      edge_data.splice(ind,1)
-                    }
+                let s1 = "0"
+                let t1 = "1"
+                node_numbers.forEach(element => {
+                    if(element.first_id==e.source-1)
+            {
+                s1 = element.second_id
+            }
+            if(element.first_id==e.target-1)
+            {
+                t1 = element.second_id
+            }
                 });
+                
+                setElements((els) => removeElements(elementsToRemove, els));
+                                
           }
           catch{}
-        })
         
-        //setElements((els) => removeElements(elementsToRemove, els));
-        var tempEl=[];
-        var j;
-        for(j=0;j<elements.length;j++){
-            if(elements[j].id!=elementsToRemove[0].id){
-                tempEl.push(elements[j]);
-            }
-        }
+  }
         
-        setElements(tempEl);
-
-        axios.delete('http://37.152.180.213/api/module/'+elementsToRemove[0].id,
-        {headers:{
-          'Content-Type' : 'application/json',
-          'Authorization' :`Token ${localStorage.getItem('token')}`
-        }}).then((resDimo)=>{
-            message.success("Removed!");
-        })
-        .catch((err)=>{
-            message.error(err.message);
-        });
+        
 
 
         // setElements((els) => removeElements(elementsToRemove, els));
@@ -365,6 +414,8 @@ const DnDFlow = () => {
         }}).then((resDimo)=>{
             message.success("Added");
             setnewModule(resDimo.data.id);
+            const no_data = {first_id: id,second_id : resDimo.data.id}
+            node_numbers.push(no_data)
 
             const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
             const type = typeReactFlow;
@@ -503,7 +554,6 @@ const DnDFlow = () => {
     return (
         <div STYLE="overflow-y: hidden;">
         <Modal
-        className='signup-card'
         visible={scenarioModal}
         title="Select a scenario or create new one!"
         closable={false}
@@ -683,7 +733,6 @@ const DnDFlow = () => {
         </div>
       </Modal>
                 <Modal
-                className='signup-card'
                 visible={vis}
                 title="Enter your api information"
                 closable={false}
@@ -704,22 +753,6 @@ const DnDFlow = () => {
                     <Select STYLE="width:100%; background-color:#ffffff;" onSelect={onSelect}>
                         {myRequests.map(d=><Option value={methodAndUrl(d)}>{d.name}</Option>)}
                     </Select>
-                    <Row STYLE="margin-top:10px;">
-                        <Col span={6}>
-                            <p STYLE="margin-right:5px;">Method</p>
-                        </Col>
-                        <Col span={18}>
-                            <p STYLE="margin-left:5px;">URL</p>
-                        </Col>                
-                    </Row>
-                    <Row STYLE="margin-top:-15px;">
-                        <Col span={6}>
-                            <Input id="scenario_method" disabled={true} STYLE="margin-right:5px;"></Input>
-                        </Col>
-                        <Col span={18}>
-                            <Input id="scenario_url" disabled={true} STYLE="margin-left:5px;" ></Input>
-                        </Col>                
-                    </Row>
                 </Form>
            
                 </div>
@@ -741,7 +774,7 @@ const DnDFlow = () => {
                             <Controls />
                         </ReactFlow>
                     </div>
-                    <Sidebar onSave={onSave} onRestore={onRestore} showModalEdgeEdit={showModalEdgeEdit}/>
+                    <Sidebar onSave={onSave} onRestore={onRestore} />
                     <div className="controls">
                     </div>
                 </ReactFlowProvider>
