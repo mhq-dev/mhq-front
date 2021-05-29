@@ -258,12 +258,13 @@ const DnDFlow = () => {
 
     const onDrop = (event) => {
         event.preventDefault();
-        setVis(true);
-        ListOfReuqests();
         const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
         setxPosition(event.clientX - reactFlowBounds.left);
         setyPosition(event.clientY - reactFlowBounds.top);
         setTypeReactFlow(event.dataTransfer.getData('application/reactflow'));
+        setVis(true);
+        ListOfReuqests();
+
 
     };
     const onSave = useCallback(() => {
@@ -373,7 +374,7 @@ const DnDFlow = () => {
             });
             
             const newNode = {
-                id: resDimo.data.id,
+                id: getId(),
                 type,
                 position,
                 style: { width: '100px',height: '100px',borderRadius: '50px', backgroundColor:'white'},
@@ -381,6 +382,7 @@ const DnDFlow = () => {
                 sourcePosition : 'right',
                 data: { label: `${type} node` },
             };                        
+            setID(parseInt(getId()))                       
 
             setElements((es) => es.concat(newNode));
         })
