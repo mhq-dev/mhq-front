@@ -554,6 +554,7 @@ const DnDFlow = () => {
     return (
         <div STYLE="overflow-y: hidden;">
         <Modal
+        className='signup-card'
         visible={scenarioModal}
         title="Select a scenario or create new one!"
         closable={false}
@@ -753,6 +754,22 @@ const DnDFlow = () => {
                     <Select STYLE="width:100%; background-color:#ffffff;" onSelect={onSelect}>
                         {myRequests.map(d=><Option value={methodAndUrl(d)}>{d.name}</Option>)}
                     </Select>
+                    <Row STYLE="margin-top:10px;">
+                        <Col span={6}>
+                            <p STYLE="margin-right:5px;">Method</p>
+                        </Col>
+                        <Col span={18}>
+                            <p STYLE="margin-left:5px;">URL</p>
+                        </Col>                
+                    </Row>
+                    <Row STYLE="margin-top:-15px;">
+                        <Col span={6}>
+                            <Input id="scenario_method" disabled={true} STYLE="margin-right:5px;"></Input>
+                        </Col>
+                        <Col span={17}>
+                            <Input id="scenario_url" disabled={true} STYLE="margin-left:5px;" ></Input>
+                        </Col>                
+                    </Row>
                 </Form>
            
                 </div>
