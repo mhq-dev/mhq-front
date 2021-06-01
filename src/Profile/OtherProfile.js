@@ -301,7 +301,7 @@ class OtherProfile extends React.Component {
             )}
             />
             </Modal>
-            <Row STYLE="background-color: #212121;">
+            <Row style={{backgroundColor: "#212121", minHeight:"100vh"}}>
                 <Col span={6}> 
                     <div className="LeftPage">
                         {(this.state.imgURL==null) ? 
