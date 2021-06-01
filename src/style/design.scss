@@ -192,6 +192,24 @@ transition: all 0.4s ease-in;
   .ant-typography{
     color: var(--maintext) !important;
   }
+  .ant-list-item-meta-description{
+    color: var(--maintext) !important;
+  }
+  .ant-empty-description{
+    color: var(--maintext) !important;
+  }
+  .ant-picker{
+    background-color: var(--layout4) !important;
+  }
+  .ant-picker-suffix{
+    color: var(--maintext) !important;
+  }
+  .ant-select-arrow{
+    color: var(--maintext) !important;
+  }
+  .ant-modal-close-x{
+    color: var(--maintext) !important;
+  }
   .ant-tabs-tab-btn{
     color: var(--maintext);transition: background-color 0.4s ease-in;
   }
