@@ -292,7 +292,7 @@ class OtherProfile extends React.Component {
                 >
                 <List.Item.Meta
                 avatar={
-                  <Avatar icon={<UserOutlined />} src={"http://37.152.180.213"+item.avatar} />
+                  <Avatar size="large" icon={<UserOutlined />} src={"http://37.152.180.213"+item.avatar} />
                 }
                 title={<Typography>{item.username}</Typography>}
                 description={item.bio === null ? `${item.username}'s bio` : item.bio}
