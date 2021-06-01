@@ -306,12 +306,18 @@ class OtherProfile extends React.Component {
                     <div className="LeftPage">
                         {(this.state.imgURL==null) ? 
                         <Image
+                        style={{objectFit:"cover"}}
+                        width={250}
+                        height={220}
                         id="image-tag-profile" className="OtherProfile-image"
                         src="https://uupload.ir/files/b9f3_default_user.png"
                         preview={false} >
                         </Image> 
                          : 
                          <Image
+                         style={{objectFit:"cover"}}
+                         width={250}
+                         height={220}
                          id="image-tag-profile" className="OtherProfile-image"
                          src={this.state.imgURL} 
                          preview={true}>
