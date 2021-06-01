@@ -189,6 +189,9 @@ transition: all 0.4s ease-in;
     background-color: transparent;
     top: 40%;
   }
+  .ant-typography{
+    color: var(--maintext) !important;
+  }
   .ant-tabs-tab-btn{
     color: var(--maintext);transition: background-color 0.4s ease-in;
   }
