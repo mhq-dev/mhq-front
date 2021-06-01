@@ -304,24 +304,8 @@ class OtherProfile extends React.Component {
             <Row style={{backgroundColor: "#212121", minHeight:"100vh"}}>
                 <Col span={6}> 
                     <div className="LeftPage">
-                        {(this.state.imgURL==null) ? 
-                        <Image
-                        style={{objectFit:"cover"}}
-                        width={250}
-                        height={220}
-                        id="image-tag-profile" className="OtherProfile-image"
-                        src="https://uupload.ir/files/b9f3_default_user.png"
-                        preview={false} >
-                        </Image> 
-                         : 
-                         <Image
-                         style={{objectFit:"cover"}}
-                         width={250}
-                         height={220}
-                         id="image-tag-profile" className="OtherProfile-image"
-                         src={this.state.imgURL} 
-                         preview={true}>
-                         </Image>
+                        {
+                         <Avatar size={250} src={this.state.imgURL} icon={<UserOutlined style={{color:'#212121'}} />} />
                         }
 
                         
