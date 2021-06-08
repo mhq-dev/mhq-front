@@ -7,6 +7,7 @@ import moment from 'moment';
 import { Handle } from 'react-flow-renderer';
 import './CustomNode.scss'
 import { Option } from 'antd/lib/mentions';
+import axios from 'axios';
 
 export default memo(({ data }) => {
   const [visible, setVisible] = useState(false);
@@ -25,6 +26,22 @@ export default memo(({ data }) => {
 
   const handleOk = () => {
     setConfirmLoading(true);
+    const config = {
+      headers: { Authorization: `Token ${localStorage.getItem("token")}` },
+    };
+    const scenario_id = localStorage.getItem('selectedScenario');
+    if(type === "intervals"){
+      console.log(type)
+      axios.put(`http://37.152.180.213/api/scenario/${scenario_id}/schedule/`,
+      {
+        type: type,
+        minutes: parseInt(minutes),
+        enable: false
+      }, config)
+      .then((res)=>{
+        console.log(res)
+      })
+    }
     setTimeout(() => {
       setVisible(false);
       setConfirmLoading(false);
