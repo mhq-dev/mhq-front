@@ -1,5 +1,5 @@
 import {  ClockCircleTwoTone } from '@ant-design/icons';
-import { Badge, Select } from 'antd';
+import { Badge, Input, Select, Typography } from 'antd';
 import React, { memo,useState } from 'react';
 import { Modal, TimePicker, DatePicker } from 'antd';
 import moment from 'moment';
@@ -12,6 +12,10 @@ export default memo(({ data }) => {
   const [visible, setVisible] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [dateVisible, setDateVisible] = useState(true);
+  const [timeVisible, setTimeVisible] = useState(false);
+  const [minutesVisible, setMinutesVisible] = useState(true);
+  const [minutes, setMinutes] = useState(0);
+  const [type, setType] = useState("");
 
   const format = 'HH:mm';
 
@@ -32,13 +36,27 @@ export default memo(({ data }) => {
     setVisible(false);
   };
 
+  const handleMinutesInputChange = (value) => {
+    setMinutes(value.target.value)
+  }
+
   function handleChangeSelect(value) {
     console.log(`selected ${value}`);
+    setType(value)
     if(value=="Everyday"){
       setDateVisible(true)
+      setMinutesVisible(true)
+      setTimeVisible(false)
     }
-    else{
+    else if(value=="Once"){
       setDateVisible(false)
+      setMinutesVisible(true)
+      setTimeVisible(false)
+    }
+    else if (value=="AtRegularIntervals") {
+      setDateVisible(true)
+      setMinutesVisible(false)
+      setTimeVisible(true)
     }
   }
   function onChangeDate(date, dateString) {
@@ -61,11 +79,14 @@ export default memo(({ data }) => {
         <Select defaultValue="Everyday" style={{ width: '100%' }} onChange={handleChangeSelect}>
           <Option value="Everyday">Every day</Option>
           <Option value="Once">Once</Option>
+          <Option value="AtRegularIntervals">At Regular Intervals</Option>
         </Select>
-        <p style={{marginTop:16}}>Time:</p>
-        <TimePicker style={{ width: '100%' }} format={format} />
-        <p style={{marginTop:16}}>Date:</p>
+        <Typography style={{marginTop:16, marginBottom:16}}>Time:</Typography>
+        <TimePicker disabled={timeVisible} style={{ width: '100%' }} format={format} />
+        <Typography style={{marginTop:16, marginBottom:16}}>Date:</Typography>
         <DatePicker disabled={dateVisible} disabledDate={disabledDate} style={{ width: '100%' }} onChange={onChangeDate} />
+        <Typography style={{marginTop:16, marginBottom:16}}>Minutes:</Typography>
+        <Input onChange={handleMinutesInputChange} value={minutes} disabled={minutesVisible} placeholder="Minutes" />
       </Modal>
       <a onClick={showModal}>
       <Badge count={<ClockCircleTwoTone style={{fontSize:'250%' ,color: 'blue' }}/>}/>
