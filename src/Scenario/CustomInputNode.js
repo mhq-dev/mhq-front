@@ -43,17 +43,17 @@ export default memo(({ data }) => {
   function handleChangeSelect(value) {
     console.log(`selected ${value}`);
     setType(value)
-    if(value=="Everyday"){
+    if(value=="every_day"){
       setDateVisible(true)
       setMinutesVisible(true)
       setTimeVisible(false)
     }
-    else if(value=="Once"){
+    else if(value=="once"){
       setDateVisible(false)
       setMinutesVisible(true)
       setTimeVisible(false)
     }
-    else if (value=="AtRegularIntervals") {
+    else if (value=="intervals") {
       setDateVisible(true)
       setMinutesVisible(false)
       setTimeVisible(true)
@@ -76,10 +76,10 @@ export default memo(({ data }) => {
         onCancel={handleCancel}
       >
         <p>Run Scenario:</p>
-        <Select defaultValue="Everyday" style={{ width: '100%' }} onChange={handleChangeSelect}>
-          <Option value="Everyday">Every day</Option>
-          <Option value="Once">Once</Option>
-          <Option value="AtRegularIntervals">At Regular Intervals</Option>
+        <Select defaultValue="every_day" style={{ width: '100%' }} onChange={handleChangeSelect}>
+          <Option value="every_day">Every day</Option>
+          <Option value="once">Once</Option>
+          <Option value="intervals">At Regular Intervals</Option>
         </Select>
         <Typography style={{marginTop:16, marginBottom:16}}>Time:</Typography>
         <TimePicker disabled={timeVisible} style={{ width: '100%' }} format={format} />
