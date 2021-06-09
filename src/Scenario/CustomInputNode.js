@@ -26,6 +26,21 @@ export default memo(({ data }) => {
     setVisible(true);
   };
 
+  useEffect(()=>{
+    const config = {
+      headers: { Authorization: `Token ${localStorage.getItem("token")}` },
+    };
+    const scenario_id = localStorage.getItem('selectedScenario');
+    axios.get(`http://37.152.180.213/api/scenario/${scenario_id}/schedule/`,config)
+      .then((res)=>{
+        console.log(res)
+        setMinutes(res.data.minutes)
+        setTime(res.data.time)
+        setDate(res.data.date)
+        setType(res.data.type)
+      })
+  },[])
+
   const handleOk = () => {
     setConfirmLoading(true);
     const config = {
