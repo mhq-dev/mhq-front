@@ -1,6 +1,6 @@
 import {  ClockCircleTwoTone } from '@ant-design/icons';
 import { Badge, Input, Select, Typography } from 'antd';
-import React, { memo,useState } from 'react';
+import React, { memo,useEffect,useState } from 'react';
 import { Modal, TimePicker, DatePicker } from 'antd';
 import moment from 'moment';
 
@@ -16,7 +16,9 @@ export default memo(({ data }) => {
   const [timeVisible, setTimeVisible] = useState(false);
   const [minutesVisible, setMinutesVisible] = useState(true);
   const [minutes, setMinutes] = useState(0);
-  const [type, setType] = useState("");
+  const [type, setType] = useState("every_day");
+  const [time, setTime] = useState(null);
+  const [date, setDate] = useState(null);
 
   const format = 'HH:mm';
 
@@ -36,6 +38,31 @@ export default memo(({ data }) => {
       {
         type: type,
         minutes: parseInt(minutes),
+        enable: false
+      }, config)
+      .then((res)=>{
+        console.log(res)
+      })
+    }
+    else if(type === "every_day"){
+      console.log(type)
+      axios.put(`http://37.152.180.213/api/scenario/${scenario_id}/schedule/`,
+      {
+        type: type,
+        time: time,
+        enable: false
+      }, config)
+      .then((res)=>{
+        console.log(res)
+      })
+    }
+    else if(type === "once"){
+      let datePlusTime = date + 'T' + time
+      console.log(datePlusTime)
+      axios.put(`http://37.152.180.213/api/scenario/${scenario_id}/schedule/`,
+      {
+        type: type,
+        date: datePlusTime,
         enable: false
       }, config)
       .then((res)=>{
@@ -78,10 +105,14 @@ export default memo(({ data }) => {
   }
   function onChangeDate(date, dateString) {
     console.log(date, dateString);
+    setDate(dateString)
   }
   function disabledDate(current) {
     // Can not select days before today and today
     return current && current < moment().endOf('day');
+  }
+  function onChangeTime(time, timeString) {
+    setTime(timeString)
   }
   return (
     <>
@@ -93,15 +124,15 @@ export default memo(({ data }) => {
         onCancel={handleCancel}
       >
         <p>Run Scenario:</p>
-        <Select defaultValue="every_day" style={{ width: '100%' }} onChange={handleChangeSelect}>
+        <Select value={type} style={{ width: '100%' }} onChange={handleChangeSelect}>
           <Option value="every_day">Every day</Option>
           <Option value="once">Once</Option>
           <Option value="intervals">At Regular Intervals</Option>
         </Select>
         <Typography style={{marginTop:16, marginBottom:16}}>Time:</Typography>
-        <TimePicker disabled={timeVisible} style={{ width: '100%' }} format={format} />
+        <TimePicker value={time === null ? time : moment(time,'HH:mm:ss')} onChange={onChangeTime} disabled={timeVisible} style={{ width: '100%' }} format={format} />
         <Typography style={{marginTop:16, marginBottom:16}}>Date:</Typography>
-        <DatePicker disabled={dateVisible} disabledDate={disabledDate} style={{ width: '100%' }} onChange={onChangeDate} />
+        <DatePicker defaultValue={date === null ? date : moment(date,'YY-MM-DD')} disabled={dateVisible} disabledDate={disabledDate} style={{ width: '100%' }} onChange={onChangeDate} />
         <Typography style={{marginTop:16, marginBottom:16}}>Minutes:</Typography>
         <Input onChange={handleMinutesInputChange} value={minutes} disabled={minutesVisible} placeholder="Minutes" />
       </Modal>
