@@ -148,7 +148,7 @@ export default memo(({ data }) => {
         <Typography style={{marginTop:16, marginBottom:16}}>Time:</Typography>
         <TimePicker value={time === null ? time : moment(time,'HH:mm:ss')} onChange={onChangeTime} disabled={timeVisible} style={{ width: '100%' }} format={format} />
         <Typography style={{marginTop:16, marginBottom:16}}>Date:</Typography>
-        <DatePicker defaultValue={date === null ? date : moment(date,'YY-MM-DD')} disabled={dateVisible} disabledDate={disabledDate} style={{ width: '100%' }} onChange={onChangeDate} />
+        <DatePicker defaultValue={date === null ? date : moment(date,'YYYY-MM-DD')} disabled={dateVisible} disabledDate={disabledDate} style={{ width: '100%' }} onChange={onChangeDate} />
         <Typography style={{marginTop:16, marginBottom:16}}>Minutes:</Typography>
         <Input onChange={handleMinutesInputChange} value={minutes} disabled={minutesVisible} placeholder="Minutes" />
       </Modal>
