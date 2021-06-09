@@ -38,6 +38,7 @@ export default memo(({ data }) => {
         setTime(res.data.time)
         setDate(res.data.date)
         setType(res.data.type)
+        handleChangeSelect(res.data.type)
       })
   },[])
 
