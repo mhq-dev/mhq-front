@@ -15,16 +15,27 @@ export default memo(({ data }) => {
   const [dateVisible, setDateVisible] = useState(true);
   const [timeVisible, setTimeVisible] = useState(false);
   const [minutesVisible, setMinutesVisible] = useState(true);
+  const [daysVisible, setDaysVisible] = useState(true);
   const [minutes, setMinutes] = useState(0);
   const [type, setType] = useState("every_day");
   const [time, setTime] = useState(null);
   const [date, setDate] = useState(null);
+  const [daysSelect, setDaysSelect] = useState(null);
 
   const format = 'HH:mm';
 
   const showModal = () => {
     setVisible(true);
   };
+
+  const days = [];
+  days.push(<Option value="0" key={"Monday"}>{"Monday"}</Option>);
+  days.push(<Option value="1" key={"Tuesday"}>{"Tuesday"}</Option>);
+  days.push(<Option value="2" key={"Wednesday"}>{"Wednesday"}</Option>);
+  days.push(<Option value="3" key={"Thursday"}>{"Thursday"}</Option>);
+  days.push(<Option value="4" key={"Friday"}>{"Friday"}</Option>);
+  days.push(<Option value="5" key={"Saturday"}>{"Saturday"}</Option>);
+  days.push(<Option value="6" key={"Sunday"}>{"Sunday"}</Option>);
 
   useEffect(()=>{
     const config = {
@@ -38,6 +49,12 @@ export default memo(({ data }) => {
         setTime(res.data.time)
         setDate(res.data.date)
         setType(res.data.type)
+        if(res.data.days !== null){
+          setDaysSelect(res.data.days.split(","))
+        }
+        else{
+          setDaysSelect(res.data.days)
+        }
         handleChangeSelect(res.data.type)
       })
   },[])
@@ -85,6 +102,18 @@ export default memo(({ data }) => {
         console.log(res)
       })
     }
+    else if(type === "days_of_week"){
+      axios.put(`http://37.152.180.213/api/scenario/${scenario_id}/schedule/`,
+      {
+        type: type,
+        time:time,
+        days: daysSelect.toString(),
+        enable: false
+      }, config)
+      .then((res)=>{
+        console.log(res)
+      })
+    }
     setTimeout(() => {
       setVisible(false);
       setConfirmLoading(false);
@@ -107,16 +136,25 @@ export default memo(({ data }) => {
       setDateVisible(true)
       setMinutesVisible(true)
       setTimeVisible(false)
+      setDaysVisible(true)
     }
     else if(value=="once"){
       setDateVisible(false)
       setMinutesVisible(true)
       setTimeVisible(false)
+      setDaysVisible(true)
     }
     else if (value=="intervals") {
       setDateVisible(true)
       setMinutesVisible(false)
       setTimeVisible(true)
+      setDaysVisible(true)
+    }
+    else if (value=="days_of_week") {
+      setDateVisible(true)
+      setMinutesVisible(true)
+      setTimeVisible(false)
+      setDaysVisible(false)
     }
   }
   function onChangeDate(date, dateString) {
@@ -129,6 +167,10 @@ export default memo(({ data }) => {
   }
   function onChangeTime(time, timeString) {
     setTime(timeString)
+  }
+  function handleChangeDays(value) {
+    console.log(`selected ${value}`);
+    setDaysSelect(value);
   }
   return (
     <>
@@ -144,6 +186,7 @@ export default memo(({ data }) => {
           <Option value="every_day">Every day</Option>
           <Option value="once">Once</Option>
           <Option value="intervals">At Regular Intervals</Option>
+          <Option value="days_of_week">Days of the Week</Option>
         </Select>
         <Typography style={{marginTop:16, marginBottom:16}}>Time:</Typography>
         <TimePicker value={time === null ? time : moment(time,'HH:mm:ss')} onChange={onChangeTime} disabled={timeVisible} style={{ width: '100%' }} format={format} />
@@ -151,6 +194,18 @@ export default memo(({ data }) => {
         <DatePicker defaultValue={date === null ? date : moment(date,'YYYY-MM-DD')} disabled={dateVisible} disabledDate={disabledDate} style={{ width: '100%' }} onChange={onChangeDate} />
         <Typography style={{marginTop:16, marginBottom:16}}>Minutes:</Typography>
         <Input onChange={handleMinutesInputChange} value={minutes} disabled={minutesVisible} placeholder="Minutes" />
+        <Typography style={{marginTop:16, marginBottom:16}}>Days:</Typography>
+        <Select
+        disabled={daysVisible}
+        value={daysSelect}
+        mode="multiple"
+        allowClear
+        style={{ width: '100%' }}
+        placeholder="Please select"
+        onChange={handleChangeDays}
+        >
+        {days}
+      </Select>
       </Modal>
       <a onClick={showModal}>
       <Badge count={<ClockCircleTwoTone style={{fontSize:'250%' ,color: 'blue' }}/>}/>
