@@ -42,13 +42,12 @@ const menu = (
     </Menu>
   
   );
-console.log(localStorage.getItem('token'));
 const initialElements = [
     
 ];
 const onNodeContextMenu = (event, node) => {
     event.preventDefault();
-    console.log('context menu:', node);
+    // console.log('context menu:', node);
 };
 const onNodeMouseEnter = (event, node) => console.log('mouse enter:', node);
 const onNodeMouseMove = (event, node) => console.log('mouse move:', node);
@@ -160,8 +159,7 @@ const DnDFlow = () => {
     const [yPosition, setyPosition] = useState(-1);
     const [typeReactFlow, setTypeReactFlow] = useState(null);
     let [id, setID] = useState(0);
-    
-    const getId = () => `${id+1}`;
+        
     const onConnect = (params) => {
         params = {
             ...params,
@@ -376,7 +374,7 @@ const DnDFlow = () => {
                     message.error("errssssss");
                 })
             }
-            console.log(myRequests);        
+            // console.log(myRequests);        
         })
         .catch((err)=>{
             message.error(err.message);
@@ -411,31 +409,45 @@ const DnDFlow = () => {
         {headers:{
           'Content-Type' : 'application/json',
           'Authorization' :`Token ${localStorage.getItem('token')}`
-        }}).then((resDimo)=>{
+        }}).then((resDimoo)=>{
             message.success("Added");
-            setnewModule(resDimo.data.id);
-            const no_data = {first_id: id,second_id : resDimo.data.id}
+            console.log("Id"+id);
+
+            setnewModule(resDimoo.data.id);
+            const no_data = {first_id: id,second_id : resDimoo.data.id}
             node_numbers.push(no_data)
 
-            const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
-            const type = typeReactFlow;
-            const position = reactFlowInstance.project({
-                x: xPosition,
-                y: yPosition,
-            });
-            
-            const newNode = {
-                id: getId(),
-                type,
-                position,
-                style: { width: '100px',height: '100px',borderRadius: '50px', backgroundColor:'white'},
-                targetPosition :  'left',
-                sourcePosition : 'right',
-                data: { label: `${type} node` },
-            };                        
-            setID(parseInt(getId()))                       
+            axios.get('http://37.152.180.213/api/scenario/all_modules/'+selectedScenario,
+            {headers:{
+            'Content-Type' : 'application/json',
+            'Authorization' :`Token ${localStorage.getItem('token')}`
+            }}).then((resDimo)=>{
+                var thisElements=[];
+                var i;
+                
+                for (i = 0; i < resDimo.data.length; i++) {
+                    thisElements.push(
+                        {
+                            id: i,
+                            type: 'defaultNode',
+                            data: { label: 'input node' },
+                            style: { width: '100px',height: '100px',borderRadius: '50px', backgroundColor:'white'},
+                            targetPosition :  'left',
+                            sourcePosition : 'right',
+                            position: { x: resDimo.data[i].x_position, y: resDimo.data[i].y_position },
+                        }
+                    );  
 
-            setElements((es) => es.concat(newNode));
+                }
+                setID(resDimo.data.length);
+
+                setElements(thisElements);
+                console.log(thisElements);
+               
+            })
+            .catch((err)=>{
+                message.error(err.message);
+            });   
         })
         .catch((err)=>{
             message.error(err.message);
@@ -489,15 +501,14 @@ const DnDFlow = () => {
             'Authorization' :`Token ${localStorage.getItem('token')}`
             }}).then((resDimo)=>{
                 message.success("Loaded Successfully");
-                console.log(resDimo);
                 setScenarioModal(false);
                 var thisElements=[];
-
+                
                 var i;
                 for (i = 0; i < resDimo.data.length; i++) {
                     thisElements.push(
                         {
-                            id: resDimo.data[i].id,
+                            id: i,
                             type: 'defaultNode',
                             data: { label: 'input node' },
                             style: { width: '100px',height: '100px',borderRadius: '50px', backgroundColor:'white'},
@@ -505,10 +516,13 @@ const DnDFlow = () => {
                             sourcePosition : 'right',
                             position: { x: resDimo.data[i].x_position, y: resDimo.data[i].y_position },
                         }
-                    );           
-                }
-                setElements(thisElements);
+                    );  
 
+                }
+                setID(resDimo.data.length);
+
+                setElements(thisElements);
+                console.log(thisElements);
                 var dndflow=document.getElementById('dndflow');
                 if(!dndflow.classList.contains('visib')){                
                     dndflow.classList.toggle('visib');
@@ -522,10 +536,9 @@ const DnDFlow = () => {
         }
     }
     const createScenarioModal=()=>{
-        console.log(localStorage.getItem('token'));
         var newScenarioName=document.getElementById('new_scenario_name').value;
         // alert(newScenarioName+"***"+localStorage.getItem('selectedCollection'));
-        axios.post('http://37.152.180.213/api/scenario/create_scenario',
+        axios.post('http://37.152.180.213/api/scenario/create_scenario/',
         {
             "name":newScenarioName,
             "collection":localStorage.getItem('selectedCollection')
@@ -554,7 +567,6 @@ const DnDFlow = () => {
     return (
         <div STYLE="overflow-y: hidden;">
         <Modal
-        className='signup-card'
         visible={scenarioModal}
         title="Select a scenario or create new one!"
         closable={false}
@@ -570,7 +582,6 @@ const DnDFlow = () => {
         
         <Form
             name="normal_singup"
-            STYLE="background-color:#fcfcfc;"
         >
         <Row>
             <Col span={20}>
@@ -749,7 +760,6 @@ const DnDFlow = () => {
                 
                 <Form
                     name="normal_singup"
-                    STYLE="background-color:#fcfcfc;"
                 >
                     <Select STYLE="width:100%; background-color:#ffffff;" onSelect={onSelect}>
                         {myRequests.map(d=><Option value={methodAndUrl(d)}>{d.name}</Option>)}
