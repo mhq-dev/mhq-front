@@ -1,5 +1,5 @@
 import {  ClockCircleTwoTone } from '@ant-design/icons';
-import { Badge, Input, Select, Typography } from 'antd';
+import { Badge, Col, Input, Row, Select, Typography } from 'antd';
 import React, { memo,useEffect,useState } from 'react';
 import { Modal, TimePicker, DatePicker } from 'antd';
 import moment from 'moment';
@@ -282,48 +282,66 @@ export default memo(({ data }) => {
           <Option value="days_of_month">Days of the Month</Option>
           <Option value="specified_dates">Specified Dates</Option>
         </Select>
-        <Typography style={{marginTop:16, marginBottom:16}}>Time:</Typography>
+        <Row gutter={8}>
+          <Col span={12}><Typography style={{marginTop:16, marginBottom:16}}>Time:</Typography>
         <TimePicker value={time === null ? time : moment(time,'HH:mm:ss')} onChange={onChangeTime} disabled={timeVisible} style={{ width: '100%' }} format={format} />
-        <Typography style={{marginTop:16, marginBottom:16}}>Date:</Typography>
+        </Col>
+          <Col span={12}>
+          <Typography style={{marginTop:16, marginBottom:16}}>Date:</Typography>
         <DatePicker defaultValue={date === null ? date : moment(date,'YYYY-MM-DD')} disabled={dateVisible} disabledDate={disabledDate} style={{ width: '100%' }} onChange={onChangeDate} />
-        <Typography style={{marginTop:16, marginBottom:16}}>Minutes:</Typography>
-        <Input onChange={handleMinutesInputChange} value={minutes} disabled={minutesVisible} placeholder="Minutes" />
-        <Typography style={{marginTop:16, marginBottom:16}}>Days:</Typography>
-        <Select
-        disabled={daysVisible}
-        value={daysSelect}
-        mode="multiple"
-        allowClear
-        style={{ width: '100%' }}
-        placeholder="Please select"
-        onChange={handleChangeDays}
-        >
-        {days}
-      </Select>
-      <Typography style={{marginTop:16, marginBottom:16}}>Days of the month:</Typography>
-        <Select
-        disabled={daysOfTheMonthVisible}
-        value={daysOfTheMonthSelect}
-        mode="multiple"
-        allowClear
-        style={{ width: '100%' }}
-        placeholder="Please select"
-        onChange={handleChangeDaysOfMonth}
-        >
-        {daysOfMonth}
-        </Select>
-        <Typography style={{marginTop:16, marginBottom:16}}>Months:</Typography>
-        <Select
-        disabled={monthsVisible}
-        value={monthsSelect}
-        mode="multiple"
-        allowClear
-        style={{ width: '100%' }}
-        placeholder="Please select"
-        onChange={handleChangeMonth}
-        >
-        {months}
-        </Select>
+          </Col>
+        </Row>
+        <Row gutter={8}>
+          <Col span={12}>
+          <Typography style={{marginTop:16, marginBottom:16}}>Minutes:</Typography>
+          <Input onChange={handleMinutesInputChange} value={minutes} disabled={minutesVisible} placeholder="Minutes" />
+          </Col>
+          <Col span={12}>
+          <Typography style={{marginTop:16, marginBottom:16}}>Days:</Typography>
+          <Select
+          disabled={daysVisible}
+          value={daysSelect}
+          mode="multiple"
+          allowClear
+          style={{ width: '100%' }}
+          placeholder="Please select"
+          onChange={handleChangeDays}
+          >
+          {days}
+          </Select>
+          </Col>
+        </Row>
+        <Row gutter={8}>
+          <Col span={12}>
+          <Typography style={{marginTop:16, marginBottom:16}}>Days of the month:</Typography>
+          <Select
+          disabled={daysOfTheMonthVisible}
+          value={daysOfTheMonthSelect}
+          mode="multiple"
+          allowClear
+          style={{ width: '100%' }}
+          placeholder="Please select"
+          onChange={handleChangeDaysOfMonth}
+          >
+          {daysOfMonth}
+          </Select>
+          </Col>
+          <Col span={12}>
+          <Typography style={{marginTop:16, marginBottom:16}}>Months:</Typography>
+          <Select
+          disabled={monthsVisible}
+          value={monthsSelect}
+          mode="multiple"
+          allowClear
+          style={{ width: '100%' }}
+          placeholder="Please select"
+          onChange={handleChangeMonth}
+          >
+          {months}
+          </Select>
+          </Col>
+        </Row>
+        
       </Modal>
       <a onClick={showModal}>
       <Badge count={<ClockCircleTwoTone style={{fontSize:'250%' ,color: 'blue' }}/>}/>
