@@ -16,12 +16,16 @@ export default memo(({ data }) => {
   const [timeVisible, setTimeVisible] = useState(false);
   const [minutesVisible, setMinutesVisible] = useState(true);
   const [daysVisible, setDaysVisible] = useState(true);
+  const [startDateVisible, setStartDateVisible] = useState(false);
+  const [endDateVisible, setEndDateVisible] = useState(false);
   const [monthsVisible, setMonthsVisible] = useState(true);
   const [daysOfTheMonthVisible, setDaysOfTheMonthVisible] = useState(true);
   const [minutes, setMinutes] = useState(0);
   const [type, setType] = useState("every_day");
   const [time, setTime] = useState(null);
   const [date, setDate] = useState(null);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
   const [daysSelect, setDaysSelect] = useState(null);
   const [monthsSelect, setMonthsSelect] = useState(null);
   const [daysOfTheMonthSelect, setDaysOfTheMonthSelect] = useState(null);
@@ -71,6 +75,8 @@ export default memo(({ data }) => {
         setMinutes(res.data.minutes)
         setTime(res.data.time)
         setDate(res.data.date)
+        setStartDate(res.data.start_date_time)
+        setEndDate(res.data.expired_date_time)
         setType(res.data.type)
         if(res.data.days !== null && res.data.type==='days_of_week'){
           setDaysSelect(res.data.days.split(","))
@@ -78,10 +84,10 @@ export default memo(({ data }) => {
         else if(res.data.type==='days_of_week'){
           setDaysSelect(res.data.days)
         }
-        if(res.data.days !== null && res.data.type==='days_of_month'){
+        if(res.data.days !== null && (res.data.type==='days_of_month' || res.data.type==='specified_dates')){
           setDaysOfTheMonthSelect(res.data.days.split(","))
         }
-        else if(res.data.type==='days_of_month'){
+        else if(res.data.type==='days_of_month' || res.data.type==='specified_dates'){
           setDaysOfTheMonthSelect(res.data.days)
         }
         if(res.data.days !== null){
@@ -102,19 +108,48 @@ export default memo(({ data }) => {
     const scenario_id = localStorage.getItem('selectedScenario');
     if(type === "intervals"){
       console.log(type)
-      axios.put(`http://37.152.180.213/api/scenario/${scenario_id}/schedule/`,
-      {
-        type: type,
-        minutes: parseInt(minutes),
-        enable: true
-      }, config)
-      .then((res)=>{
-        console.log(res)
-      })
+      if(startDate !== "" && endDate !== ""){
+        axios.put(`http://37.152.180.213/api/scenario/${scenario_id}/schedule/`,
+        {
+          type: type,
+          minutes: parseInt(minutes),
+          enable: true,
+          start_date_time: startDate.replace(" ","T"),
+          expired_date_time: endDate.replace(" ","T")
+        }, config)
+        .then((res)=>{
+          console.log(res)
+        })
+      }
+      else{
+        axios.put(`http://37.152.180.213/api/scenario/${scenario_id}/schedule/`,
+        {
+          type: type,
+          minutes: parseInt(minutes),
+          enable: true,
+        }, config)
+        .then((res)=>{
+          console.log(res)
+        })
+      }
     }
     else if(type === "every_day"){
       console.log(type)
-      axios.put(`http://37.152.180.213/api/scenario/${scenario_id}/schedule/`,
+      if(startDate !== "" && endDate !== ""){
+        axios.put(`http://37.152.180.213/api/scenario/${scenario_id}/schedule/`,
+        {
+          type: type,
+          time: time,
+          enable: true,
+          start_date_time: startDate.replace(" ","T"),
+          expired_date_time: endDate.replace(" ","T")
+        }, config)
+        .then((res)=>{
+          console.log(res)
+        })
+      }
+      else{
+        axios.put(`http://37.152.180.213/api/scenario/${scenario_id}/schedule/`,
       {
         type: type,
         time: time,
@@ -123,6 +158,7 @@ export default memo(({ data }) => {
       .then((res)=>{
         console.log(res)
       })
+      }
     }
     else if(type === "once"){
       let datePlusTime = date + 'T' + time
@@ -138,7 +174,22 @@ export default memo(({ data }) => {
       })
     }
     else if(type === "days_of_week"){
-      axios.put(`http://37.152.180.213/api/scenario/${scenario_id}/schedule/`,
+      if(startDate !== "" && endDate !== ""){
+        axios.put(`http://37.152.180.213/api/scenario/${scenario_id}/schedule/`,
+        {
+          type: type,
+          time:time,
+          days: daysSelect.toString(),
+          enable: true,
+          start_date_time: startDate.replace(" ","T"),
+          expired_date_time: endDate.replace(" ","T")
+        }, config)
+        .then((res)=>{
+          console.log(res)
+        })
+      }
+      else{
+        axios.put(`http://37.152.180.213/api/scenario/${scenario_id}/schedule/`,
       {
         type: type,
         time:time,
@@ -148,9 +199,25 @@ export default memo(({ data }) => {
       .then((res)=>{
         console.log(res)
       })
+      }
     }
     else if(type === "days_of_month"){
-      axios.put(`http://37.152.180.213/api/scenario/${scenario_id}/schedule/`,
+      if(startDate !== "" && endDate !== ""){
+        axios.put(`http://37.152.180.213/api/scenario/${scenario_id}/schedule/`,
+        {
+          type: type,
+          time:time,
+          days: daysOfTheMonthSelect.toString(),
+          enable: true,
+          start_date_time: startDate.replace(" ","T"),
+          expired_date_time: endDate.replace(" ","T")
+        }, config)
+        .then((res)=>{
+          console.log(res)
+        })
+      }
+      else{
+        axios.put(`http://37.152.180.213/api/scenario/${scenario_id}/schedule/`,
       {
         type: type,
         time:time,
@@ -160,9 +227,26 @@ export default memo(({ data }) => {
       .then((res)=>{
         console.log(res)
       })
+      }
     }
     else if(type === "specified_dates"){
-      axios.put(`http://37.152.180.213/api/scenario/${scenario_id}/schedule/`,
+      if(startDate !== "" && endDate !== ""){
+        axios.put(`http://37.152.180.213/api/scenario/${scenario_id}/schedule/`,
+        {
+          type: type,
+          time:time,
+          days: daysOfTheMonthSelect.toString(),
+          months: monthsSelect.toString(),
+          enable: true,
+          start_date_time: startDate.replace(" ","T"),
+          expired_date_time: endDate.replace(" ","T")
+        }, config)
+        .then((res)=>{
+          console.log(res)
+        })
+      }
+      else{
+        axios.put(`http://37.152.180.213/api/scenario/${scenario_id}/schedule/`,
       {
         type: type,
         time:time,
@@ -173,6 +257,7 @@ export default memo(({ data }) => {
       .then((res)=>{
         console.log(res)
       })
+      }
     }
     setTimeout(() => {
       setVisible(false);
@@ -199,6 +284,8 @@ export default memo(({ data }) => {
       setDaysVisible(true)
       setDaysOfTheMonthVisible(true)
       setMonthsVisible(true)
+      setStartDateVisible(false)
+      setEndDateVisible(false)
     }
     else if(value=="once"){
       setDateVisible(false)
@@ -207,6 +294,8 @@ export default memo(({ data }) => {
       setDaysVisible(true)
       setDaysOfTheMonthVisible(true)
       setMonthsVisible(true)
+      setStartDateVisible(true)
+      setEndDateVisible(true)
     }
     else if (value=="intervals") {
       setDateVisible(true)
@@ -215,6 +304,8 @@ export default memo(({ data }) => {
       setDaysVisible(true)
       setDaysOfTheMonthVisible(true)
       setMonthsVisible(true)
+      setStartDateVisible(false)
+      setEndDateVisible(false)
     }
     else if (value=="days_of_week") {
       setDateVisible(true)
@@ -223,6 +314,8 @@ export default memo(({ data }) => {
       setDaysVisible(false)
       setDaysOfTheMonthVisible(true)
       setMonthsVisible(true)
+      setStartDateVisible(false)
+      setEndDateVisible(false)
     }
     else if (value=="days_of_month") {
       setDateVisible(true)
@@ -231,6 +324,8 @@ export default memo(({ data }) => {
       setDaysVisible(true)
       setDaysOfTheMonthVisible(false)
       setMonthsVisible(true)
+      setStartDateVisible(false)
+      setEndDateVisible(false)
     }
     else if (value=="specified_dates") {
       setDateVisible(true)
@@ -239,11 +334,21 @@ export default memo(({ data }) => {
       setDaysVisible(true)
       setDaysOfTheMonthVisible(false)
       setMonthsVisible(false)
+      setStartDateVisible(false)
+      setEndDateVisible(false)
     }
   }
   function onChangeDate(date, dateString) {
     console.log(date, dateString);
     setDate(dateString)
+  }
+  function onChangeStartDate(date, dateString) {
+    console.log(date, dateString);
+    setStartDate(dateString)
+  }
+  function onChangeEndDate(date, dateString) {
+    console.log(date, dateString);
+    setEndDate(dateString)
   }
   function disabledDate(current) {
     // Can not select days before today and today
@@ -339,6 +444,16 @@ export default memo(({ data }) => {
           >
           {months}
           </Select>
+          </Col>
+        </Row>
+        <Row gutter={8}>
+          <Col span={12}>
+            <Typography style={{marginTop:16, marginBottom:16}}>Start:</Typography>
+            <DatePicker showTime defaultValue={startDate === null ? startDate : moment(startDate.replace("T"," "),'YYYY-MM-DD HH:mm:ss')} disabled={startDateVisible} disabledDate={disabledDate} style={{ width: '100%' }} onChange={onChangeStartDate} />
+          </Col>
+          <Col span={12}>
+            <Typography style={{marginTop:16, marginBottom:16}}>End:</Typography>
+            <DatePicker showTime defaultValue={endDate === null ? endDate : moment(endDate.replace("T"," "),'YYYY-MM-DD HH:mm:ss')} disabled={endDateVisible} disabledDate={disabledDate} style={{ width: '100%' }} onChange={onChangeEndDate} />
           </Col>
         </Row>
         
