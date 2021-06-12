@@ -16,12 +16,14 @@ export default memo(({ data }) => {
   const [timeVisible, setTimeVisible] = useState(false);
   const [minutesVisible, setMinutesVisible] = useState(true);
   const [daysVisible, setDaysVisible] = useState(true);
+  const [monthsVisible, setMonthsVisible] = useState(true);
   const [daysOfTheMonthVisible, setDaysOfTheMonthVisible] = useState(true);
   const [minutes, setMinutes] = useState(0);
   const [type, setType] = useState("every_day");
   const [time, setTime] = useState(null);
   const [date, setDate] = useState(null);
   const [daysSelect, setDaysSelect] = useState(null);
+  const [monthsSelect, setMonthsSelect] = useState(null);
   const [daysOfTheMonthSelect, setDaysOfTheMonthSelect] = useState(null);
 
   const format = 'HH:mm';
@@ -43,6 +45,20 @@ export default memo(({ data }) => {
   for (let index = 1; index < 32; index++) {
     daysOfMonth.push(<Option value={index.toString()} key={index.toString()}>{index.toString()}</Option>);
   }
+
+  const months = [];
+  months.push(<Option value="0" key={"January"}>{"January"}</Option>);
+  months.push(<Option value="1" key={"February"}>{"February"}</Option>);
+  months.push(<Option value="2" key={"March"}>{"March"}</Option>);
+  months.push(<Option value="3" key={"April"}>{"April"}</Option>);
+  months.push(<Option value="4" key={"May"}>{"May"}</Option>);
+  months.push(<Option value="5" key={"June"}>{"June"}</Option>);
+  months.push(<Option value="6" key={"July"}>{"July"}</Option>);
+  months.push(<Option value="7" key={"August"}>{"August"}</Option>);
+  months.push(<Option value="8" key={"September"}>{"September"}</Option>);
+  months.push(<Option value="9" key={"October"}>{"October"}</Option>);
+  months.push(<Option value="10" key={"November"}>{"November"}</Option>);
+  months.push(<Option value="11" key={"December"}>{"December"}</Option>);
 
   useEffect(()=>{
     const config = {
@@ -68,6 +84,12 @@ export default memo(({ data }) => {
         else if(res.data.type==='days_of_month'){
           setDaysOfTheMonthSelect(res.data.days)
         }
+        if(res.data.days !== null){
+          setMonthsSelect(res.data.months.split(","))
+        }
+        else{
+          setMonthsSelect(res.data.months)
+        }
         handleChangeSelect(res.data.type)
       })
   },[])
@@ -84,7 +106,7 @@ export default memo(({ data }) => {
       {
         type: type,
         minutes: parseInt(minutes),
-        enable: false
+        enable: true
       }, config)
       .then((res)=>{
         console.log(res)
@@ -96,7 +118,7 @@ export default memo(({ data }) => {
       {
         type: type,
         time: time,
-        enable: false
+        enable: true
       }, config)
       .then((res)=>{
         console.log(res)
@@ -109,7 +131,7 @@ export default memo(({ data }) => {
       {
         type: type,
         date: datePlusTime,
-        enable: false
+        enable: true
       }, config)
       .then((res)=>{
         console.log(res)
@@ -121,7 +143,7 @@ export default memo(({ data }) => {
         type: type,
         time:time,
         days: daysSelect.toString(),
-        enable: false
+        enable: true
       }, config)
       .then((res)=>{
         console.log(res)
@@ -133,7 +155,20 @@ export default memo(({ data }) => {
         type: type,
         time:time,
         days: daysOfTheMonthSelect.toString(),
-        enable: false
+        enable: true
+      }, config)
+      .then((res)=>{
+        console.log(res)
+      })
+    }
+    else if(type === "specified_dates"){
+      axios.put(`http://37.152.180.213/api/scenario/${scenario_id}/schedule/`,
+      {
+        type: type,
+        time:time,
+        days: daysOfTheMonthSelect.toString(),
+        months: monthsSelect.toString(),
+        enable: true
       }, config)
       .then((res)=>{
         console.log(res)
@@ -163,6 +198,7 @@ export default memo(({ data }) => {
       setTimeVisible(false)
       setDaysVisible(true)
       setDaysOfTheMonthVisible(true)
+      setMonthsVisible(true)
     }
     else if(value=="once"){
       setDateVisible(false)
@@ -170,6 +206,7 @@ export default memo(({ data }) => {
       setTimeVisible(false)
       setDaysVisible(true)
       setDaysOfTheMonthVisible(true)
+      setMonthsVisible(true)
     }
     else if (value=="intervals") {
       setDateVisible(true)
@@ -177,6 +214,7 @@ export default memo(({ data }) => {
       setTimeVisible(true)
       setDaysVisible(true)
       setDaysOfTheMonthVisible(true)
+      setMonthsVisible(true)
     }
     else if (value=="days_of_week") {
       setDateVisible(true)
@@ -184,6 +222,7 @@ export default memo(({ data }) => {
       setTimeVisible(false)
       setDaysVisible(false)
       setDaysOfTheMonthVisible(true)
+      setMonthsVisible(true)
     }
     else if (value=="days_of_month") {
       setDateVisible(true)
@@ -191,6 +230,15 @@ export default memo(({ data }) => {
       setTimeVisible(false)
       setDaysVisible(true)
       setDaysOfTheMonthVisible(false)
+      setMonthsVisible(true)
+    }
+    else if (value=="specified_dates") {
+      setDateVisible(true)
+      setMinutesVisible(true)
+      setTimeVisible(false)
+      setDaysVisible(true)
+      setDaysOfTheMonthVisible(false)
+      setMonthsVisible(false)
     }
   }
   function onChangeDate(date, dateString) {
@@ -212,6 +260,10 @@ export default memo(({ data }) => {
     console.log(`selected ${value}`);
     setDaysOfTheMonthSelect(value);
   }
+  function handleChangeMonth(value) {
+    console.log(`selected ${value}`);
+    setMonthsSelect(value);
+  }
   return (
     <>
       <Modal
@@ -228,6 +280,7 @@ export default memo(({ data }) => {
           <Option value="intervals">At Regular Intervals</Option>
           <Option value="days_of_week">Days of the Week</Option>
           <Option value="days_of_month">Days of the Month</Option>
+          <Option value="specified_dates">Specified Dates</Option>
         </Select>
         <Typography style={{marginTop:16, marginBottom:16}}>Time:</Typography>
         <TimePicker value={time === null ? time : moment(time,'HH:mm:ss')} onChange={onChangeTime} disabled={timeVisible} style={{ width: '100%' }} format={format} />
@@ -258,6 +311,18 @@ export default memo(({ data }) => {
         onChange={handleChangeDaysOfMonth}
         >
         {daysOfMonth}
+        </Select>
+        <Typography style={{marginTop:16, marginBottom:16}}>Months:</Typography>
+        <Select
+        disabled={monthsVisible}
+        value={monthsSelect}
+        mode="multiple"
+        allowClear
+        style={{ width: '100%' }}
+        placeholder="Please select"
+        onChange={handleChangeMonth}
+        >
+        {months}
         </Select>
       </Modal>
       <a onClick={showModal}>
