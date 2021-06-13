@@ -86,7 +86,16 @@ const DnDFlow = () => {
     const [firstedge_set, setfirstedge_set] = useState("");
     const [secondedge_set, setsecondedge_set] = useState("");
     const [edge_operator, setedge_operator] = useState("");
+    let ands=[]
+    let statements=[]
+    
+    const [s_count, sets_count] = useState(0);
+    const [ss_count, setss_count] = useState([0]);
+    const repeat=()=>{
+        for (let index = 0; index <= s_count; index++) {
 
+        }
+    }
     const [source_set, setsource_set] = useState("");
     //localforage.setItem("edge_data",[])
     //const [edge_data, setedge_data] = useState([]);
@@ -94,6 +103,25 @@ const DnDFlow = () => {
     const [edge_id, setedge_id] = useState("");
     const [visible_edge, setvisible_edge] = useState(false);
     const [visible_edge_edit, setvisible_edge_edit] = useState(false);
+
+    const onAnd = () => {
+        sets_count(s_count+1)
+        setss_count((s)=>s.concat(s_count))
+        ands.push("and")
+        const newcon={
+            operator: edge_operator, first: firstedge_set ,second: secondedge_set
+        }
+        statements.push(newcon)
+    };
+    const onOr = () => {
+        sets_count(s_count+1)
+        setss_count((s)=>s.concat(s_count))
+        ands.push("or")
+        const newcon={
+            operator: edge_operator, first: firstedge_set ,second: secondedge_set
+        }
+        statements.push(newcon)
+    };
 
     const edgeOk = () => {
         axios.post('http://37.152.180.213/api/edge/statement',{
@@ -145,7 +173,6 @@ const DnDFlow = () => {
             
           });
 
-
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
     const [elements, setElements] = useState(initialElements);
     const [vis, setVis] = useState(false);
@@ -159,7 +186,7 @@ const DnDFlow = () => {
     const [xPosition, setxPosition] = useState(-1);
     const [yPosition, setyPosition] = useState(-1);
     const [typeReactFlow, setTypeReactFlow] = useState(null);
-    let [id, setID] = useState(0);
+    const [id, setID] = useState(0);
     
     const getId = () => `${id+1}`;
     const onConnect = (params) => {
@@ -396,8 +423,6 @@ const DnDFlow = () => {
             x=x+splitedValue[j]+"_";
         }
         x=x.substring(0,x.length-1);
-        document.getElementById("scenario_method").value = splitedValue[1];
-        document.getElementById("scenario_url").value = x;
 
     }
     const doneNodeModal = ()=>{       
@@ -413,7 +438,7 @@ const DnDFlow = () => {
           'Authorization' :`Token ${localStorage.getItem('token')}`
         }}).then((resDimo)=>{
             message.success("Added");
-            setnewModule(resDimo.data.id);
+            //setnewModule(resDimo.data.id);
             const no_data = {first_id: id,second_id : resDimo.data.id}
             node_numbers.push(no_data)
 
@@ -423,6 +448,7 @@ const DnDFlow = () => {
                 x: xPosition,
                 y: yPosition,
             });
+            //alert(JSON.stringify(elements))
             
             const newNode = {
                 id: getId(),
@@ -432,10 +458,12 @@ const DnDFlow = () => {
                 targetPosition :  'left',
                 sourcePosition : 'right',
                 data: { label: `${type} node` },
-            };                        
-            setID(parseInt(getId()))                       
-
+            };
+            //alert(JSON.stringify(node_numbers))                                                         
+            setID(parseInt(getId())) 
             setElements((es) => es.concat(newNode));
+            //alert(JSON.stringify(elements))
+
         })
         .catch((err)=>{
             message.error(err.message);
@@ -495,20 +523,24 @@ const DnDFlow = () => {
 
                 var i;
                 for (i = 0; i < resDimo.data.length; i++) {
-                    thisElements.push(
-                        {
-                            id: resDimo.data[i].id,
-                            type: 'defaultNode',
-                            data: { label: 'input node' },
-                            style: { width: '100px',height: '100px',borderRadius: '50px', backgroundColor:'white'},
-                            targetPosition :  'left',
-                            sourcePosition : 'right',
-                            position: { x: resDimo.data[i].x_position, y: resDimo.data[i].y_position },
-                        }
-                    );           
-                }
-                setElements(thisElements);
+                    const no_data = {first_id: i,second_id : resDimo.data[i].id}
+                    node_numbers.push(no_data)
 
+                    const newNode = {
+                        id: i.toString(),
+                        
+                        type: 'defaultNode',
+                        data: { label: 'input node' },
+                        position: { x: resDimo.data[i].x_position, y: resDimo.data[i].y_position },
+                        style: { width: '100px',height: '100px',borderRadius: '50px', backgroundColor:'white'},
+                        targetPosition :  'left',
+                        sourcePosition : 'right',
+                    };
+                   // alert(newNode.id)
+                    setElements((es) => es.concat(newNode));
+                        
+                }
+                setID(resDimo.data.length-1)                
                 var dndflow=document.getElementById('dndflow');
                 if(!dndflow.classList.contains('visib')){                
                     dndflow.classList.toggle('visib');
@@ -525,7 +557,7 @@ const DnDFlow = () => {
         console.log(localStorage.getItem('token'));
         var newScenarioName=document.getElementById('new_scenario_name').value;
         // alert(newScenarioName+"***"+localStorage.getItem('selectedCollection'));
-        axios.post('http://37.152.180.213/api/scenario/create_scenario',
+        axios.post('http://37.152.180.213/api/scenario/create_scenario/',
         {
             "name":newScenarioName,
             "collection":localStorage.getItem('selectedCollection')
@@ -595,7 +627,7 @@ const DnDFlow = () => {
    
         </div>
         </Modal>
-
+        
 
             <Header  style={{width:'100%', height: '8vh',backgroundColor: 'transparent',padding: '0px',borderBottom: '1px solid rgb(204 204 204)',lineHeight: '3.75'}}>
             <Row justify="start" style={{width: '100%',marginLeft: '-1%'}}>
@@ -652,7 +684,8 @@ const DnDFlow = () => {
                 </Button>
                 ]}
             >
-        <div style={{alignContent: 'center' ,marginLeft: 'auto',marginRight: 'auto',alignItems: 'center',textAlign: 'center'}}>
+        <div //className="andor"
+         style={{alignContent: 'center' ,marginLeft: 'auto',marginRight: 'auto',alignItems: 'center',textAlign: 'center'}}>
         <h5 style={{textAlign: 'left',marginLeft: '10%'}}>
             Statement
         </h5>
@@ -664,39 +697,62 @@ const DnDFlow = () => {
                   value={condition_set}
                   onChange={conditionSet}
                 />
-        <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
-            First Set
-        </h5>
-        <Input
-                style={{width: '80%'}}
-                  required
-                  name="first"
-                  placeholder="first set"
-                  value={firstedge_set}
-                  onChange={firstEdgeSet}
-                />
-        <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
-            Operator
-        </h5>
-        <Input
-                 style={{width: '80%'}}
-                 required
-                  name="Operator"
-                  placeholder="operator"
-                  value={edge_operator}
-                  onChange={edgeOperatorSet}
-                />
-        <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
-            Second Set
-        </h5>
-        <Input
-                style={{width: '80%'}}
-                required
-                  name="second"
-                  placeholder="second set"
-                  value={secondedge_set}
-                  onChange={secondEdgeSet}
-                />
+                
+        {ss_count.map(d=>(
+                
+                <div className="andor"
+            style={{alignContent: 'center' ,marginLeft: 'auto',marginRight: 'auto',alignItems: 'center',textAlign: 'center'}}>
+           <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
+               First Set
+           </h5>
+           <Input
+                   style={{width: '80%'}}
+                     required
+                     name="first"
+                     placeholder="first set"
+                     value={firstedge_set}
+                     onChange={firstEdgeSet}
+                   />
+           <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
+               Operator
+           </h5>
+           <Input
+                    style={{width: '80%'}}
+                    required
+                     name="Operator"
+                     placeholder="operator"
+                     value={edge_operator}
+                     onChange={edgeOperatorSet}
+                   />
+           <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
+               Second Set
+           </h5>
+           <Input
+                   style={{width: '80%'}}
+                   required
+                     name="second"
+                     placeholder="second set"
+                     value={secondedge_set}
+                     onChange={secondEdgeSet}
+                   />
+                   <Row style={{marginTop: '4%'}}>
+                       <Col span="6">
+   
+                       </Col>
+                       <Col span="6">
+                       <Button style={{backgroundColor: '#1890ff',color: 'white',
+                   border: 'none',lineHeight: '0.5',width: '100%',height: '3vh'}} onClick={onAnd}>AND</Button>
+                       </Col>
+                       <Col span="6">
+                       <Button style={{backgroundColor: '#1890ff',color: 'white',
+                   border: 'none',lineHeight: '0.5',width: '100%',height: '3vh',marginLeft: '10%'}}onClick={onOr}>OR</Button>
+                       </Col>
+                   </Row>
+           </div>
+            
+            
+        ))}
+         
         </div>
       </Modal>
       <Modal
@@ -754,22 +810,7 @@ const DnDFlow = () => {
                     <Select STYLE="width:100%; background-color:#ffffff;" onSelect={onSelect}>
                         {myRequests.map(d=><Option value={methodAndUrl(d)}>{d.name}</Option>)}
                     </Select>
-                    <Row STYLE="margin-top:10px;">
-                        <Col span={6}>
-                            <p STYLE="margin-right:5px;">Method</p>
-                        </Col>
-                        <Col span={18}>
-                            <p STYLE="margin-left:5px;">URL</p>
-                        </Col>                
-                    </Row>
-                    <Row STYLE="margin-top:-15px;">
-                        <Col span={6}>
-                            <Input id="scenario_method" disabled={true} STYLE="margin-right:5px;"></Input>
-                        </Col>
-                        <Col span={17}>
-                            <Input id="scenario_url" disabled={true} STYLE="margin-left:5px;" ></Input>
-                        </Col>                
-                    </Row>
+                   
                 </Form>
            
                 </div>
@@ -787,6 +828,7 @@ const DnDFlow = () => {
                             onNodeContextMenu={onNodeContextMenu}
                             connectionLineComponent={ConnectionLine}
                             nodeTypes={nodeTypes}
+                            
                         >
                             <Controls />
                         </ReactFlow>
