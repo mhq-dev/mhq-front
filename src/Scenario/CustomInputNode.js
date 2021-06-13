@@ -8,7 +8,7 @@ import { Handle } from 'react-flow-renderer';
 import './CustomNode.scss'
 import { Option } from 'antd/lib/mentions';
 
-export default memo(({ data }) => {
+export  default memo(({ data }) => {
   const [visible, setVisible] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [dateVisible, setDateVisible] = useState(true);
