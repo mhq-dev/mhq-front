@@ -20,4 +20,4 @@ jobs:
       run: docker ps
     
     - name: Run tests
-      run: docker run -e CI=true react-app npm run test
+      run: docker run -e CI=true react-app npm test
