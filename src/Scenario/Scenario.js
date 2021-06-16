@@ -97,6 +97,8 @@ const DnDFlow = () => {
         }
     }
     const [source_set, setsource_set] = useState("");
+    const [param_set, setparam_set] = useState("");
+
     //localforage.setItem("edge_data",[])
     //const [edge_data, setedge_data] = useState([]);
     const [target_set, settarget_set] = useState("");
@@ -124,8 +126,24 @@ const DnDFlow = () => {
     };
 
     const edgeOk = () => {
-        axios.post('http://37.152.180.213/api/edge/statement',{
-        edge: edge_id,name: condition_set
+        let s = "0"
+        let t = "1"
+        node_numbers.forEach(element => {
+            if(element.first_id==source_set-1)
+            {
+                s = element.second_id
+            }
+            if(element.first_id==target_set-1)
+            {
+                t = element.second_id
+            }
+        });
+        //alert(t)
+        const conditions = [{operator: edge_operator,first_token: 'str',first: firstedge_set,second_token: 'str',second: secondedge_set}]
+        const statement= [{conditions: conditions}]
+        
+        axios.post('http://37.152.180.213/api/edge/',{
+        source: s, dist: t ,statements: statement
         },{headers:{
         'Content-Type' : 'application/json',
         'Authorization' :`Token ${localStorage.getItem('token')}`
@@ -133,21 +151,16 @@ const DnDFlow = () => {
         .then((response)=>{
         if (response.status === 201){
           //message.success("Collection created successfully")
-          axios.post('http://37.152.180.213/api/condition/',{
-            operator: edge_operator, first: firstedge_set ,second: secondedge_set,statement: response.data.id
-        },{headers:{
-        'Content-Type' : 'application/json',
-        'Authorization' :`Token ${localStorage.getItem('token')}`
-        }})
-        .then((response)=>{
-        if (response.status === 201){
-          message.success("Statement and Condition created successfully")
-          
+
+          setElements((els) => addEdge(param_set, els));
+          //alert(JSON.stringify(elements))
+          message.success("The edge is created successfully")
+
         }
-        
         else{
-          message.error("Something went wrong.")
-        }}).catch({})}})
+          message.error("Please try again")
+        }})
+        
         const data={source: source_set ,target: target_set , condition: condition_set,
             first: firstedge_set, operator: edge_operator , second: secondedge_set}
         //const newone = localforage.getItem("edge_data")
@@ -199,37 +212,12 @@ const DnDFlow = () => {
             // labelStyle:{fill:'#fff',fontWeight: 800},
             // labelShowBg:false,
         }
+        alert(JSON.stringify(params))
+        setparam_set(params)
         setsource_set(params.source)
         settarget_set(params.target)
         conditionEmpty();
-        let s = "0"
-        let t = "1"
-        node_numbers.forEach(element => {
-            if(element.first_id==params.source-1)
-            {
-                s = element.second_id
-            }
-            if(element.first_id==params.target-1)
-            {
-                t = element.second_id
-            }
-        });
-        axios.post('http://37.152.180.213/api/edge/',{
-        source: s, dist: t
-        },{headers:{
-        'Content-Type' : 'application/json',
-        'Authorization' :`Token ${localStorage.getItem('token')}`
-        }})
-        .then((response)=>{
-        if (response.status === 201){
-          //message.success("Collection created successfully")
-          setedge_id(response.data.id)
-          showModalEdge();
-          setElements((els) => addEdge(params, els));
-        }
-        else{
-          message.error("Please try again")
-        }})
+        showModalEdge();
     
     }
     const conditionSet = (e) => {
@@ -511,7 +499,7 @@ const DnDFlow = () => {
         } else{
             setScenarioModal(false);
             
-            axios.get('http://37.152.180.213/api/scenario/all_modules/'+selectedScenario,
+            axios.get('http://37.152.180.213/api/scenario/'+selectedScenario+'/',
             {headers:{
             'Content-Type' : 'application/json',
             'Authorization' :`Token ${localStorage.getItem('token')}`
@@ -522,8 +510,8 @@ const DnDFlow = () => {
                 var thisElements=[];
 
                 var i;
-                for (i = 0; i < resDimo.data.length; i++) {
-                    const no_data = {first_id: i,second_id : resDimo.data[i].id}
+                for (i = 0; i < resDimo.data.nodes.length; i++) {
+                    const no_data = {first_id: i,second_id : resDimo.data.nodes[i].id}
                     node_numbers.push(no_data)
 
                     const newNode = {
@@ -531,16 +519,53 @@ const DnDFlow = () => {
                         
                         type: 'defaultNode',
                         data: { label: 'input node' },className: "dropnode",
-                        position: { x: resDimo.data[i].x_position, y: resDimo.data[i].y_position },
+                        position: { x: resDimo.data.nodes[i].x_position, y: resDimo.data.nodes[i].y_position },
                         style: { width: '12vw',height: '12vw',borderRadius: '50px'},
                         targetPosition :  'left',
                         sourcePosition : 'right',
                     };
                    // alert(newNode.id)
                     setElements((es) => es.concat(newNode));
+
                         
                 }
-                setID(resDimo.data.length-1)                
+                for(i=0;i<resDimo.data.edges.length;i++){
+                    let s1 = "0"
+                    let t1 = "1"
+                    const e = resDimo.data.edges[i]
+                    //alert(JSON.stringify(e))
+                    node_numbers.forEach(element => {
+                    if(element.second_id==e.source)
+                    {
+                        s1 = element.first_id
+                        s1 = s1.toString()
+                    }
+                    if(element.second_id==e.dist)
+                    {
+                        t1 = element.first_id
+                        t1 = t1.toString()
+                    }
+                    });
+                    const reflow= "reactflow__edge-"+s1+"a-"+t1+"b"
+                    const params = {
+                        source: s1,
+                        sourceHandle: 'a',
+                        target: t1,
+                        targetHandle: 'b',
+                        animated: true,
+                        arrowHeadType: 'arrow',
+                        style: {strokeWidth:3},
+                        // label:'Setting',
+                        // labelStyle:{fill:'#fff',fontWeight: 800},
+                        // labelShowBg:false,
+                    }
+
+                    //alert(JSON.stringify(params))
+                    setElements((els) => addEdge(params, els));
+                    //alert(JSON.stringify(elements))
+
+                }
+                setID(resDimo.data.nodes.length-1)                
                 var dndflow=document.getElementById('dndflow');
                 if(!dndflow.classList.contains('visib')){                
                     dndflow.classList.toggle('visib');
@@ -557,7 +582,7 @@ const DnDFlow = () => {
         console.log(localStorage.getItem('token'));
         var newScenarioName=document.getElementById('new_scenario_name').value;
         // alert(newScenarioName+"***"+localStorage.getItem('selectedCollection'));
-        axios.post('http://37.152.180.213/api/scenario/create_scenario/',
+        axios.post('http://37.152.180.213/api/scenario/',
         {
             "name":newScenarioName,
             "collection":localStorage.getItem('selectedCollection')
