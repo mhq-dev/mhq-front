@@ -331,7 +331,7 @@ body{
   background: var(--layout4) !important;
 }
 .andor{
-  height: 36vh;
+  height: 40vh;
   position: relative;
   animation: myfirst 2s 1;
   animation-direction: normal;
@@ -340,6 +340,49 @@ body{
 
 @keyframes myfirst{
   0%   {height: 0px;}
-  100% {height:36vh;}
+  100% {height:40vh;}
 
+}
+.shadow{
+  box-shadow: 0px 6px 4px var(--layout3);
+}
+.dropnode{
+  animation: dropping 1.4s 1;
+  animation-direction: normal;
+  box-shadow: 2px 7px 9px var(--layout2);
+
+}
+@keyframes dropping{
+  0%   {margin-top: -45px;}
+  30%   {margin-top: 0px;}
+  50%   {margin-top: -20px;}
+  70%   {margin-top: 0px;}
+  80%   {margin-top: -5px;}
+  90%   {margin-top: 0px;}
+  94%   {margin-top: -3px;}
+  98%   {margin-top: 0px;}
+  99%   {margin-top: -1px;}
+  100%   {margin-top: 0px;}
+
+}
+.handlegrow { 
+  transition: all .2s ease-in-out;
+  width: 20px !important;
+  height: 20px !important;
+}
+.handlegrow:hover {
+  width: 35px !important;
+  height: 35px !important;
+  left: 88% !important;
+
+}
+.handlegrowleft { 
+  transition: all .2s ease-in-out;
+  width: 20px !important;
+  height: 20px !important;
+}
+.handlegrowleft:hover {
+  width: 35px !important;
+  height: 35px !important;
+  left: -10% !important;
 }
