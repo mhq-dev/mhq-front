@@ -453,8 +453,8 @@ const DnDFlow = () => {
             const newNode = {
                 id: getId(),
                 type,
-                position,
-                style: { width: '100px',height: '100px',borderRadius: '50px', backgroundColor:'white'},
+                position,className: "dropnode",
+                style: { width: '12vw',height: '12vw',borderRadius: '50px'},
                 targetPosition :  'left',
                 sourcePosition : 'right',
                 data: { label: `${type} node` },
@@ -530,9 +530,9 @@ const DnDFlow = () => {
                         id: i.toString(),
                         
                         type: 'defaultNode',
-                        data: { label: 'input node' },
+                        data: { label: 'input node' },className: "dropnode",
                         position: { x: resDimo.data[i].x_position, y: resDimo.data[i].y_position },
-                        style: { width: '100px',height: '100px',borderRadius: '50px', backgroundColor:'white'},
+                        style: { width: '12vw',height: '12vw',borderRadius: '50px'},
                         targetPosition :  'left',
                         sourcePosition : 'right',
                     };
