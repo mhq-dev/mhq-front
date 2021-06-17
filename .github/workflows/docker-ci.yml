@@ -1,0 +1,23 @@
+name: Docker CI
+
+on:
+  push:
+    branches: [ master, develop ]
+  pull_request:
+    branches: [ master, develop ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Build the docker-compose
+      run: docker-compose -f docker-compose-dev.yml up -d --build
+    
+    - name: Check running containers
+      run: docker ps
+    
+    - name: Run tests
+      run: docker-compose -f docker-compose-dev.yml exec -T react-app npm test
