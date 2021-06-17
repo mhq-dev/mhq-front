@@ -200,7 +200,15 @@ const DnDFlow = () => {
     const [yPosition, setyPosition] = useState(-1);
     const [typeReactFlow, setTypeReactFlow] = useState(null);
     const [id, setID] = useState(0);
-    
+    const [firsttoken_set, setfirsttoke_set] = useState("token");
+    const onChangeSelectFirstToken = value=>{
+        setfirsttoke_set(value);
+    }
+    const [secondtoken_set, setsecondtoke_set] = useState("token");
+    const onChangeSelectSecondToken = value=>{
+        setsecondtoke_set(value);
+    }
+
     const getId = () => `${id+1}`;
     const onConnect = (params) => {
         params = {
@@ -700,10 +708,10 @@ const DnDFlow = () => {
                 <Col flex={8}>
                 <p className="no-scenario" id="no-scenario">Please Select A Scenario!</p>
                 <div className="dndflow" id="dndflow">
-                <Modal width={"24vw"}
+                <Modal width={"36vw"}
                 visible={visible_edge}
                 title="Set condition"
-                style={{height: '36vh'}}
+                style={{height: '30vh'}}
                 footer={[
                 <Button key="ok" className="btn btn-primary" onClick={edgeOk} >Set
                 </Button>
@@ -711,24 +719,16 @@ const DnDFlow = () => {
             >
         <div //className="andor"
          style={{alignContent: 'center' ,marginLeft: 'auto',marginRight: 'auto',alignItems: 'center',textAlign: 'center'}}>
-        <h5 style={{textAlign: 'left',marginLeft: '10%'}}>
-            Statement
-        </h5>
-        <Input
-        style={{width: '80%'}}
-                  required
-                  name="Statement"
-                  placeholder="statement"
-                  value={condition_set}
-                  onChange={conditionSet}
-                />
+        
                 
         {ss_count.map(d=>(
                 
                 <div className="andor"
             style={{alignContent: 'center' ,marginLeft: 'auto',marginRight: 'auto',alignItems: 'center',textAlign: 'center'}}>
-           <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
-               First Set
+            <Row style={{width: '90%',marginLeft: '6%'}}>
+                <Col span={12}>
+                <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
+               First Operand
            </h5>
            <Input
                    style={{width: '80%'}}
@@ -738,6 +738,50 @@ const DnDFlow = () => {
                      value={firstedge_set}
                      onChange={firstEdgeSet}
                    />
+                </Col>
+                <Col span={12}>
+                <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
+               Token's Type
+           </h5>
+           <Select onChange={onChangeSelectFirstToken} value={firsttoken_set} style={{ width: '80%' ,textAlign: 'left'}}>
+                            <Option value="str">string</Option>
+                            <Option value="num">number</Option>
+                            <Option value="timestamp">timestamp</Option>
+                            <Option value="body">body</Option>
+                            <Option value="status_code">status code</Option>
+
+                        </Select>
+                </Col>
+            </Row>
+           
+            <Row style={{width: '90%',marginLeft: '6%'}}>
+                <Col span={12}>
+                <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
+                    Second Operand
+                </h5>
+                <Input
+                   style={{width: '80%'}}
+                   required
+                     name="second"
+                     placeholder="second set"
+                     value={secondedge_set}
+                     onChange={secondEdgeSet}
+                   />
+                </Col>
+                <Col span={12}>
+                <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
+               Token's Type
+           </h5>
+           <Select onChange={onChangeSelectSecondToken} value={secondtoken_set} style={{ width: '80%' ,textAlign: 'left'}}>
+                            <Option value="str">string</Option>
+                            <Option value="num">number</Option>
+                            <Option value="timestamp">timestamp</Option>
+                            <Option value="body">body</Option>
+                            <Option value="status_code">status code</Option>
+
+                        </Select> 
+                </Col>
+            </Row>
            <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
                Operator
            </h5>
@@ -749,17 +793,7 @@ const DnDFlow = () => {
                      value={edge_operator}
                      onChange={edgeOperatorSet}
                    />
-           <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
-               Second Set
-           </h5>
-           <Input
-                   style={{width: '80%'}}
-                   required
-                     name="second"
-                     placeholder="second set"
-                     value={secondedge_set}
-                     onChange={secondEdgeSet}
-                   />
+           
                    <Row style={{marginTop: '4%'}}>
                        <Col span="6">
    
