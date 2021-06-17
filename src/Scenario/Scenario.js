@@ -158,6 +158,8 @@ const DnDFlow = () => {
     const [xPosition, setxPosition] = useState(-1);
     const [yPosition, setyPosition] = useState(-1);
     const [typeReactFlow, setTypeReactFlow] = useState(null);
+    const [runningScenario, setRunningScenario] = useState(false);
+
     let [id, setID] = useState(0);
         
     const onConnect = (params) => {
@@ -610,13 +612,31 @@ const DnDFlow = () => {
                         {headers:{
                         'Content-Type' : 'application/json',
                         'Authorization' :`Token ${localStorage.getItem('token')}`
-                        }}).then((resDimo)=>{
+                        }}).then((runScenario)=>{
                             message.success("Started");
+                            setRunningScenario(true);
+                            while(runningScenario){
+                                axios.get('http://37.152.180.213/api/scenario/history'+runScenario.data.id+"/",
+                                {headers:{
+                                'Content-Type' : 'application/json',
+                                'Authorization' :`Token ${localStorage.getItem('token')}`
+                                }}).then((runScenario)=>{
+                                    setRunningScenario(false);
+                                })
+                                .catch((err)=>{
+                                    setRunningScenario(false);
+                                });  
+                                setTimeout(function(){ }, 1000);   
+                            }    
+                            })  
+                            .catch((err)=>{
+                                message.error(err.message);
+                            });  
                         })
                         .catch((err)=>{
                             message.error(err.message);
                         }); 
-                    })
+                    })  
                     .catch((err)=>{
                         message.error(err.message);
                     });  
