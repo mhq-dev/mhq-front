@@ -292,7 +292,7 @@ class OtherProfile extends React.Component {
                 >
                 <List.Item.Meta
                 avatar={
-                  <Avatar icon={<UserOutlined />} src={"http://37.152.180.213"+item.avatar} />
+                  <Avatar size="large" icon={<UserOutlined />} src={"http://37.152.180.213"+item.avatar} />
                 }
                 title={<Typography>{item.username}</Typography>}
                 description={item.bio === null ? `${item.username}'s bio` : item.bio}
@@ -301,21 +301,11 @@ class OtherProfile extends React.Component {
             )}
             />
             </Modal>
-            <Row STYLE="background-color: #212121;">
+            <Row style={{backgroundColor: "#212121", minHeight:"100vh"}}>
                 <Col span={6}> 
                     <div className="LeftPage">
-                        {(this.state.imgURL==null) ? 
-                        <Image
-                        id="image-tag-profile" className="OtherProfile-image"
-                        src="https://uupload.ir/files/b9f3_default_user.png"
-                        preview={false} >
-                        </Image> 
-                         : 
-                         <Image
-                         id="image-tag-profile" className="OtherProfile-image"
-                         src={this.state.imgURL} 
-                         preview={true}>
-                         </Image>
+                        {
+                         <Avatar size={250} src={this.state.imgURL} icon={<UserOutlined style={{color:'#212121'}} />} />
                         }
 
                         

@@ -2,7 +2,7 @@ import React from 'react';
 import 'antd/dist/antd.css';
 import './Profile.css';
 import axios from 'axios';
-import {Row, Form, Input, Button,message, Col,Card } from 'antd';
+import {Row, Form, Input, Button,message, Col,Card, Image } from 'antd';
 import {InfoCircleOutlined, MailOutlined, UserOutlined } from '@ant-design/icons';
 
 class EditProfile extends React.Component {
@@ -95,15 +95,21 @@ class EditProfile extends React.Component {
         return (
             <div className="profile-text">
                     {(this.state.ImageURL==null) ? 
-                    <img
+                    <Image
+                    style={{objectFit:"cover"}}
+                    width={250}
+                    height={220}
                     id="image-tag-profile" className="image-tag-profile" 
                     src="https://uupload.ir/files/b9f3_default_user.png" >
-                    </img> 
+                    </Image> 
                      : 
-                     <img
-                     id="image-tag-profile" className="image-tag-profile" 
-                     src={this.state.ImageURL} >
-                     </img>
+                    <Image
+                    style={{objectFit:"cover", padding:8}}
+                    width={250}
+                    height={220}
+                    id="image-tag-profile" className="image-tag-profile" 
+                    src={this.state.ImageURL} >
+                    </Image>
                     }
                     
                     
