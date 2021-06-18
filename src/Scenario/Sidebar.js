@@ -17,15 +17,6 @@ const Sidebar =  (props) => {
       <div className="dndnode" onDragStart={(event) => onDragStart(event, 'defaultNode')} draggable>
        <h5>Default Node</h5> 
       </div>
-      <div className="dndnode output" onDragStart={(event) => onDragStart(event, 'outputNode')} draggable>
-        <h5>Output Node</h5>
-      </div>
-      <div className="save__controls">
-          <button onClick={props.onSave}>save</button>
-          <button onClick={props.onRestore}>restore</button>
-        </div>
-        <div className="save__controls" style={{marginTop: '6%'}}>
-        </div>
     </aside>
   );
 };

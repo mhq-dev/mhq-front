@@ -380,7 +380,7 @@ export  default memo(({ data }) => {
         confirmLoading={confirmLoading}
         onCancel={handleCancel}
       >
-        <p>Run Scenario:</p>
+        <Typography style={{marginTop:16, marginBottom:16}}>Run Scenario:</Typography>
         <Select value={type} style={{ width: '100%' }} onChange={handleChangeSelect}>
           <Option value="every_day">Every day</Option>
           <Option value="once">Once</Option>

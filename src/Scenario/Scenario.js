@@ -110,7 +110,7 @@ const DnDFlow = () => {
 
         const secondcoditions = {operator: "operator",first_token: "token",first: "",second_token: "token",second: ""}
         statement.statements[st_index].conditions.push(secondcoditions)
-        alert(JSON.stringify(statement))
+        //alert(JSON.stringify(statement))
     }
     const onOr = () => {
         sets_count(s_count+1)
@@ -119,7 +119,7 @@ const DnDFlow = () => {
         const secondcoditions = [{operator: "operator",first_token: "token",first: "",second_token: "token",second: ""}]
          const secondstatem= {conditions: secondcoditions}
         statement.statements.push(secondstatem)
-        alert(JSON.stringify(statement))
+        //alert(JSON.stringify(statement))
 
     };
 
@@ -717,38 +717,40 @@ const DnDFlow = () => {
                 'Content-Type' : 'application/json',
                 'Authorization' :`Token ${localStorage.getItem('token')}`
                 }}).then((resDimo)=>{
+                    setRunningScenario(true);
                     axios.get('http://37.152.180.213/api/scenario/'+selectedScenario+"/execute",
                         {headers:{
                         'Content-Type' : 'application/json',
                         'Authorization' :`Token ${localStorage.getItem('token')}`
                         }}).then((runScenario)=>{
-                            setRunningScenario(true);
+                            message.success("Ran successfully");
+                            setRunningScenario(false);
                             // while(runningScenario){
-                                axios.get('http://37.152.180.213/api/scenario/history/'+runScenario.data.scenario_history+"/",
-                                {headers:{
-                                'Content-Type' : 'application/json',
-                                'Authorization' :`Token ${localStorage.getItem('token')}`
-                                }}).then((runScenario)=>{
-                                    message.success("Runned successfully");
-                                    setRunningScenario(false);
-                                })
-                                .catch((err)=>{
-                                    message.success("Failed to complete scenario");
-                                    setRunningScenario(false);
-                                });  
+                                // axios.get('http://37.152.180.213/api/scenario/history/'+runScenario.data.scenario_history+"/",
+                                // {headers:{
+                                // 'Content-Type' : 'application/json',
+                                // 'Authorization' :`Token ${localStorage.getItem('token')}`
+                                // }}).then((runScenario)=>{
+                                //     message.success("Runned successfully");
+                                //     setRunningScenario(false);
+                                // })
+                                // .catch((err)=>{
+                                //     message.success("Failed to complete scenario");
+                                //     setRunningScenario(false);
+                                // });  
                             //     setTimeout(function(){ }, 1000);   
                             // }    
                             })  
                             .catch((err)=>{
-                                message.error(err.message);
+                                message.success("Failed to complete scenario");
                             });  
                         })
                         .catch((err)=>{
-                            message.error(err.message);
+                            message.success("Failed to complete scenario");
                         }); 
                     })  
                     .catch((err)=>{
-                        message.error(err.message);
+                        message.success("Failed to complete scenario");
                     });  
           
     }
@@ -1033,8 +1035,10 @@ const DnDFlow = () => {
             </ReactFlowProvider>
                 </Row>
                 <Row STYLE="height:15%;">
-                    <img onClick={()=>RunScenario()} STYLE="height:70%;" src="https://s4.uupload.ir/files/run_button_byw4.jpg"></img>
+                    <a style={{height:'80%'}}>
+                    <img style={{height:'80%'}} onClick={()=>RunScenario()} src="https://s4.uupload.ir/files/run_button_byw4.jpg"></img>
                     {(runningScenario)?<Spin STYLE="margin-top:15px; margin-left:15px;" size="large"></Spin>:<p></p>}
+                    </a>
                     
                 </Row>
 
