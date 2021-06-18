@@ -449,7 +449,7 @@ const DnDFlow = () => {
         {headers:{
           'Content-Type' : 'application/json',
           'Authorization' :`Token ${localStorage.getItem('token')}`
-        }}).then((resDimoo)=>{
+        }}).then((resDimo)=>{
             message.success("Added");
             //setnewModule(resDimo.data.id);
             const no_data = {first_id: id,second_id : resDimo.data.id}
@@ -536,23 +536,62 @@ const DnDFlow = () => {
                 console.log(resDimo.data);
                 var thisElements=[];
                 var i;
+
+                var dict = {};
+                var maxim=resDimo.data.nodes.length;
+                var maximID=0;
+                
+                for (i = 0; i < resDimo.data.nodes.length; i++) {
+                    dict[resDimo.data.nodes[i].id]=0;
+                }
+                for (i = 0; i < resDimo.data.edges.length; i++) {
+                    if((resDimo.data.edges[i].dist) in dict){
+                        dict[resDimo.data.edges[i].dist]++;
+                    }
+                    else{
+                        dict[resDimo.data.edges[i].dist]=1;
+                    }
+                }
+                console.log(dict);
+                
+                for(var key in dict) {
+                    var value = dict[key];
+                    if(value<maxim){
+                        maximID=key;
+                        maxim=value;
+                    }
+                }
+
                 for (i = 0; i < resDimo.data.nodes.length; i++) {
 
                     const no_data = {first_id: i,second_id : resDimo.data.nodes[i].id}
                     node_numbers.push(no_data)
 
-                    const newNode = {
-                        id: i.toString(),
-                        
-                        type: 'defaultNode',
-                        data: { label: 'input node' },className: "dropnode",
-                        position: { x: resDimo.data.nodes[i].x_position, y: resDimo.data.nodes[i].y_position },
-                        style: { width: '12vw',height: '12vw',borderRadius: '50px'},
-                        targetPosition :  'left',
-                        sourcePosition : 'right',
-                    };
+                    if(resDimo.data.nodes[i].id==maximID){
+                        const newNode1 = {
+                            id: i.toString(),
+                            type: 'inputNode',
+                            data: { label: 'input node' },className: "dropnode",
+                            position: { x: resDimo.data.nodes[i].x_position, y: resDimo.data.nodes[i].y_position },
+                            style: { width: '12vw',height: '12vw',borderRadius: '50px'},
+                            targetPosition :  'left',
+                            sourcePosition : 'right',
+                        };
+                        setElements((es) => es.concat(newNode1));
+                    } else{
+                        const newNode2 = {
+                            id: i.toString(),
+                            type: 'defaultNode',
+                            data: { label: 'input node' },className: "dropnode",
+                            position: { x: resDimo.data.nodes[i].x_position, y: resDimo.data.nodes[i].y_position },
+                            style: { width: '12vw',height: '12vw',borderRadius: '50px'},
+                            targetPosition :  'left',
+                            sourcePosition : 'right',
+                        };
+                        setElements((es) => es.concat(newNode2));
+                    }
                    // alert(newNode.id)
-                    setElements((es) => es.concat(newNode));
+                    
 
                         
                 }
@@ -620,6 +659,7 @@ const DnDFlow = () => {
             setElements([]);
 
             setSelectedScenario(resDimo.data.id);
+            localStorage.setItem('selectedScenario',resDimo.data.id);
             message.success("Created Successfully");
             setScenarioModal(false);
             var dndflow=document.getElementById('dndflow');        
@@ -635,6 +675,7 @@ const DnDFlow = () => {
     }
     const onSelectScenario = value=>{
         setSelectedScenario(value);
+        localStorage.setItem('selectedScenario',value);
     }
     const RunScenario=()=>{
         axios.get('http://37.152.180.213/api/scenario/'+selectedScenario,
@@ -683,7 +724,7 @@ const DnDFlow = () => {
                         }}).then((runScenario)=>{
                             setRunningScenario(true);
                             // while(runningScenario){
-                                axios.get('http://37.152.180.213/api/scenario/history'+runScenario.data.id+"/",
+                                axios.get('http://37.152.180.213/api/scenario/history/'+runScenario.data.scenario_history+"/",
                                 {headers:{
                                 'Content-Type' : 'application/json',
                                 'Authorization' :`Token ${localStorage.getItem('token')}`
@@ -692,7 +733,7 @@ const DnDFlow = () => {
                                     setRunningScenario(false);
                                 })
                                 .catch((err)=>{
-                                    message.error("Failed");
+                                    message.success("Failed to complete scenario");
                                     setRunningScenario(false);
                                 });  
                             //     setTimeout(function(){ }, 1000);   
