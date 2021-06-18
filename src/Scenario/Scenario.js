@@ -101,6 +101,7 @@ const DnDFlow = () => {
     //const [edge_data, setedge_data] = useState([]);
     const [target_set, settarget_set] = useState("");
     const [edge_id, setedge_id] = useState("");
+    const [all_edges, setall_edges] = useState([]);
     const [visible_edge, setvisible_edge] = useState(false);
     const [visible_edge_edit, setvisible_edge_edit] = useState(false);
     function onAnd(st_index) {
@@ -110,7 +111,7 @@ const DnDFlow = () => {
 
         const secondcoditions = {operator: "operator",first_token: "token",first: "",second_token: "token",second: ""}
         statement.statements[st_index].conditions.push(secondcoditions)
-        alert(JSON.stringify(statement))
+        //alert(JSON.stringify(statement))
     }
     const onOr = () => {
         sets_count(s_count+1)
@@ -119,7 +120,7 @@ const DnDFlow = () => {
         const secondcoditions = [{operator: "operator",first_token: "token",first: "",second_token: "token",second: ""}]
          const secondstatem= {conditions: secondcoditions}
         statement.statements.push(secondstatem)
-        alert(JSON.stringify(statement))
+        //alert(JSON.stringify(statement))
 
     };
 
@@ -148,7 +149,9 @@ const DnDFlow = () => {
         .then((response)=>{
         if (response.status === 201){
           //message.success("Collection created successfully")
-
+          const newelm= {id: response.data.id , source: s,dist: t}
+          all_edges.push(newelm)
+          //alert(JSON.stringify(all_edges))
           setElements((els) => addEdge(param_set, els));
           //alert(JSON.stringify(elements))
           message.success("The edge is created successfully")
@@ -189,8 +192,8 @@ const DnDFlow = () => {
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
     const [elements, setElements] = useState(initialElements);
     const [vis, setVis] = useState(false);
-    const coditions = [{operator: edge_operator,first_token: 'str',
-    first: firstedge_set,second_token: 'str',second: secondedge_set}]
+    const coditions = [{operator: "",first_token: "",
+    first: "",second_token: "",second: ""}]
     const statem= {statements:[{conditions: coditions}]}
     const [statement, setstatement] = useState(statem);
 
@@ -209,6 +212,8 @@ const DnDFlow = () => {
 
 
     const [id, setID] = useState(0);
+    const [loading, setisloading] = useState(false);
+
     const [firsttoken_set, setfirsttoke_set] = useState("token");
     function onChangeSelectFirstToken (cc,value){
         cc.first_token=value;
@@ -276,8 +281,54 @@ const DnDFlow = () => {
         e.preventDefault()
         }
     const onElementsRemove = (elementsToRemove) => {
+            if(elementsToRemove[0].source>=0)
+            {
+                const e = elementsToRemove[0]
+            try{
+
+                let s1 = "0"
+                let t1 = "1"
+                node_numbers.forEach(element => {
+                    if(element.first_id==e.source-1)
+            {
+                s1 = element.second_id
+            }
+            if(element.first_id==e.target-1)
+            {
+                t1 = element.second_id
+            }
+            let id= -1;
+            all_edges.forEach(el => {
+                if(el.source===s1&&el.dist===t1)
+                {
+                    id=el.id
+                    axios.delete('http://37.152.180.213/api/edge/'+el.id,
+                    {headers:{
+              'Content-Type' : 'application/json',
+              'Authorization' :`Token ${localStorage.getItem('token')}`
+            }}).then((resDimo)=>{
+                message.success("Removed successfuly!");
+            })
+            .catch((err)=>{
+                message.error(err.message);
+            });
+
+                }
+            
+            });
+            
+                });
+                
+                setElements((els) => removeElements(elementsToRemove, els));
+                                
+          }
+          catch{}
+            }
+
+        
         try{if(elementsToRemove[0].id>=0)
         {
+
             var tempEl=[];
             var j;
             for(j=0;j<elements.length;j++){
@@ -307,26 +358,7 @@ const DnDFlow = () => {
             });        }
         }
         catch{
-            const e = elementsToRemove[0]
-            try{
-
-                let s1 = "0"
-                let t1 = "1"
-                node_numbers.forEach(element => {
-                    if(element.first_id==e.source-1)
-            {
-                s1 = element.second_id
-            }
-            if(element.first_id==e.target-1)
-            {
-                t1 = element.second_id
-            }
-                });
-                
-                setElements((els) => removeElements(elementsToRemove, els));
-                                
-          }
-          catch{}
+            
         
   }
         
@@ -452,7 +484,12 @@ const DnDFlow = () => {
         }}).then((resDimo)=>{
             message.success("Added");
             //setnewModule(resDimo.data.id);
-            const no_data = {first_id: id,second_id : resDimo.data.id}
+            let y = id
+            if(loading)
+            {
+                y=id+1
+            }
+            const no_data = {first_id: y,second_id : resDimo.data.id}
             node_numbers.push(no_data)
 
             const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
@@ -462,9 +499,14 @@ const DnDFlow = () => {
                 y: yPosition,
             });
             //alert(JSON.stringify(elements))
-            
+            let x=getId();
+            if(loading)
+            {
+                x=parseInt(getId())+1
+
+            }
             const newNode = {
-                id: getId(),
+                id: x.toString(),
                 type,
                 position,className: "dropnode",
                 style: { width: '12vw',height: '12vw',borderRadius: '50px'},
@@ -472,6 +514,8 @@ const DnDFlow = () => {
                 sourcePosition : 'right',
                 data: { label: `${type} node` },
             };
+           // alert(newNode.id)
+
             //alert(JSON.stringify(node_numbers))                                                         
             setID(parseInt(getId())) 
             setElements((es) => es.concat(newNode));
@@ -536,11 +580,11 @@ const DnDFlow = () => {
                 console.log(resDimo.data);
                 var thisElements=[];
                 var i;
-
+                setisloading(true)
                 var dict = {};
                 var maxim=resDimo.data.nodes.length;
                 var maximID=0;
-                
+                setall_edges(resDimo.data.edges)
                 for (i = 0; i < resDimo.data.nodes.length; i++) {
                     dict[resDimo.data.nodes[i].id]=0;
                 }
@@ -566,6 +610,7 @@ const DnDFlow = () => {
 
                     const no_data = {first_id: i,second_id : resDimo.data.nodes[i].id}
                     node_numbers.push(no_data)
+                 
 
                     if(resDimo.data.nodes[i].id==maximID){
                         const newNode1 = {
@@ -577,6 +622,9 @@ const DnDFlow = () => {
                             targetPosition :  'left',
                             sourcePosition : 'right',
                         };
+                        //alert(newNode1.id)
+                        setID(parseInt(getId())) 
+
                         setElements((es) => es.concat(newNode1));
                     } else{
                         const newNode2 = {
@@ -588,28 +636,33 @@ const DnDFlow = () => {
                             targetPosition :  'left',
                             sourcePosition : 'right',
                         };
+                        setID(parseInt(getId()))
+                      //  alert(newNode2.id) 
+
                         setElements((es) => es.concat(newNode2));
                     }
                    // alert(newNode.id)
-                    
+
 
                         
                 }
+
                 for(i=0;i<resDimo.data.edges.length;i++){
                     let s1 = "0"
                     let t1 = "1"
                     const e = resDimo.data.edges[i]
-                    //alert(JSON.stringify(e))
                     node_numbers.forEach(element => {
                     if(element.second_id==e.source)
                     {
                         s1 = element.first_id+1
                         s1 = s1.toString()
+                        //alert(s1)
                     }
                     if(element.second_id==e.dist)
                     {
                         t1 = element.first_id+1
                         t1 = t1.toString()
+                        //alert(t1)
                     }
                     });
                     const reflow= "reactflow__edge-"+s1+"a-"+t1+"b"
