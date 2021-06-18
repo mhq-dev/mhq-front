@@ -3,13 +3,15 @@ import { Badge, Col, Input, Row, Select, Typography } from 'antd';
 import React, { memo,useEffect,useState } from 'react';
 import { Modal, TimePicker, DatePicker } from 'antd';
 import moment from 'moment';
+import Bg from './input.jpg'
 
 import { Handle } from 'react-flow-renderer';
 import './CustomNode.scss'
 import { Option } from 'antd/lib/mentions';
 import axios from 'axios';
+import '../style/design.scss'
 
-export default memo(({ data }) => {
+export  default memo(({ data }) => {
   const [visible, setVisible] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [dateVisible, setDateVisible] = useState(true);
@@ -461,14 +463,15 @@ export default memo(({ data }) => {
       <a onClick={showModal}>
       <Badge count={<ClockCircleTwoTone style={{fontSize:'250%' ,color: 'blue' }}/>}/>
       </a>
-      <div style={{margin: 0,position: 'absolute',top: '50%',left: '50%',transform: 'translate(-50%, -50%)'}}>
-        Input Node
+      <div style={{margin: 0,position: 'absolute',width: '12vw',height: '12vw',borderRadius: '50px',display: 'flex',backgroundSize: '100% 100%'
+    ,backgroundImage: "url(" + Bg +")"}}>
       </div>
       <Handle
         type="source"
+        className="handlegrow"
         position="right"
         id="a"
-        style={{ background: '#0091ff', width: '12px', height: '12px' }}
+        style={{ background: '#0091ff',left: '93%' }}
       />
     </>
   );
