@@ -84,19 +84,63 @@ const DnDFlow = () => {
     const [condition_set, setcondition_set] = useState("");
     const [firstedge_set, setfirstedge_set] = useState("");
     const [secondedge_set, setsecondedge_set] = useState("");
-    const [edge_operator, setedge_operator] = useState("");
+    const [edge_operator, setedge_operator] = useState("operator");
+    let ands=[]
+    
+    const [s_count, sets_count] = useState(0);
+    const [ss_count, setss_count] = useState([0]);
+    const repeat=()=>{
+        for (let index = 0; index <= s_count; index++) {
 
+        }
+    }
     const [source_set, setsource_set] = useState("");
+    const [param_set, setparam_set] = useState("");
+
     //localforage.setItem("edge_data",[])
     //const [edge_data, setedge_data] = useState([]);
     const [target_set, settarget_set] = useState("");
     const [edge_id, setedge_id] = useState("");
     const [visible_edge, setvisible_edge] = useState(false);
     const [visible_edge_edit, setvisible_edge_edit] = useState(false);
+    function onAnd(st_index) {
+        sets_count(s_count+1)
+        setss_count((s)=>s.concat(s_count))
+        ands.push("and")
+
+        const secondcoditions = {operator: "operator",first_token: "token",first: "",second_token: "token",second: ""}
+        statement.statements[st_index].conditions.push(secondcoditions)
+        alert(JSON.stringify(statement))
+    }
+    const onOr = () => {
+        sets_count(s_count+1)
+        setss_count((s)=>s.concat(s_count))
+        ands.push("or")
+        const secondcoditions = [{operator: "operator",first_token: "token",first: "",second_token: "token",second: ""}]
+         const secondstatem= {conditions: secondcoditions}
+        statement.statements.push(secondstatem)
+        alert(JSON.stringify(statement))
+
+    };
 
     const edgeOk = () => {
-        axios.post('http://37.152.180.213/api/edge/statement',{
-        edge: edge_id,name: condition_set
+        let s = "0"
+        let t = "1"
+        node_numbers.forEach(element => {
+            if(element.first_id==source_set-1)
+            {
+                s = element.second_id
+            }
+            if(element.first_id==target_set-1)
+            {
+                t = element.second_id
+            }
+        });
+        //alert(t)
+        
+        
+        axios.post('http://37.152.180.213/api/edge/',{
+        source: s, dist: t ,statements: statement.statements
         },{headers:{
         'Content-Type' : 'application/json',
         'Authorization' :`Token ${localStorage.getItem('token')}`
@@ -104,21 +148,19 @@ const DnDFlow = () => {
         .then((response)=>{
         if (response.status === 201){
           //message.success("Collection created successfully")
-          axios.post('http://37.152.180.213/api/condition/',{
-            operator: edge_operator, first: firstedge_set ,second: secondedge_set,statement: response.data.id
-        },{headers:{
-        'Content-Type' : 'application/json',
-        'Authorization' :`Token ${localStorage.getItem('token')}`
-        }})
-        .then((response)=>{
-        if (response.status === 201){
-          message.success("Statement and Condition created successfully")
-          
+
+          setElements((els) => addEdge(param_set, els));
+          //alert(JSON.stringify(elements))
+          message.success("The edge is created successfully")
+
         }
-        
         else{
-          message.error("Something went wrong.")
-        }}).catch({})}})
+          message.error("Please fill all of the fields correctly!")
+        }})
+        const twocoditions = [{operator: "",first_token: '',
+        first: "",second_token: '',second: ""}]
+        const twostatem= {statements:[{conditions: twocoditions}]}
+        setstatement(twostatem);
         const data={source: source_set ,target: target_set , condition: condition_set,
             first: firstedge_set, operator: edge_operator , second: secondedge_set}
         //const newone = localforage.getItem("edge_data")
@@ -144,10 +186,14 @@ const DnDFlow = () => {
             
           });
 
-
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
     const [elements, setElements] = useState(initialElements);
     const [vis, setVis] = useState(false);
+    const coditions = [{operator: edge_operator,first_token: 'str',
+    first: firstedge_set,second_token: 'str',second: secondedge_set}]
+    const statem= {statements:[{conditions: coditions}]}
+    const [statement, setstatement] = useState(statem);
+
     const [scenarioModal, setScenarioModal] = useState(false);
     const [myRequests, setmyRequests] = useState([]);
     const [myCols, setmyCols] = useState(initialCols);
@@ -158,10 +204,24 @@ const DnDFlow = () => {
     const [xPosition, setxPosition] = useState(-1);
     const [yPosition, setyPosition] = useState(-1);
     const [typeReactFlow, setTypeReactFlow] = useState(null);
+
     const [runningScenario, setRunningScenario] = useState(false);
 
-    let [id, setID] = useState(0);
-        
+
+    const [id, setID] = useState(0);
+    const [firsttoken_set, setfirsttoke_set] = useState("token");
+    function onChangeSelectFirstToken (cc,value){
+        cc.first_token=value;
+        //setfirsttoke_set(value);
+    }
+    const [secondtoken_set, setsecondtoke_set] = useState("token");
+    function onChangeSelectSecondToken (cc, value){
+        //setsecondtoke_set(value);
+        cc.second_token=value
+    }
+
+    const getId = () => `${id+1}`;
+
     const onConnect = (params) => {
         params = {
             ...params,
@@ -172,50 +232,30 @@ const DnDFlow = () => {
             // labelStyle:{fill:'#fff',fontWeight: 800},
             // labelShowBg:false,
         }
+        setparam_set(params)
         setsource_set(params.source)
         settarget_set(params.target)
         conditionEmpty();
-        let s = "0"
-        let t = "1"
-        node_numbers.forEach(element => {
-            if(element.first_id==params.source-1)
-            {
-                s = element.second_id
-            }
-            if(element.first_id==params.target-1)
-            {
-                t = element.second_id
-            }
-        });
-        axios.post('http://37.152.180.213/api/edge/',{
-        source: s, dist: t
-        },{headers:{
-        'Content-Type' : 'application/json',
-        'Authorization' :`Token ${localStorage.getItem('token')}`
-        }})
-        .then((response)=>{
-        if (response.status === 201){
-          //message.success("Collection created successfully")
-          setedge_id(response.data.id)
-          showModalEdge();
-          setElements((els) => addEdge(params, els));
-        }
-        else{
-          message.error("Please try again")
-        }})
+        showModalEdge();
     
     }
     const conditionSet = (e) => {
         setcondition_set(e.target.value);
       };
-    const firstEdgeSet = (e) => {
-        setfirstedge_set(e.target.value);
+    
+    function firstEdgeSet (d,cc,e) {
+        statement.statements[d].conditions[cc].first
+        =e.target.value
+        //setfirstedge_set(e.target.value);
     };
-    const secondEdgeSet = (e) => {
-        setsecondedge_set(e.target.value);
+    function secondEdgeSet (cc,e) {
+        cc.second=e.target.value
+
+        //setsecondedge_set(e.target.value);
     };   
-    const edgeOperatorSet = (e) => {
-        setedge_operator(e.target.value);
+    function edgeOperatorSet(cc,value){
+        cc.operator=value
+        //setedge_operator(value);
     };
     function editCondition(edge,e){
         const x=edge
@@ -396,8 +436,6 @@ const DnDFlow = () => {
             x=x+splitedValue[j]+"_";
         }
         x=x.substring(0,x.length-1);
-        document.getElementById("scenario_method").value = splitedValue[1];
-        document.getElementById("scenario_url").value = x;
 
     }
     const doneNodeModal = ()=>{       
@@ -413,43 +451,32 @@ const DnDFlow = () => {
           'Authorization' :`Token ${localStorage.getItem('token')}`
         }}).then((resDimoo)=>{
             message.success("Added");
-            console.log("Id"+id);
-
-            setnewModule(resDimoo.data.id);
-            const no_data = {first_id: id,second_id : resDimoo.data.id}
+            //setnewModule(resDimo.data.id);
+            const no_data = {first_id: id,second_id : resDimo.data.id}
             node_numbers.push(no_data)
 
-            axios.get('http://37.152.180.213/api/scenario/all_modules/'+selectedScenario,
-            {headers:{
-            'Content-Type' : 'application/json',
-            'Authorization' :`Token ${localStorage.getItem('token')}`
-            }}).then((resDimo)=>{
-                var thisElements=[];
-                var i;
-                
-                for (i = 0; i < resDimo.data.length; i++) {
-                    thisElements.push(
-                        {
-                            id: i,
-                            type: 'defaultNode',
-                            data: { label: 'input node' },
-                            style: { width: '100px',height: '100px',borderRadius: '50px', backgroundColor:'white'},
-                            targetPosition :  'left',
-                            sourcePosition : 'right',
-                            position: { x: resDimo.data[i].x_position, y: resDimo.data[i].y_position },
-                        }
-                    );  
+            const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
+            const type = typeReactFlow;
+            const position = reactFlowInstance.project({
+                x: xPosition,
+                y: yPosition,
+            });
+            //alert(JSON.stringify(elements))
+            
+            const newNode = {
+                id: getId(),
+                type,
+                position,className: "dropnode",
+                style: { width: '12vw',height: '12vw',borderRadius: '50px'},
+                targetPosition :  'left',
+                sourcePosition : 'right',
+                data: { label: `${type} node` },
+            };
+            //alert(JSON.stringify(node_numbers))                                                         
+            setID(parseInt(getId())) 
+            setElements((es) => es.concat(newNode));
+            //alert(JSON.stringify(elements))
 
-                }
-                setID(resDimo.data.length);
-
-                setElements(thisElements);
-                console.log(thisElements);
-               
-            })
-            .catch((err)=>{
-                message.error(err.message);
-            });   
         })
         .catch((err)=>{
             message.error(err.message);
@@ -498,7 +525,8 @@ const DnDFlow = () => {
         } else{
             setScenarioModal(false);
             
-            axios.get('http://37.152.180.213/api/scenario/'+selectedScenario,
+
+            axios.get('http://37.152.180.213/api/scenario/'+selectedScenario+'/',
             {headers:{
             'Content-Type' : 'application/json',
             'Authorization' :`Token ${localStorage.getItem('token')}`
@@ -509,22 +537,61 @@ const DnDFlow = () => {
                 var thisElements=[];
                 var i;
                 for (i = 0; i < resDimo.data.nodes.length; i++) {
-                    thisElements.push(
-                        {
-                            id: i,
-                            type: 'defaultNode',
-                            data: { label: 'input node' },
-                            style: { width: '100px',height: '100px',borderRadius: '50px', backgroundColor:'white'},
-                            targetPosition :  'left',
-                            sourcePosition : 'right',
-                            position: { x: resDimo.data.nodes[i].x_position, y: resDimo.data.nodes[i].y_position },
-                        }
-                    );  
-                }
-                setID(resDimo.data.nodes.length);
 
-                setElements(thisElements);
-                console.log(thisElements);
+                    const no_data = {first_id: i,second_id : resDimo.data.nodes[i].id}
+                    node_numbers.push(no_data)
+
+                    const newNode = {
+                        id: i.toString(),
+                        
+                        type: 'defaultNode',
+                        data: { label: 'input node' },className: "dropnode",
+                        position: { x: resDimo.data.nodes[i].x_position, y: resDimo.data.nodes[i].y_position },
+                        style: { width: '12vw',height: '12vw',borderRadius: '50px'},
+                        targetPosition :  'left',
+                        sourcePosition : 'right',
+                    };
+                   // alert(newNode.id)
+                    setElements((es) => es.concat(newNode));
+
+                        
+                }
+                for(i=0;i<resDimo.data.edges.length;i++){
+                    let s1 = "0"
+                    let t1 = "1"
+                    const e = resDimo.data.edges[i]
+                    //alert(JSON.stringify(e))
+                    node_numbers.forEach(element => {
+                    if(element.second_id==e.source)
+                    {
+                        s1 = element.first_id
+                        s1 = s1.toString()
+                    }
+                    if(element.second_id==e.dist)
+                    {
+                        t1 = element.first_id
+                        t1 = t1.toString()
+                    }
+                    });
+                    const reflow= "reactflow__edge-"+s1+"a-"+t1+"b"
+                    const params = {
+                        source: s1,
+                        sourceHandle: 'a',
+                        target: t1,
+                        targetHandle: 'b',
+                        animated: true,
+                        arrowHeadType: 'arrow',
+                        style: {strokeWidth:3},
+                        // label:'Setting',
+                        // labelStyle:{fill:'#fff',fontWeight: 800},
+                        // labelShowBg:false,
+                    }
+
+                    setElements((els) => addEdge(params, els));
+
+                }
+                setID(resDimo.data.nodes.length-1)                
+
                 var dndflow=document.getElementById('dndflow');
                 if(!dndflow.classList.contains('visib')){                
                     dndflow.classList.toggle('visib');
@@ -540,7 +607,8 @@ const DnDFlow = () => {
     const createScenarioModal=()=>{
         var newScenarioName=document.getElementById('new_scenario_name').value;
         // alert(newScenarioName+"***"+localStorage.getItem('selectedCollection'));
-        axios.post('http://37.152.180.213/api/scenario/create_scenario/',
+
+        axios.post('http://37.152.180.213/api/scenario/',
         {
             "name":newScenarioName,
             "collection":localStorage.getItem('selectedCollection')
@@ -685,7 +753,7 @@ const DnDFlow = () => {
    
         </div>
         </Modal>
-
+        
 
             <Header  style={{width:'100%', height: '8vh',backgroundColor: 'transparent',padding: '0px',borderBottom: '1px solid rgb(204 204 204)',lineHeight: '3.75'}}>
             <Row justify="start" style={{width: '100%',marginLeft: '-1%'}}>
@@ -733,60 +801,111 @@ const DnDFlow = () => {
                 <Col flex={8}>
                 <p className="no-scenario" id="no-scenario">Please Select A Scenario!</p>
                 <div className="dndflow" id="dndflow">
-                <Modal width={"24vw"}
+                <Modal width={"36vw"}
                 visible={visible_edge}
                 title="Set condition"
-                style={{height: '36vh'}}
+                style={{height: '30vh'}}
                 footer={[
                 <Button key="ok" className="btn btn-primary" onClick={edgeOk} >Set
                 </Button>
                 ]}
             >
-        <div style={{alignContent: 'center' ,marginLeft: 'auto',marginRight: 'auto',alignItems: 'center',textAlign: 'center'}}>
-        <h5 style={{textAlign: 'left',marginLeft: '10%'}}>
-            Statement
-        </h5>
-        <Input
-        style={{width: '80%'}}
-                  required
-                  name="Statement"
-                  placeholder="statement"
-                  value={condition_set}
-                  onChange={conditionSet}
-                />
-        <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
-            First Set
-        </h5>
-        <Input
-                style={{width: '80%'}}
-                  required
-                  name="first"
-                  placeholder="first set"
-                  value={firstedge_set}
-                  onChange={firstEdgeSet}
-                />
-        <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
-            Operator
-        </h5>
-        <Input
-                 style={{width: '80%'}}
-                 required
-                  name="Operator"
-                  placeholder="operator"
-                  value={edge_operator}
-                  onChange={edgeOperatorSet}
-                />
-        <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
-            Second Set
-        </h5>
-        <Input
-                style={{width: '80%'}}
-                required
-                  name="second"
-                  placeholder="second set"
-                  value={secondedge_set}
-                  onChange={secondEdgeSet}
-                />
+        <div //className="andor"
+         style={{alignContent: 'center' ,marginLeft: 'auto',marginRight: 'auto',alignItems: 'center',textAlign: 'center'}}>
+        
+                
+        {statement.statements.map(d=>(
+                d.conditions.map(cc=>(
+                    <div className="andor"
+            style={{alignContent: 'center' ,marginLeft: 'auto',marginRight: 'auto',alignItems: 'center',textAlign: 'center'}}>
+            <Row style={{width: '90%',marginLeft: '6%'}}>
+                <Col span={12}>
+                <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
+               First Operand
+           </h5>
+           <Input
+                   style={{width: '80%'}}
+                     required
+                     name="first"
+                     placeholder="first set"
+                     onChange={(e)=>{firstEdgeSet(statement.statements.indexOf(d),
+                        d.conditions.indexOf(cc),e)}}
+                   />
+                </Col>
+                <Col span={12}>
+                <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
+               Token's Type
+           </h5>
+           <Select className="select_modal" onChange={(e)=>{onChangeSelectFirstToken(cc,e)}}  style={{ width: '80%' ,textAlign: 'left'}}>
+                            <Option value="str">string</Option>
+                            <Option value="num">number</Option>
+                            <Option value="timestamp">timestamp</Option>
+                            <Option value="body">body</Option>
+                            <Option value="status_code">status code</Option>
+
+                        </Select>
+                </Col>
+            </Row>
+            <h5 style={{textAlign: 'left',marginLeft: '11%',marginTop: '3%'}}>
+               Operator
+           </h5>
+           <Select onChange={(e)=>{edgeOperatorSet(cc,e)}}  style={{ width: '81%' ,textAlign: 'left',marginLeft: '2%'}}>
+                            <Option value="equal">equal</Option>
+                            <Option value="exist">exist</Option>
+                            <Option value="start_with">starts with</Option>
+                            <Option value="contains">contains</Option>
+                        </Select> 
+         
+            <Row style={{width: '90%',marginLeft: '6%'}}>
+                <Col span={12}>
+                <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
+                    Second Operand
+                </h5>
+                <Input
+                   style={{width: '80%'}}
+                   required
+                     name="second"
+                     placeholder="second set"
+                     
+                     onChange={(e)=>{secondEdgeSet(cc,e)}}
+                   />
+                </Col>
+                <Col span={12}>
+                <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
+               Token's Type
+           </h5>
+           <Select onChange={(e)=>{onChangeSelectSecondToken(cc,e)}} style={{ width: '80%' ,textAlign: 'left'}}>
+                            <Option value="str">string</Option>
+                            <Option value="num">number</Option>
+                            <Option value="timestamp">timestamp</Option>
+                            <Option value="body">body</Option>
+                            <Option value="status_code">status code</Option>
+
+                        </Select> 
+                </Col>
+            </Row>
+          
+           
+                   <Row style={{marginTop: '4%'}}>
+                       <Col span="6">
+   
+                       </Col>
+                       <Col span="6">
+                       <Button style={{backgroundColor: '#1890ff',color: 'white',
+                   border: 'none',lineHeight: '0.5',width: '100%',height: '3vh'}} onClick={()=>{onAnd(statement.statements.indexOf(d))}}>AND</Button>
+                       </Col>
+                       <Col span="6">
+                       <Button style={{backgroundColor: '#1890ff',color: 'white',
+                   border: 'none',lineHeight: '0.5',width: '100%',height: '3vh',marginLeft: '10%'}}onClick={onOr}>OR</Button>
+                       </Col>
+                   </Row>
+           </div>
+                ))
+                
+            
+            
+        ))}
+         
         </div>
       </Modal>
                 <Modal
@@ -843,22 +962,7 @@ const DnDFlow = () => {
                     <Select STYLE="width:100%; background-color:#ffffff;" onSelect={onSelect}>
                         {myRequests.map(d=><Option value={methodAndUrl(d)}>{d.name}</Option>)}
                     </Select>
-                    <Row STYLE="margin-top:10px;">
-                        <Col span={6}>
-                            <p STYLE="margin-right:5px;">Method</p>
-                        </Col>
-                        <Col span={18}>
-                            <p STYLE="margin-left:5px;">URL</p>
-                        </Col>                
-                    </Row>
-                    <Row STYLE="margin-top:-15px;">
-                        <Col span={6}>
-                            <Input id="scenario_method" disabled={true} STYLE="margin-right:5px;"></Input>
-                        </Col>
-                        <Col span={17}>
-                            <Input id="scenario_url" disabled={true} STYLE="margin-left:5px;" ></Input>
-                        </Col>                
-                    </Row>
+                   
                 </Form>
            
                 </div>
@@ -894,6 +998,7 @@ const DnDFlow = () => {
                 </Row>
 
                 </Col>
+
                 </div>
                 </Col>
             </Row>

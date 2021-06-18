@@ -1,11 +1,10 @@
 .OtherProfile-image {
-    -webkit-border-radius: 300px;
+    -webkit-border-radius: 50px;
     -webkit-background-clip: padding-box;
     -moz-border-radius: 300px;
     -moz-background-clip: padding;
-    border-radius: 300px;
+    border-radius: 50px;
     background-clip: padding-box;
-    margin: 7px 0 0 5px;
     background-size: cover;
 }
 

@@ -97,7 +97,7 @@ class Profile extends React.Component {
                 </Row>
                 </Header>
                 <Row>
-                    <Col flex={2}>
+                    <Col>
                         <Sider theme={this.state.theme?"dark":"light"}  collapsible style={{width: '20%' ,minHeight: '100vh'}} 
                         STYLE="text-align:left; color:#ffffff; font-weight: bold; background-color:#282828;">
                             <Menu
