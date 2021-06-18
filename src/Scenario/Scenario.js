@@ -15,7 +15,7 @@ import './layouting.css';
 import inputNode from './CustomInputNode';
 import defaultNode from './CustomDefaultNode';
 import outputNode from './CustomOutputNode';
-import { message,Modal,Form,Select,Row,Col, Input, Dropdown ,Layout,Menu,Button,Spin } from 'antd';
+import { message,Modal,Form,Select,Row,Col, Input, Dropdown ,Layout,Menu,Button,Spin, Typography } from 'antd';
 import axios from 'axios';
 import {  Link, NavLink } from 'react-router-dom';
 import SearchUser from '../Search/SearchUser';
@@ -770,38 +770,40 @@ const DnDFlow = () => {
                 'Content-Type' : 'application/json',
                 'Authorization' :`Token ${localStorage.getItem('token')}`
                 }}).then((resDimo)=>{
+                    setRunningScenario(true);
                     axios.get('http://37.152.180.213/api/scenario/'+selectedScenario+"/execute",
                         {headers:{
                         'Content-Type' : 'application/json',
                         'Authorization' :`Token ${localStorage.getItem('token')}`
                         }}).then((runScenario)=>{
-                            setRunningScenario(true);
+                            message.success("Ran successfully");
+                            setRunningScenario(false);
                             // while(runningScenario){
-                                axios.get('http://37.152.180.213/api/scenario/history/'+runScenario.data.scenario_history+"/",
-                                {headers:{
-                                'Content-Type' : 'application/json',
-                                'Authorization' :`Token ${localStorage.getItem('token')}`
-                                }}).then((runScenario)=>{
-                                    message.success("Runned successfully");
-                                    setRunningScenario(false);
-                                })
-                                .catch((err)=>{
-                                    message.success("Failed to complete scenario");
-                                    setRunningScenario(false);
-                                });  
+                                // axios.get('http://37.152.180.213/api/scenario/history/'+runScenario.data.scenario_history+"/",
+                                // {headers:{
+                                // 'Content-Type' : 'application/json',
+                                // 'Authorization' :`Token ${localStorage.getItem('token')}`
+                                // }}).then((runScenario)=>{
+                                //     message.success("Runned successfully");
+                                //     setRunningScenario(false);
+                                // })
+                                // .catch((err)=>{
+                                //     message.success("Failed to complete scenario");
+                                //     setRunningScenario(false);
+                                // });  
                             //     setTimeout(function(){ }, 1000);   
                             // }    
                             })  
                             .catch((err)=>{
-                                message.error(err.message);
+                                message.success("Failed to complete scenario");
                             });  
                         })
                         .catch((err)=>{
-                            message.error(err.message);
+                            message.success("Failed to complete scenario");
                         }); 
                     })  
                     .catch((err)=>{
-                        message.error(err.message);
+                        message.success("Failed to complete scenario");
                     });  
           
     }
@@ -836,7 +838,7 @@ const DnDFlow = () => {
         </Row>
             <Row>
                 <Col span={11}></Col>
-                <Col span={2}><p STYLE="margin:10px; font-weight: bold;">Or</p></Col>
+                <Col span={2}><Typography STYLE="margin:10px; font-weight: bold;">Or</Typography></Col>
                 <Col span={11}></Col>
             </Row>
             <Select STYLE="width:100%; background-color:#ffffff;" onSelect={onSelectScenario}>
@@ -1086,8 +1088,10 @@ const DnDFlow = () => {
             </ReactFlowProvider>
                 </Row>
                 <Row STYLE="height:15%;">
-                    <img onClick={()=>RunScenario()} STYLE="height:70%;" src="https://s4.uupload.ir/files/run_button_byw4.jpg"></img>
+                    <a style={{height:'80%'}}>
+                    <img style={{height:'80%'}} onClick={()=>RunScenario()} src="https://s4.uupload.ir/files/run_button_byw4.jpg"></img>
                     {(runningScenario)?<Spin STYLE="margin-top:15px; margin-left:15px;" size="large"></Spin>:<p></p>}
+                    </a>
                     
                 </Row>
 

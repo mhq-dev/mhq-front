@@ -23,20 +23,6 @@ const optionsWithDisabled = [
   { label: 'public', value: 'public' },
   { label: 'private', value: 'private' },
 ];
-const initialHistory=[];
-Axios.get('http://37.152.180.213/api/request/history/',
-        {headers:{
-          'Content-Type' : 'application/json',
-          'Authorization' :`Token ${localStorage.getItem('token')}`
-        }}).then((resDimo)=>{
-            var i;        
-            for (i = 0; i < resDimo.data.length; i++) {
-              initialHistory.push(resDimo.data[i]);
-            }
-        })
-        .catch((err)=>{
-            message.error(err.message);
-        });
 const menu = (
   <Menu>
     <Menu.Item >
@@ -78,7 +64,7 @@ class Dashboard extends React.Component {
     method_tpye: '',
     url: '',
     type: '',
-
+    initialHistory: [],
     
   };
   
@@ -432,6 +418,21 @@ onChangeInputUrl = (input)=>{
     });
   };
   componentDidMount() {
+    Axios.get('http://37.152.180.213/api/request/history/',
+        {headers:{
+          'Content-Type' : 'application/json',
+          'Authorization' :`Token ${localStorage.getItem('token')}`
+        }}).then((resDimo)=>{
+            var i;   
+            const His =[]     
+            for (i = 0; i < resDimo.data.length; i++) {
+              His.push(resDimo.data[i]);
+            }
+            this.setState(({initialHistory:His}))
+        })
+        .catch((err)=>{
+            message.error(err.message);
+        });
     this.getCollection()
   }
   setDark = () =>{
@@ -560,8 +561,10 @@ onChangeInputUrl = (input)=>{
                       some other items
                     </Menu.Item>
                 </SubMenu>
-                <SubMenu key="sub5" icon={<ClockCircleOutlined />}  title={"History"}>
-                {initialHistory.map(history=>
+                <SubMenu
+                 style={{overflow:'auto', maxHeight:'200px', margin:0}}
+                 key="sub5" icon={<ClockCircleOutlined />}  title={"History"}>
+                {this.state.initialHistory.map(history=>
                   <Menu.Item onClick={()=>this.historyClicked(history)}>
                     {history.url}
                   </Menu.Item>
