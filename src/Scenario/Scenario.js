@@ -15,7 +15,7 @@ import './layouting.css';
 import inputNode from './CustomInputNode';
 import defaultNode from './CustomDefaultNode';
 import outputNode from './CustomOutputNode';
-import { message,Modal,Form,Select,Row,Col, Input, Dropdown ,Layout,Menu,Button } from 'antd';
+import { message,Modal,Form,Select,Row,Col, Input, Dropdown ,Layout,Menu,Button,Spin } from 'antd';
 import axios from 'axios';
 import {  Link, NavLink } from 'react-router-dom';
 import SearchUser from '../Search/SearchUser';
@@ -42,13 +42,12 @@ const menu = (
     </Menu>
   
   );
-console.log(localStorage.getItem('token'));
 const initialElements = [
     
 ];
 const onNodeContextMenu = (event, node) => {
     event.preventDefault();
-    console.log('context menu:', node);
+    // console.log('context menu:', node);
 };
 const onNodeMouseEnter = (event, node) => console.log('mouse enter:', node);
 const onNodeMouseMove = (event, node) => console.log('mouse move:', node);
@@ -205,6 +204,10 @@ const DnDFlow = () => {
     const [xPosition, setxPosition] = useState(-1);
     const [yPosition, setyPosition] = useState(-1);
     const [typeReactFlow, setTypeReactFlow] = useState(null);
+
+    const [runningScenario, setRunningScenario] = useState(false);
+
+
     const [id, setID] = useState(0);
     const [firsttoken_set, setfirsttoke_set] = useState("token");
     function onChangeSelectFirstToken (cc,value){
@@ -218,6 +221,7 @@ const DnDFlow = () => {
     }
 
     const getId = () => `${id+1}`;
+
     const onConnect = (params) => {
         params = {
             ...params,
@@ -412,7 +416,7 @@ const DnDFlow = () => {
                     message.error("errssssss");
                 })
             }
-            console.log(myRequests);        
+            // console.log(myRequests);        
         })
         .catch((err)=>{
             message.error(err.message);
@@ -445,7 +449,7 @@ const DnDFlow = () => {
         {headers:{
           'Content-Type' : 'application/json',
           'Authorization' :`Token ${localStorage.getItem('token')}`
-        }}).then((resDimo)=>{
+        }}).then((resDimoo)=>{
             message.success("Added");
             //setnewModule(resDimo.data.id);
             const no_data = {first_id: id,second_id : resDimo.data.id}
@@ -515,23 +519,25 @@ const DnDFlow = () => {
         setScenarioModal(false);
     }
     const doneScenarioModal=()=>{
+        console.log(localStorage.getItem('token'));
         if(selectedScenario==(-1)){
             message.error("Please select a scenario or create new one!");
         } else{
             setScenarioModal(false);
             
+
             axios.get('http://37.152.180.213/api/scenario/'+selectedScenario+'/',
             {headers:{
             'Content-Type' : 'application/json',
             'Authorization' :`Token ${localStorage.getItem('token')}`
             }}).then((resDimo)=>{
                 message.success("Loaded Successfully");
-                console.log(resDimo);
                 setScenarioModal(false);
+                console.log(resDimo.data);
                 var thisElements=[];
-
                 var i;
                 for (i = 0; i < resDimo.data.nodes.length; i++) {
+
                     const no_data = {first_id: i,second_id : resDimo.data.nodes[i].id}
                     node_numbers.push(no_data)
 
@@ -585,6 +591,7 @@ const DnDFlow = () => {
 
                 }
                 setID(resDimo.data.nodes.length-1)                
+
                 var dndflow=document.getElementById('dndflow');
                 if(!dndflow.classList.contains('visib')){                
                     dndflow.classList.toggle('visib');
@@ -598,9 +605,9 @@ const DnDFlow = () => {
         }
     }
     const createScenarioModal=()=>{
-        console.log(localStorage.getItem('token'));
         var newScenarioName=document.getElementById('new_scenario_name').value;
         // alert(newScenarioName+"***"+localStorage.getItem('selectedCollection'));
+
         axios.post('http://37.152.180.213/api/scenario/',
         {
             "name":newScenarioName,
@@ -610,6 +617,8 @@ const DnDFlow = () => {
           'Content-Type' : 'application/json',
           'Authorization' :`Token ${localStorage.getItem('token')}`
         }}).then((resDimo)=>{
+            setElements([]);
+
             setSelectedScenario(resDimo.data.id);
             message.success("Created Successfully");
             setScenarioModal(false);
@@ -627,10 +636,84 @@ const DnDFlow = () => {
     const onSelectScenario = value=>{
         setSelectedScenario(value);
     }
+    const RunScenario=()=>{
+        axios.get('http://37.152.180.213/api/scenario/'+selectedScenario,
+            {headers:{
+            'Content-Type' : 'application/json',
+            'Authorization' :`Token ${localStorage.getItem('token')}`
+            }}).then((resDimo)=>{
+                var dict = {};
+                var i;
+                var maxim=resDimo.data.nodes.length;
+                var maximID=0;
+                
+                for (i = 0; i < resDimo.data.nodes.length; i++) {
+                    dict[resDimo.data.nodes[i].id]=0;
+                }
+                for (i = 0; i < resDimo.data.edges.length; i++) {
+                    if((resDimo.data.edges[i].dist) in dict){
+                        dict[resDimo.data.edges[i].dist]++;
+                    }
+                    else{
+                        dict[resDimo.data.edges[i].dist]=1;
+                    }
+                }
+                console.log(dict);
+                
+                for(var key in dict) {
+                    var value = dict[key];
+                    if(value<maxim){
+                        maximID=key;
+                        maxim=value;
+                    }
+                }
+                console.log(maximID);
+                axios.put('http://37.152.180.213/api/scenario/'+selectedScenario+"/",
+                {
+                    "starter_module":maximID
+                },
+                {headers:{
+                'Content-Type' : 'application/json',
+                'Authorization' :`Token ${localStorage.getItem('token')}`
+                }}).then((resDimo)=>{
+                    axios.get('http://37.152.180.213/api/scenario/'+selectedScenario+"/execute",
+                        {headers:{
+                        'Content-Type' : 'application/json',
+                        'Authorization' :`Token ${localStorage.getItem('token')}`
+                        }}).then((runScenario)=>{
+                            setRunningScenario(true);
+                            // while(runningScenario){
+                                axios.get('http://37.152.180.213/api/scenario/history'+runScenario.data.id+"/",
+                                {headers:{
+                                'Content-Type' : 'application/json',
+                                'Authorization' :`Token ${localStorage.getItem('token')}`
+                                }}).then((runScenario)=>{
+                                    message.success("Runned successfully");
+                                    setRunningScenario(false);
+                                })
+                                .catch((err)=>{
+                                    message.error("Failed");
+                                    setRunningScenario(false);
+                                });  
+                            //     setTimeout(function(){ }, 1000);   
+                            // }    
+                            })  
+                            .catch((err)=>{
+                                message.error(err.message);
+                            });  
+                        })
+                        .catch((err)=>{
+                            message.error(err.message);
+                        }); 
+                    })  
+                    .catch((err)=>{
+                        message.error(err.message);
+                    });  
+          
+    }
     return (
         <div STYLE="overflow-y: hidden;">
         <Modal
-        className='signup-card'
         visible={scenarioModal}
         title="Select a scenario or create new one!"
         closable={false}
@@ -646,7 +729,6 @@ const DnDFlow = () => {
         
         <Form
             name="normal_singup"
-            STYLE="background-color:#fcfcfc;"
         >
         <Row>
             <Col span={20}>
@@ -826,7 +908,7 @@ const DnDFlow = () => {
          
         </div>
       </Modal>
-      <Modal
+                <Modal
                 visible={visible_edge_edit}
                 title="Edit Edges"
                 style={{height: '36vh'}}
@@ -876,7 +958,6 @@ const DnDFlow = () => {
                 
                 <Form
                     name="normal_singup"
-                    STYLE="background-color:#fcfcfc;"
                 >
                     <Select STYLE="width:100%; background-color:#ffffff;" onSelect={onSelect}>
                         {myRequests.map(d=><Option value={methodAndUrl(d)}>{d.name}</Option>)}
@@ -886,29 +967,38 @@ const DnDFlow = () => {
            
                 </div>
                 </Modal>
-                
+
+                <Col STYLE="width:100%;">
+                <Row STYLE="height:85%;">
                 <ReactFlowProvider>
-                    <div className="reactflow-wrapper" ref={reactFlowWrapper}>
-                        <ReactFlow
-                            elements={elements}
-                            onConnect={onConnect}
-                            onElementsRemove={onElementsRemove}
-                            onLoad={onLoad}
-                            onDrop={onDrop}
-                            onDragOver={onDragOver}
-                            onNodeContextMenu={onNodeContextMenu}
-                            connectionLineComponent={ConnectionLine}
-                            nodeTypes={nodeTypes}
-                            
-                        >
-                            <Controls />
-                        </ReactFlow>
-                    </div>
-                    <Sidebar onSave={onSave} onRestore={onRestore} />
-                    <div className="controls">
-                    </div>
-                </ReactFlowProvider>
-                
+                <div className="reactflow-wrapper" ref={reactFlowWrapper}>
+                    <ReactFlow
+                        elements={elements}
+                        onConnect={onConnect}
+                        onElementsRemove={onElementsRemove}
+                        onLoad={onLoad}
+                        onDrop={onDrop}
+                        onDragOver={onDragOver}
+                        onNodeContextMenu={onNodeContextMenu}
+                        connectionLineComponent={ConnectionLine}
+                        nodeTypes={nodeTypes}
+                    >
+                        <Controls />
+                    </ReactFlow>
+                </div>
+                <Sidebar onSave={onSave} onRestore={onRestore} />
+                <div className="controls">
+                </div>
+            </ReactFlowProvider>
+                </Row>
+                <Row STYLE="height:15%;">
+                    <img onClick={()=>RunScenario()} STYLE="height:70%;" src="https://s4.uupload.ir/files/run_button_byw4.jpg"></img>
+                    {(runningScenario)?<Spin STYLE="margin-top:15px; margin-left:15px;" size="large"></Spin>:<p></p>}
+                    
+                </Row>
+
+                </Col>
+
                 </div>
                 </Col>
             </Row>

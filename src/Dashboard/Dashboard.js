@@ -475,6 +475,12 @@ onChangeInputUrl = (input)=>{
     }
 
   };
+  historyClicked(history){
+    localStorage.setItem('apiUrl',history.url);
+        localStorage.setItem('apiMethod',history.http_method);
+        localStorage.setItem('apiID',history.id);
+        window.location.replace("/apiRunner");
+  }
   render(){  
     return (
       <Layout style={{backgroundColor: 'transparent',overflowX: 'hidden',width: '100%'}}>
@@ -556,7 +562,7 @@ onChangeInputUrl = (input)=>{
                 </SubMenu>
                 <SubMenu key="sub5" icon={<ClockCircleOutlined />}  title={"History"}>
                 {initialHistory.map(history=>
-                  <Menu.Item >
+                  <Menu.Item onClick={()=>this.historyClicked(history)}>
                     {history.url}
                   </Menu.Item>
                   )}                  
