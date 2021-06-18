@@ -194,6 +194,9 @@ transition: all 0.4s ease-in;
   .ant-picker{
     background-color: var(--layout4) !important;
   }
+  .ant-picker-input > input{
+    color: var(--maintext) !important;
+  }
   .ant-picker-suffix{
     color: var(--maintext) !important;
   }
