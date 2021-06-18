@@ -85,9 +85,8 @@ const DnDFlow = () => {
     const [condition_set, setcondition_set] = useState("");
     const [firstedge_set, setfirstedge_set] = useState("");
     const [secondedge_set, setsecondedge_set] = useState("");
-    const [edge_operator, setedge_operator] = useState("");
+    const [edge_operator, setedge_operator] = useState("operator");
     let ands=[]
-    let statements=[]
     
     const [s_count, sets_count] = useState(0);
     const [ss_count, setss_count] = useState([0]);
@@ -105,24 +104,24 @@ const DnDFlow = () => {
     const [edge_id, setedge_id] = useState("");
     const [visible_edge, setvisible_edge] = useState(false);
     const [visible_edge_edit, setvisible_edge_edit] = useState(false);
-
-    const onAnd = () => {
+    function onAnd(st_index) {
         sets_count(s_count+1)
         setss_count((s)=>s.concat(s_count))
         ands.push("and")
-        const newcon={
-            operator: edge_operator, first: firstedge_set ,second: secondedge_set
-        }
-        statements.push(newcon)
-    };
+
+        const secondcoditions = {operator: "operator",first_token: "token",first: "",second_token: "token",second: ""}
+        statement.statements[st_index].conditions.push(secondcoditions)
+        alert(JSON.stringify(statement))
+    }
     const onOr = () => {
         sets_count(s_count+1)
         setss_count((s)=>s.concat(s_count))
         ands.push("or")
-        const newcon={
-            operator: edge_operator, first: firstedge_set ,second: secondedge_set
-        }
-        statements.push(newcon)
+        const secondcoditions = [{operator: "operator",first_token: "token",first: "",second_token: "token",second: ""}]
+         const secondstatem= {conditions: secondcoditions}
+        statement.statements.push(secondstatem)
+        alert(JSON.stringify(statement))
+
     };
 
     const edgeOk = () => {
@@ -139,11 +138,10 @@ const DnDFlow = () => {
             }
         });
         //alert(t)
-        const conditions = [{operator: edge_operator,first_token: 'str',first: firstedge_set,second_token: 'str',second: secondedge_set}]
-        const statement= [{conditions: conditions}]
+        
         
         axios.post('http://37.152.180.213/api/edge/',{
-        source: s, dist: t ,statements: statement
+        source: s, dist: t ,statements: statement.statements
         },{headers:{
         'Content-Type' : 'application/json',
         'Authorization' :`Token ${localStorage.getItem('token')}`
@@ -158,9 +156,12 @@ const DnDFlow = () => {
 
         }
         else{
-          message.error("Please try again")
+          message.error("Please fill all of the fields correctly!")
         }})
-        
+        const twocoditions = [{operator: "",first_token: '',
+        first: "",second_token: '',second: ""}]
+        const twostatem= {statements:[{conditions: twocoditions}]}
+        setstatement(twostatem);
         const data={source: source_set ,target: target_set , condition: condition_set,
             first: firstedge_set, operator: edge_operator , second: secondedge_set}
         //const newone = localforage.getItem("edge_data")
@@ -189,6 +190,11 @@ const DnDFlow = () => {
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
     const [elements, setElements] = useState(initialElements);
     const [vis, setVis] = useState(false);
+    const coditions = [{operator: edge_operator,first_token: 'str',
+    first: firstedge_set,second_token: 'str',second: secondedge_set}]
+    const statem= {statements:[{conditions: coditions}]}
+    const [statement, setstatement] = useState(statem);
+
     const [scenarioModal, setScenarioModal] = useState(false);
     const [myRequests, setmyRequests] = useState([]);
     const [myCols, setmyCols] = useState(initialCols);
@@ -201,12 +207,14 @@ const DnDFlow = () => {
     const [typeReactFlow, setTypeReactFlow] = useState(null);
     const [id, setID] = useState(0);
     const [firsttoken_set, setfirsttoke_set] = useState("token");
-    const onChangeSelectFirstToken = value=>{
-        setfirsttoke_set(value);
+    function onChangeSelectFirstToken (cc,value){
+        cc.first_token=value;
+        //setfirsttoke_set(value);
     }
     const [secondtoken_set, setsecondtoke_set] = useState("token");
-    const onChangeSelectSecondToken = value=>{
-        setsecondtoke_set(value);
+    function onChangeSelectSecondToken (cc, value){
+        //setsecondtoke_set(value);
+        cc.second_token=value
     }
 
     const getId = () => `${id+1}`;
@@ -220,7 +228,6 @@ const DnDFlow = () => {
             // labelStyle:{fill:'#fff',fontWeight: 800},
             // labelShowBg:false,
         }
-        alert(JSON.stringify(params))
         setparam_set(params)
         setsource_set(params.source)
         settarget_set(params.target)
@@ -231,14 +238,20 @@ const DnDFlow = () => {
     const conditionSet = (e) => {
         setcondition_set(e.target.value);
       };
-    const firstEdgeSet = (e) => {
-        setfirstedge_set(e.target.value);
+    
+    function firstEdgeSet (d,cc,e) {
+        statement.statements[d].conditions[cc].first
+        =e.target.value
+        //setfirstedge_set(e.target.value);
     };
-    const secondEdgeSet = (e) => {
-        setsecondedge_set(e.target.value);
+    function secondEdgeSet (cc,e) {
+        cc.second=e.target.value
+
+        //setsecondedge_set(e.target.value);
     };   
-    const edgeOperatorSet = (e) => {
-        setedge_operator(e.target.value);
+    function edgeOperatorSet(cc,value){
+        cc.operator=value
+        //setedge_operator(value);
     };
     function editCondition(edge,e){
         const x=edge
@@ -568,9 +581,7 @@ const DnDFlow = () => {
                         // labelShowBg:false,
                     }
 
-                    //alert(JSON.stringify(params))
                     setElements((els) => addEdge(params, els));
-                    //alert(JSON.stringify(elements))
 
                 }
                 setID(resDimo.data.nodes.length-1)                
@@ -721,9 +732,9 @@ const DnDFlow = () => {
          style={{alignContent: 'center' ,marginLeft: 'auto',marginRight: 'auto',alignItems: 'center',textAlign: 'center'}}>
         
                 
-        {ss_count.map(d=>(
-                
-                <div className="andor"
+        {statement.statements.map(d=>(
+                d.conditions.map(cc=>(
+                    <div className="andor"
             style={{alignContent: 'center' ,marginLeft: 'auto',marginRight: 'auto',alignItems: 'center',textAlign: 'center'}}>
             <Row style={{width: '90%',marginLeft: '6%'}}>
                 <Col span={12}>
@@ -735,15 +746,15 @@ const DnDFlow = () => {
                      required
                      name="first"
                      placeholder="first set"
-                     value={firstedge_set}
-                     onChange={firstEdgeSet}
+                     onChange={(e)=>{firstEdgeSet(statement.statements.indexOf(d),
+                        d.conditions.indexOf(cc),e)}}
                    />
                 </Col>
                 <Col span={12}>
                 <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
                Token's Type
            </h5>
-           <Select onChange={onChangeSelectFirstToken} value={firsttoken_set} style={{ width: '80%' ,textAlign: 'left'}}>
+           <Select className="select_modal" onChange={(e)=>{onChangeSelectFirstToken(cc,e)}}  style={{ width: '80%' ,textAlign: 'left'}}>
                             <Option value="str">string</Option>
                             <Option value="num">number</Option>
                             <Option value="timestamp">timestamp</Option>
@@ -753,7 +764,16 @@ const DnDFlow = () => {
                         </Select>
                 </Col>
             </Row>
-           
+            <h5 style={{textAlign: 'left',marginLeft: '11%',marginTop: '3%'}}>
+               Operator
+           </h5>
+           <Select onChange={(e)=>{edgeOperatorSet(cc,e)}}  style={{ width: '81%' ,textAlign: 'left',marginLeft: '2%'}}>
+                            <Option value="equal">equal</Option>
+                            <Option value="exist">exist</Option>
+                            <Option value="start_with">starts with</Option>
+                            <Option value="contains">contains</Option>
+                        </Select> 
+         
             <Row style={{width: '90%',marginLeft: '6%'}}>
                 <Col span={12}>
                 <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
@@ -764,15 +784,15 @@ const DnDFlow = () => {
                    required
                      name="second"
                      placeholder="second set"
-                     value={secondedge_set}
-                     onChange={secondEdgeSet}
+                     
+                     onChange={(e)=>{secondEdgeSet(cc,e)}}
                    />
                 </Col>
                 <Col span={12}>
                 <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
                Token's Type
            </h5>
-           <Select onChange={onChangeSelectSecondToken} value={secondtoken_set} style={{ width: '80%' ,textAlign: 'left'}}>
+           <Select onChange={(e)=>{onChangeSelectSecondToken(cc,e)}} style={{ width: '80%' ,textAlign: 'left'}}>
                             <Option value="str">string</Option>
                             <Option value="num">number</Option>
                             <Option value="timestamp">timestamp</Option>
@@ -782,17 +802,7 @@ const DnDFlow = () => {
                         </Select> 
                 </Col>
             </Row>
-           <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
-               Operator
-           </h5>
-           <Input
-                    style={{width: '80%'}}
-                    required
-                     name="Operator"
-                     placeholder="operator"
-                     value={edge_operator}
-                     onChange={edgeOperatorSet}
-                   />
+          
            
                    <Row style={{marginTop: '4%'}}>
                        <Col span="6">
@@ -800,7 +810,7 @@ const DnDFlow = () => {
                        </Col>
                        <Col span="6">
                        <Button style={{backgroundColor: '#1890ff',color: 'white',
-                   border: 'none',lineHeight: '0.5',width: '100%',height: '3vh'}} onClick={onAnd}>AND</Button>
+                   border: 'none',lineHeight: '0.5',width: '100%',height: '3vh'}} onClick={()=>{onAnd(statement.statements.indexOf(d))}}>AND</Button>
                        </Col>
                        <Col span="6">
                        <Button style={{backgroundColor: '#1890ff',color: 'white',
@@ -808,6 +818,8 @@ const DnDFlow = () => {
                        </Col>
                    </Row>
            </div>
+                ))
+                
             
             
         ))}
