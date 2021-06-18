@@ -92,7 +92,7 @@ export  default memo(({ data }) => {
         else if(res.data.type==='days_of_month' || res.data.type==='specified_dates'){
           setDaysOfTheMonthSelect(res.data.days)
         }
-        if(res.data.days !== null){
+        if(res.data.months !== null){
           setMonthsSelect(res.data.months.split(","))
         }
         else{
@@ -110,7 +110,7 @@ export  default memo(({ data }) => {
     const scenario_id = localStorage.getItem('selectedScenario');
     if(type === "intervals"){
       console.log(type)
-      if(startDate !== "" && endDate !== ""){
+      if(startDate !== "" && endDate !== "" && endDate !== null && startDate !== null){
         axios.put(`http://37.152.180.213/api/scenario/${scenario_id}/schedule/`,
         {
           type: type,
@@ -137,7 +137,7 @@ export  default memo(({ data }) => {
     }
     else if(type === "every_day"){
       console.log(type)
-      if(startDate !== "" && endDate !== ""){
+      if(startDate !== "" && endDate !== "" && endDate !== null && startDate !== null){
         axios.put(`http://37.152.180.213/api/scenario/${scenario_id}/schedule/`,
         {
           type: type,
@@ -176,7 +176,7 @@ export  default memo(({ data }) => {
       })
     }
     else if(type === "days_of_week"){
-      if(startDate !== "" && endDate !== ""){
+      if(startDate !== "" && endDate !== "" && endDate !== null && startDate !== null){
         axios.put(`http://37.152.180.213/api/scenario/${scenario_id}/schedule/`,
         {
           type: type,
@@ -204,7 +204,7 @@ export  default memo(({ data }) => {
       }
     }
     else if(type === "days_of_month"){
-      if(startDate !== "" && endDate !== ""){
+      if(startDate !== "" && endDate !== "" && endDate !== null && startDate !== null){
         axios.put(`http://37.152.180.213/api/scenario/${scenario_id}/schedule/`,
         {
           type: type,
@@ -232,7 +232,7 @@ export  default memo(({ data }) => {
       }
     }
     else if(type === "specified_dates"){
-      if(startDate !== "" && endDate !== ""){
+      if(startDate !== "" && endDate !== "" && endDate !== null && startDate !== null){
         axios.put(`http://37.152.180.213/api/scenario/${scenario_id}/schedule/`,
         {
           type: type,
@@ -401,7 +401,7 @@ export  default memo(({ data }) => {
         <Row gutter={8}>
           <Col span={12}>
           <Typography style={{marginTop:16, marginBottom:16}}>Minutes:</Typography>
-          <Input onChange={handleMinutesInputChange} value={minutes} disabled={minutesVisible} placeholder="Minutes" />
+          <Input style={{backgroundColor:'#414141', color:'white'}} onChange={handleMinutesInputChange} value={minutes} disabled={minutesVisible} placeholder="Minutes" />
           </Col>
           <Col span={12}>
           <Typography style={{marginTop:16, marginBottom:16}}>Days:</Typography>
