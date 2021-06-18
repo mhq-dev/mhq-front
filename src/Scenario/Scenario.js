@@ -15,7 +15,7 @@ import './layouting.css';
 import inputNode from './CustomInputNode';
 import defaultNode from './CustomDefaultNode';
 import outputNode from './CustomOutputNode';
-import { message,Modal,Form,Select,Row,Col, Input, Dropdown ,Layout,Menu,Button } from 'antd';
+import { message,Modal,Form,Select,Row,Col, Input, Dropdown ,Layout,Menu,Button,Spin } from 'antd';
 import axios from 'axios';
 import {  Link, NavLink } from 'react-router-dom';
 import SearchUser from '../Search/SearchUser';
@@ -613,21 +613,22 @@ const DnDFlow = () => {
                         'Content-Type' : 'application/json',
                         'Authorization' :`Token ${localStorage.getItem('token')}`
                         }}).then((runScenario)=>{
-                            message.success("Started");
                             setRunningScenario(true);
-                            while(runningScenario){
+                            // while(runningScenario){
                                 axios.get('http://37.152.180.213/api/scenario/history'+runScenario.data.id+"/",
                                 {headers:{
                                 'Content-Type' : 'application/json',
                                 'Authorization' :`Token ${localStorage.getItem('token')}`
                                 }}).then((runScenario)=>{
+                                    message.success("Runned successfully");
                                     setRunningScenario(false);
                                 })
                                 .catch((err)=>{
+                                    message.error("Failed");
                                     setRunningScenario(false);
                                 });  
-                                setTimeout(function(){ }, 1000);   
-                            }    
+                            //     setTimeout(function(){ }, 1000);   
+                            // }    
                             })  
                             .catch((err)=>{
                                 message.error(err.message);
@@ -640,11 +641,6 @@ const DnDFlow = () => {
                     .catch((err)=>{
                         message.error(err.message);
                     });  
-            })
-            .catch((err)=>{
-                message.error(err.message);
-            });    
-
           
     }
     return (
@@ -893,6 +889,8 @@ const DnDFlow = () => {
                 </Row>
                 <Row STYLE="height:15%;">
                     <img onClick={()=>RunScenario()} STYLE="height:70%;" src="https://s4.uupload.ir/files/run_button_byw4.jpg"></img>
+                    {(runningScenario)?<Spin STYLE="margin-top:15px; margin-left:15px;" size="large"></Spin>:<p></p>}
+                    
                 </Row>
 
                 </Col>
