@@ -569,7 +569,7 @@ const DnDFlow = () => {
 
                     if(resDimo.data.nodes[i].id==maximID){
                         const newNode1 = {
-                            id: i.toString(),
+                            id: (i+1).toString(),
                             type: 'inputNode',
                             data: { label: 'input node' },className: "dropnode",
                             position: { x: resDimo.data.nodes[i].x_position, y: resDimo.data.nodes[i].y_position },
@@ -580,7 +580,7 @@ const DnDFlow = () => {
                         setElements((es) => es.concat(newNode1));
                     } else{
                         const newNode2 = {
-                            id: i.toString(),
+                            id: (i+1).toString(),
                             type: 'defaultNode',
                             data: { label: 'input node' },className: "dropnode",
                             position: { x: resDimo.data.nodes[i].x_position, y: resDimo.data.nodes[i].y_position },
@@ -603,12 +603,12 @@ const DnDFlow = () => {
                     node_numbers.forEach(element => {
                     if(element.second_id==e.source)
                     {
-                        s1 = element.first_id
+                        s1 = element.first_id+1
                         s1 = s1.toString()
                     }
                     if(element.second_id==e.dist)
                     {
-                        t1 = element.first_id
+                        t1 = element.first_id+1
                         t1 = t1.toString()
                     }
                     });
