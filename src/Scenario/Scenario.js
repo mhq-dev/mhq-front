@@ -310,7 +310,6 @@ const DnDFlow = () => {
                 message.success("Removed successfuly!");
             })
             .catch((err)=>{
-                message.error(err.message);
             });
 
                 }
