@@ -910,7 +910,8 @@ const DnDFlow = () => {
         
                 
         {statement.statements.map(d=>(
-                d.conditions.map(cc=>(
+            <div style={{border: '1px solid gray',marginTop: '2%'}}>
+                {d.conditions.map(cc=>(
                     <div className="andor"
             style={{alignContent: 'center' ,marginLeft: 'auto',marginRight: 'auto',alignItems: 'center',textAlign: 'center'}}>
             <Row style={{width: '90%',marginLeft: '6%'}}>
@@ -995,7 +996,7 @@ const DnDFlow = () => {
                        </Col>
                    </Row>
            </div>
-                ))
+                ))}</div>
                 
             
             
