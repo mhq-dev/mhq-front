@@ -15,7 +15,7 @@ import './layouting.css';
 import inputNode from './CustomInputNode';
 import defaultNode from './CustomDefaultNode';
 import outputNode from './CustomOutputNode';
-import { message,Modal,Form,Select,Row,Col, Input, Dropdown ,Layout,Menu,Button,Spin } from 'antd';
+import { message,Modal,Form,Select,Row,Col, Input, Dropdown ,Layout,Menu,Button,Spin, Typography } from 'antd';
 import axios from 'axios';
 import {  Link, NavLink } from 'react-router-dom';
 import SearchUser from '../Search/SearchUser';
@@ -785,7 +785,7 @@ const DnDFlow = () => {
         </Row>
             <Row>
                 <Col span={11}></Col>
-                <Col span={2}><p STYLE="margin:10px; font-weight: bold;">Or</p></Col>
+                <Col span={2}><Typography STYLE="margin:10px; font-weight: bold;">Or</Typography></Col>
                 <Col span={11}></Col>
             </Row>
             <Select STYLE="width:100%; background-color:#ffffff;" onSelect={onSelectScenario}>
