@@ -4,6 +4,7 @@ import ReactFlow, {
     addEdge,
     removeElements,
     Controls,
+    updateEdge
 } from 'react-flow-renderer';
 import ConnectionLine from './ConnectionLine';
 import './dnd.css';
@@ -113,6 +114,15 @@ const DnDFlow = () => {
         statement.statements[st_index].conditions.push(secondcoditions)
         //alert(JSON.stringify(statement))
     }
+    function onAnd_edit(st_index) {
+        sets_count(s_count+1)
+        setss_count((s)=>s.concat(s_count))
+        ands.push("and")
+
+        const secondcoditions = {operator: "operator",first_token: "token",first: "",second_token: "token",second: ""}
+        statement_edit.statements[st_index].conditions.push(secondcoditions)
+        //alert(JSON.stringify(statement))
+    }
     const onOr = () => {
         sets_count(s_count+1)
         setss_count((s)=>s.concat(s_count))
@@ -120,6 +130,16 @@ const DnDFlow = () => {
         const secondcoditions = [{operator: "operator",first_token: "token",first: "",second_token: "token",second: ""}]
          const secondstatem= {conditions: secondcoditions}
         statement.statements.push(secondstatem)
+        //alert(JSON.stringify(statement))
+
+    };
+    const onOr_edit = () => {
+        sets_count(s_count+1)
+        setss_count((s)=>s.concat(s_count))
+        ands.push("or")
+        const secondcoditions = [{operator: "operator",first_token: "token",first: "",second_token: "token",second: ""}]
+         const secondstatem= {conditions: secondcoditions}
+        statement_edit.statements.push(secondstatem)
         //alert(JSON.stringify(statement))
 
     };
@@ -196,6 +216,7 @@ const DnDFlow = () => {
     first: "",second_token: "",second: ""}]
     const statem= {statements:[{conditions: coditions}]}
     const [statement, setstatement] = useState(statem);
+    const [statement_edit, setstatement_edit] = useState(statem);
 
     const [scenarioModal, setScenarioModal] = useState(false);
     const [myRequests, setmyRequests] = useState([]);
@@ -233,8 +254,8 @@ const DnDFlow = () => {
             animated: true,
             arrowHeadType: 'arrow',
             style: {strokeWidth:3},
-            // label:'Setting',
-            // labelStyle:{fill:'#fff',fontWeight: 800},
+             label:'updatable edge',
+            //labelStyle:{fill: 'transparent'},
             // labelShowBg:false,
         }
         setparam_set(params)
@@ -244,6 +265,69 @@ const DnDFlow = () => {
         showModalEdge();
     
     }
+    const UpdatableEdge = () => {
+        
+        const [elements, setElements] = useState(initialElements);
+    }
+      
+        // gets called after end of edge gets dragged to another source or target
+        const onEdgeUpdate = (oldEdge, newConnection) =>
+        {
+            if(oldEdge.source === newConnection.source && oldEdge.target === newConnection.target)
+            {
+                //alert(JSON.stringify(oldEdge))
+                //alert(JSON.stringify(newConnection))
+            }
+            else
+            {
+                    //alert(JSON.stringify(oldEdge))
+                    //alert(JSON.stringify(newConnection))
+                    const e = oldEdge
+                    try{
+        
+                        let s1 = "0"
+                        let t1 = "1"
+                        node_numbers.forEach(element => {
+                            if(element.first_id==e.source-1)
+                    {
+                        s1 = element.second_id
+                    }
+                    if(element.first_id==e.target-1)
+                    {
+                        t1 = element.second_id
+                    }
+                    
+                    
+                        });
+                        let id= -1;
+                    all_edges.forEach(el => {
+                        if(el.source===s1&&el.dist===t1)
+                        {
+                            id=el.id
+                            axios.get('http://37.152.180.213/api/edge/'+el.id,
+                            {headers:{
+                      'Content-Type' : 'application/json',
+                      'Authorization' :`Token ${localStorage.getItem('token')}`
+                    }}).then((resDimo)=>{
+                        //alert(JSON.stringify(resDimo.data.statements))
+                        setstatement_edit(resDimo.data);
+                        showModalEdgeEdit();
+                        
+                    })
+                    .catch((err)=>{
+                    });
+        
+                        }
+                    
+                    });
+                    
+                                        
+                  }
+                  catch{}
+                }
+            
+          setElements((els) => updateEdge(oldEdge, newConnection, els));
+        }
     const conditionSet = (e) => {
         setcondition_set(e.target.value);
       };
@@ -251,6 +335,10 @@ const DnDFlow = () => {
     function firstEdgeSet (d,cc,e) {
         statement.statements[d].conditions[cc].first
         =e.target.value
+        //setfirstedge_set(e.target.value);
+    };
+    function firstEdgeSet_edit (cc,e) {
+        cc=e.target.value
         //setfirstedge_set(e.target.value);
     };
     function secondEdgeSet (cc,e) {
@@ -673,7 +761,7 @@ const DnDFlow = () => {
                         animated: true,
                         arrowHeadType: 'arrow',
                         style: {strokeWidth:3},
-                        // label:'Setting',
+                        label:'updatable edge'
                         // labelStyle:{fill:'#fff',fontWeight: 800},
                         // labelShowBg:false,
                     }
@@ -1003,40 +1091,115 @@ const DnDFlow = () => {
          
         </div>
       </Modal>
-                <Modal
+      <Modal width={"36vw"}
                 visible={visible_edge_edit}
-                title="Edit Edges"
-                style={{height: '36vh'}}
+                title="Set condition"
+                style={{height: '30vh'}}
                 footer={[
-                <Button key="ok" className="btn btn-primary" onClick={edgeEditOk} >Done
+                <Button key="ok" className="btn btn-primary" onClick={edgeOk} >Set
                 </Button>
                 ]}
             >
-        <div style={{alignContent: 'center' ,marginLeft: 'auto',marginRight: 'auto',alignItems: 'center',textAlign: 'center'}}>
-        {edge_data.length===0?
-        <h5>There is no edge in this scenario</h5>:
-        edge_data.map(e=>(
-            <Row>
-                <Col span={4}><h5>Source : {e.source}</h5></Col>
-                <Col span={4}><h5>Target : {e.target}</h5></Col>
-                <Col span={4}><h5>Condition : </h5></Col>
-
-                <Col span = {8}><Input
-                  required
-                  name="edit_condition"
-                  defaultValue={e.condition}
-                  onChange={(er) => editCondition(e,er)}
-                  style={{height: '3vh'}}
-                />
-                </Col>
-                <Col span={4}><Button style={{backgroundColor: '#1890ff',color: 'white',
-                border: 'none',lineHeight: '0.5',width: '90%',height: '3vh'}}>Edit</Button></Col>
+        <div //className="andor"
+         style={{alignContent: 'center' ,marginLeft: 'auto',marginRight: 'auto',alignItems: 'center',textAlign: 'center'}}>
+        
                 
+        {statement_edit.statements.map(d=>(
+                d.conditions.map(cc=>(
+                    <div className="andor"
+            style={{alignContent: 'center' ,marginLeft: 'auto',marginRight: 'auto',alignItems: 'center',textAlign: 'center'}}>
+            <Row style={{width: '90%',marginLeft: '6%'}}>
+                <Col span={12}>
+                <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
+               First Operand
+           </h5>
+           <Input
+                   style={{width: '80%'}}
+                     required
+                     name="first"
+                     placeholder="first set"
+                     defaultValue={cc.first}
+                     onChange={(e)=>{firstEdgeSet_edit(cc.first,e)}}
+                   />
+                </Col>
+                <Col span={12}>
+                <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
+               Token's Type
+           </h5>
+           <Select className="select_modal" defaultValue={cc.first_token} onChange={(e)=>{onChangeSelectFirstToken(cc,e)}}  style={{ width: '80%' ,textAlign: 'left'}}>
+                            <Option value="str">string</Option>
+                            <Option value="num">number</Option>
+                            <Option value="timestamp">timestamp</Option>
+                            <Option value="body">body</Option>
+                            <Option value="status_code">status code</Option>
+
+                        </Select>
+                </Col>
             </Row>
-        ))
-        }
+            <h5 style={{textAlign: 'left',marginLeft: '11%',marginTop: '3%'}}>
+               Operator
+           </h5>
+           <Select onChange={(e)=>{edgeOperatorSet(cc,e)}} defaultValue={cc.operator} style={{ width: '81%' ,textAlign: 'left',marginLeft: '2%'}}>
+                            <Option value="equal">equal</Option>
+                            <Option value="exist">exist</Option>
+                            <Option value="start_with">starts with</Option>
+                            <Option value="contains">contains</Option>
+                        </Select> 
+         
+            <Row style={{width: '90%',marginLeft: '6%'}}>
+                <Col span={12}>
+                <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
+                    Second Operand
+                </h5>
+                <Input
+                   style={{width: '80%'}}
+                   required
+                     name="second"
+                     placeholder="second set"
+                     defaultValue={cc.second}
+
+                     onChange={(e)=>{secondEdgeSet(cc,e)}}
+                   />
+                </Col>
+                <Col span={12}>
+                <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
+               Token's Type
+           </h5>
+           <Select onChange={(e)=>{onChangeSelectSecondToken(cc,e)}} defaultValue={cc.second_token} style={{ width: '80%' ,textAlign: 'left'}}>
+                            <Option value="str">string</Option>
+                            <Option value="num">number</Option>
+                            <Option value="timestamp">timestamp</Option>
+                            <Option value="body">body</Option>
+                            <Option value="status_code">status code</Option>
+
+                        </Select> 
+                </Col>
+            </Row>
+          
+           
+                   <Row style={{marginTop: '4%'}}>
+                       <Col span="6">
+   
+                       </Col>
+                       <Col span="6">
+                       <Button style={{backgroundColor: '#1890ff',color: 'white',
+                   border: 'none',lineHeight: '0.5',width: '100%',height: '3vh'}} onClick={()=>{onAnd_edit(statement_edit.statements.indexOf(d))}}>AND</Button>
+                       </Col>
+                       <Col span="6">
+                       <Button style={{backgroundColor: '#1890ff',color: 'white',
+                   border: 'none',lineHeight: '0.5',width: '100%',height: '3vh',marginLeft: '10%'}}onClick={onOr_edit}>OR</Button>
+                       </Col>
+                   </Row>
+           </div>
+                ))
+                
+            
+            
+        ))}
+         
         </div>
       </Modal>
+
                 <Modal
                 visible={vis}
                 title="Enter your api information"
@@ -1077,6 +1240,9 @@ const DnDFlow = () => {
                         onNodeContextMenu={onNodeContextMenu}
                         connectionLineComponent={ConnectionLine}
                         nodeTypes={nodeTypes}
+                        onEdgeUpdate={onEdgeUpdate}
+                        
+
                     >
                         <Controls />
                     </ReactFlow>
