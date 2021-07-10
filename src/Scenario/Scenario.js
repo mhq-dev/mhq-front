@@ -104,13 +104,17 @@ const DnDFlow = () => {
     const [edge_id, setedge_id] = useState("");
     const [all_edges, setall_edges] = useState([]);
     const [visible_edge, setvisible_edge] = useState(false);
+    const [edit_st, setedit_st] = useState(-1);
+    const [edit_s, setedit_s] = useState(-1);
+    const [edit_t, setedit_t] = useState(-1);
+
     const [visible_edge_edit, setvisible_edge_edit] = useState(false);
     function onAnd(st_index) {
         sets_count(s_count+1)
         setss_count((s)=>s.concat(s_count))
         ands.push("and")
 
-        const secondcoditions = {operator: "operator",first_token: "token",first: "",second_token: "token",second: ""}
+        const secondcoditions = {operator: "",first_token: "",first: "",second_token: "",second: ""}
         statement.statements[st_index].conditions.push(secondcoditions)
         //alert(JSON.stringify(statement))
     }
@@ -119,7 +123,7 @@ const DnDFlow = () => {
         setss_count((s)=>s.concat(s_count))
         ands.push("and")
 
-        const secondcoditions = {operator: "operator",first_token: "token",first: "",second_token: "token",second: ""}
+        const secondcoditions = {operator: "",first_token: "",first: "",second_token: "",second: ""}
         statement_edit.statements[st_index].conditions.push(secondcoditions)
         //alert(JSON.stringify(statement))
     }
@@ -127,7 +131,7 @@ const DnDFlow = () => {
         sets_count(s_count+1)
         setss_count((s)=>s.concat(s_count))
         ands.push("or")
-        const secondcoditions = [{operator: "operator",first_token: "token",first: "",second_token: "token",second: ""}]
+        const secondcoditions = [{operator: "",first_token: "",first: "",second_token: "",second: ""}]
          const secondstatem= {conditions: secondcoditions}
         statement.statements.push(secondstatem)
         //alert(JSON.stringify(statement))
@@ -137,7 +141,7 @@ const DnDFlow = () => {
         sets_count(s_count+1)
         setss_count((s)=>s.concat(s_count))
         ands.push("or")
-        const secondcoditions = [{operator: "operator",first_token: "token",first: "",second_token: "token",second: ""}]
+        const secondcoditions = [{operator: "",first_token: "",first: "",second_token: "",second: ""}]
          const secondstatem= {conditions: secondcoditions}
         statement_edit.statements.push(secondstatem)
         //alert(JSON.stringify(statement))
@@ -175,6 +179,7 @@ const DnDFlow = () => {
           setElements((els) => addEdge(param_set, els));
           //alert(JSON.stringify(elements))
           message.success("The edge is created successfully")
+          setstatement(statem)
 
         }
         else{
@@ -197,6 +202,67 @@ const DnDFlow = () => {
         setfirstedge_set("");
         setsecondedge_set("");
         };
+        const edgeOk_edit = () => {
+            if(edit_st===-1)
+            {
+
+            
+            axios.post('http://37.152.180.213/api/edge/',{
+            source: edit_s, dist: edit_t ,statements: statement_edit.statements
+            },{headers:{
+            'Content-Type' : 'application/json',
+            'Authorization' :`Token ${localStorage.getItem('token')}`
+            }})
+            .then((response)=>{
+            if (response.status === 201){
+              //message.success("Collection created successfully")
+             
+             
+              message.success("The edge is updated successfully")
+              setstatement(statem)
+    
+            }
+            else{
+              message.error("Please fill all of the fields correctly!")
+            }})
+        }
+        else{
+            axios.put('http://37.152.180.213/api/edge/'+edit_st,{
+            source: edit_s, dist: edit_t ,statements: statement_edit.statements
+            },{headers:{
+            'Content-Type' : 'application/json',
+            'Authorization' :`Token ${localStorage.getItem('token')}`
+            }})
+            .then((response)=>{
+            if (response.status === 200){
+              //message.success("Collection created successfully")
+
+              message.success("The edge is updated successfully")
+              setstatement(statem)
+    
+            }
+            else{
+              message.error("Please fill all of the fields correctly!")
+            }})
+        }
+            const twocoditions = [{operator: "",first_token: '',
+            first: "",second_token: '',second: ""}]
+            const twostatem= {statements:[{conditions: twocoditions}]}
+            setstatement(twostatem);
+            const data={source: source_set ,target: target_set , condition: condition_set,
+                first: firstedge_set, operator: edge_operator , second: secondedge_set}
+            //const newone = localforage.getItem("edge_data")
+            edge_data.push(data)
+            //alert(JSON.stringify(edge_data))
+            setvisible_edge(false) ;
+            setvisible_edge_edit(false) ;
+            setsource_set("");
+            settarget_set("");
+            setcondition_set("");
+            setedge_operator("");
+            setfirstedge_set("");
+            setsecondedge_set("");
+            };
         const edgeEditOk = () => {
             setvisible_edge_edit(false) ;
         };
@@ -255,8 +321,8 @@ const DnDFlow = () => {
             arrowHeadType: 'arrow',
             style: {strokeWidth:3},
              label:'updatable edge',
-            //labelStyle:{fill: 'transparent'},
-            // labelShowBg:false,
+            labelStyle:{fill: 'transparent'},
+            labelShowBg:false,
         }
         setparam_set(params)
         setsource_set(params.source)
@@ -273,20 +339,12 @@ const DnDFlow = () => {
         // gets called after end of edge gets dragged to another source or target
         const onEdgeUpdate = (oldEdge, newConnection) =>
         {
-            if(oldEdge.source === newConnection.source && oldEdge.target === newConnection.target)
-            {
-                //alert(JSON.stringify(oldEdge))
-                //alert(JSON.stringify(newConnection))
-            }
-            else
-            {
-                    //alert(JSON.stringify(oldEdge))
-                    //alert(JSON.stringify(newConnection))
-                    const e = oldEdge
-                    try{
-        
+            const e = oldEdge
+            const n = newConnection
                         let s1 = "0"
                         let t1 = "1"
+                        let s2 = "0"
+                        let t2 = "1"
                         node_numbers.forEach(element => {
                             if(element.first_id==e.source-1)
                     {
@@ -295,6 +353,14 @@ const DnDFlow = () => {
                     if(element.first_id==e.target-1)
                     {
                         t1 = element.second_id
+                    }
+                    if(element.first_id==n.target-1)
+                    {
+                        t2 = element.second_id
+                    }
+                    if(element.first_id==n.source-1)
+                    {
+                        s2 = element.second_id
                     }
                     
                     
@@ -308,9 +374,33 @@ const DnDFlow = () => {
                             {headers:{
                       'Content-Type' : 'application/json',
                       'Authorization' :`Token ${localStorage.getItem('token')}`
-                    }}).then((resDimo)=>{
+                        }}).then((resDimo)=>{
                         //alert(JSON.stringify(resDimo.data.statements))
                         setstatement_edit(resDimo.data);
+                        if(oldEdge.source === newConnection.source && oldEdge.target === newConnection.target)
+                        {
+                            //alert(JSON.stringify(oldEdge))
+                            //alert(JSON.stringify(newConnection))
+                            setedit_st(id)
+                            setedit_s(s2)
+                            setedit_t(t2)
+                        }
+                        else
+                        {
+                            setedit_st(-1)
+                            setedit_t(t2)
+                            setedit_s(s2)
+                        axios.delete('http://37.152.180.213/api/edge/'+el.id,
+                            {headers:{
+                      'Content-Type' : 'application/json',
+                      'Authorization' :`Token ${localStorage.getItem('token')}`
+                    }}).then((resDimo)=>{
+                        
+                    })
+                    .catch((err)=>{
+                    });
+                                
+                        }
                         showModalEdgeEdit();
                         
                     })
@@ -320,11 +410,7 @@ const DnDFlow = () => {
                         }
                     
                     });
-                    
-                                        
-                  }
-                  catch{}
-                }
+           
             
           setElements((els) => updateEdge(oldEdge, newConnection, els));
         }
@@ -338,7 +424,7 @@ const DnDFlow = () => {
         //setfirstedge_set(e.target.value);
     };
     function firstEdgeSet_edit (cc,e) {
-        cc=e.target.value
+        cc.first=e.target.value
         //setfirstedge_set(e.target.value);
     };
     function secondEdgeSet (cc,e) {
@@ -761,9 +847,9 @@ const DnDFlow = () => {
                         animated: true,
                         arrowHeadType: 'arrow',
                         style: {strokeWidth:3},
-                        label:'updatable edge'
-                        // labelStyle:{fill:'#fff',fontWeight: 800},
-                        // labelShowBg:false,
+                        label:'updatable edge',
+                         labelStyle:{fill:'transparent',fontWeight: 800},
+                        labelShowBg:false,
                     }
 
                     setElements((els) => addEdge(params, els));
@@ -986,7 +1072,7 @@ const DnDFlow = () => {
                 <div className="dndflow" id="dndflow">
                 <Modal width={"36vw"}
                 visible={visible_edge}
-                title="Set condition"
+                title="Set Statements"
                 style={{height: '30vh'}}
                 footer={[
                 <Button key="ok" className="btn btn-primary" onClick={edgeOk} >Set
@@ -998,7 +1084,8 @@ const DnDFlow = () => {
         
                 
         {statement.statements.map(d=>(
-                d.conditions.map(cc=>(
+                <div style={{border: '1px solid gray',marginTop: '2%'}}>
+                {d.conditions.map(cc=>(
                     <div className="andor"
             style={{alignContent: 'center' ,marginLeft: 'auto',marginRight: 'auto',alignItems: 'center',textAlign: 'center'}}>
             <Row style={{width: '90%',marginLeft: '6%'}}>
@@ -1019,7 +1106,8 @@ const DnDFlow = () => {
                 <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
                Token's Type
            </h5>
-           <Select className="select_modal" onChange={(e)=>{onChangeSelectFirstToken(cc,e)}}  style={{ width: '80%' ,textAlign: 'left'}}>
+           <Select className="select_modal" onChange={(e)=>{onChangeSelectFirstToken(cc,e)}} 
+           defaultValue={""} style={{ width: '80%' ,textAlign: 'left'}}>
                             <Option value="str">string</Option>
                             <Option value="num">number</Option>
                             <Option value="timestamp">timestamp</Option>
@@ -1032,7 +1120,7 @@ const DnDFlow = () => {
             <h5 style={{textAlign: 'left',marginLeft: '11%',marginTop: '3%'}}>
                Operator
            </h5>
-           <Select onChange={(e)=>{edgeOperatorSet(cc,e)}}  style={{ width: '81%' ,textAlign: 'left',marginLeft: '2%'}}>
+           <Select onChange={(e)=>{edgeOperatorSet(cc,e)}} defaultValue={""}  style={{ width: '81%' ,textAlign: 'left',marginLeft: '2%'}}>
                             <Option value="equal">equal</Option>
                             <Option value="exist">exist</Option>
                             <Option value="start_with">starts with</Option>
@@ -1057,7 +1145,7 @@ const DnDFlow = () => {
                 <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
                Token's Type
            </h5>
-           <Select onChange={(e)=>{onChangeSelectSecondToken(cc,e)}} style={{ width: '80%' ,textAlign: 'left'}}>
+           <Select defaultValue={""} onChange={(e)=>{onChangeSelectSecondToken(cc,e)}} style={{ width: '80%' ,textAlign: 'left'}}>
                             <Option value="str">string</Option>
                             <Option value="num">number</Option>
                             <Option value="timestamp">timestamp</Option>
@@ -1087,16 +1175,16 @@ const DnDFlow = () => {
                 
             
             
-        ))}
+                     }</div>))}
          
         </div>
       </Modal>
       <Modal width={"36vw"}
                 visible={visible_edge_edit}
-                title="Set condition"
+                title="Edit Statements"
                 style={{height: '30vh'}}
                 footer={[
-                <Button key="ok" className="btn btn-primary" onClick={edgeOk} >Set
+                <Button key="ok" className="btn btn-primary" onClick={edgeOk_edit} >Set
                 </Button>
                 ]}
             >
@@ -1105,7 +1193,8 @@ const DnDFlow = () => {
         
                 
         {statement_edit.statements.map(d=>(
-                d.conditions.map(cc=>(
+                <div style={{border: '1px solid gray',marginTop: '2%'}}>
+                {d.conditions.map(cc=>(
                     <div className="andor"
             style={{alignContent: 'center' ,marginLeft: 'auto',marginRight: 'auto',alignItems: 'center',textAlign: 'center'}}>
             <Row style={{width: '90%',marginLeft: '6%'}}>
@@ -1119,7 +1208,7 @@ const DnDFlow = () => {
                      name="first"
                      placeholder="first set"
                      defaultValue={cc.first}
-                     onChange={(e)=>{firstEdgeSet_edit(cc.first,e)}}
+                     onChange={(e)=>{firstEdgeSet_edit(cc,e)}}
                    />
                 </Col>
                 <Col span={12}>
@@ -1195,7 +1284,7 @@ const DnDFlow = () => {
                 
             
             
-        ))}
+                }</div>))}
          
         </div>
       </Modal>
