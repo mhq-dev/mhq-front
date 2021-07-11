@@ -163,7 +163,7 @@ const DnDFlow = () => {
         });
         //alert(t)
         
-        
+        set_last(statement.statements[0].conditions[0])
         axios.post('http://37.152.180.213/api/edge/',{
         source: s, dist: t ,statements: statement.statements
         },{headers:{
@@ -179,14 +179,14 @@ const DnDFlow = () => {
           setElements((els) => addEdge(param_set, els));
           //alert(JSON.stringify(elements))
           message.success("The edge is created successfully")
-          setstatement(statem)
+          //setstatement(statem)
 
         }
         else{
           message.error("Please fill all of the fields correctly!")
         }})
-        const twocoditions = [{operator: "",first_token: '',
-        first: "",second_token: '',second: ""}]
+        const twocoditions = [{operator: last.operator,first_token: last.first_token,
+        first: last.first,second_token: last.second_token,second: last.second}]
         const twostatem= {statements:[{conditions: twocoditions}]}
         setstatement(twostatem);
         const data={source: source_set ,target: target_set , condition: condition_set,
@@ -206,7 +206,7 @@ const DnDFlow = () => {
             if(edit_st===-1)
             {
 
-            
+                
             axios.post('http://37.152.180.213/api/edge/',{
             source: edit_s, dist: edit_t ,statements: statement_edit.statements
             },{headers:{
@@ -217,9 +217,10 @@ const DnDFlow = () => {
             if (response.status === 201){
               //message.success("Collection created successfully")
              
-             
+              const newelm= {id: response.data.id , source: edit_s,dist: edit_t}
+              all_edges.push(newelm)
               message.success("The edge is updated successfully")
-              setstatement(statem)
+             // setstatement(statem)
     
             }
             else{
@@ -238,15 +239,15 @@ const DnDFlow = () => {
               //message.success("Collection created successfully")
 
               message.success("The edge is updated successfully")
-              setstatement(statem)
+              //setstatement(statem)
     
             }
             else{
               message.error("Please fill all of the fields correctly!")
             }})
         }
-            const twocoditions = [{operator: "",first_token: '',
-            first: "",second_token: '',second: ""}]
+        const twocoditions = [{operator: last.operator,first_token: last.first_token,
+            first: last.first,second_token: last.second_token,second: last.second}]
             const twostatem= {statements:[{conditions: twocoditions}]}
             setstatement(twostatem);
             const data={source: source_set ,target: target_set , condition: condition_set,
@@ -256,6 +257,10 @@ const DnDFlow = () => {
             //alert(JSON.stringify(edge_data))
             setvisible_edge(false) ;
             setvisible_edge_edit(false) ;
+            setedit_s(-1)
+            setedit_st(-1)
+            setedit_t(-1)
+            setstatement_edit(statem)
             setsource_set("");
             settarget_set("");
             setcondition_set("");
@@ -282,6 +287,7 @@ const DnDFlow = () => {
     first: "",second_token: "",second: ""}]
     const statem= {statements:[{conditions: coditions}]}
     const [statement, setstatement] = useState(statem);
+    const [last, set_last] = useState(statem.statements[0].conditions[0]);
     const [statement_edit, setstatement_edit] = useState(statem);
 
     const [scenarioModal, setScenarioModal] = useState(false);
@@ -328,6 +334,10 @@ const DnDFlow = () => {
         setsource_set(params.source)
         settarget_set(params.target)
         conditionEmpty();
+        const twocoditions = [{operator: last.operator,first_token: last.first_token,
+            first: last.first,second_token: last.second_token,second: last.second}]
+            const twostatem= {statements:[{conditions: twocoditions}]}
+            setstatement(twostatem);
         showModalEdge();
     
     }
@@ -366,6 +376,7 @@ const DnDFlow = () => {
                     
                         });
                         let id= -1;
+                        let all_edges2=[]
                     all_edges.forEach(el => {
                         if(el.source===s1&&el.dist===t1)
                         {
@@ -401,6 +412,7 @@ const DnDFlow = () => {
                     });
                                 
                         }
+                        
                         showModalEdgeEdit();
                         
                     })
@@ -408,10 +420,22 @@ const DnDFlow = () => {
                     });
         
                         }
+                        else{
+                            const newelm= {id: el.id , source: el.source,dist: el.dist}
+                            all_edges2.push(newelm);
+                        }
                     
                     });
-           
-            
+                    
+                    if(edit_st===-1)
+                    {
+                        setall_edges(all_edges2)
+                    }
+                    else
+                    {
+                        
+                    }
+                    
           setElements((els) => updateEdge(oldEdge, newConnection, els));
         }
     const conditionSet = (e) => {
@@ -943,40 +967,46 @@ const DnDFlow = () => {
                 'Content-Type' : 'application/json',
                 'Authorization' :`Token ${localStorage.getItem('token')}`
                 }}).then((resDimo)=>{
-                    setRunningScenario(true);
                     axios.get('http://37.152.180.213/api/scenario/'+selectedScenario+"/execute",
                         {headers:{
                         'Content-Type' : 'application/json',
                         'Authorization' :`Token ${localStorage.getItem('token')}`
                         }}).then((runScenario)=>{
-                            message.success("Ran successfully");
-                            setRunningScenario(false);
+                            setRunningScenario(true);
                             // while(runningScenario){
-                                // axios.get('http://37.152.180.213/api/scenario/history/'+runScenario.data.scenario_history+"/",
-                                // {headers:{
-                                // 'Content-Type' : 'application/json',
-                                // 'Authorization' :`Token ${localStorage.getItem('token')}`
-                                // }}).then((runScenario)=>{
-                                //     message.success("Runned successfully");
-                                //     setRunningScenario(false);
-                                // })
-                                // .catch((err)=>{
-                                //     message.success("Failed to complete scenario");
-                                //     setRunningScenario(false);
-                                // });  
+                                console.log("Dimo");
+                                console.log(resDimo.data);
+                                setTimeout(function(){ 
+                                    axios.get('http://37.152.180.213/api/scenario/history/'+runScenario.data.scenario_history+"/",
+                                    {headers:{
+                                    'Content-Type' : 'application/json',
+                                    'Authorization' :`Token ${localStorage.getItem('token')}`
+                                    }}).then((runScenarioo)=>{      
+                                        var percent = parseInt((runScenarioo.data.requests.length / resDimo.data.nodes.length)*100);
+                                        console.log(runScenarioo.data);
+                                        message.success(percent+"% of nodes ran successfully");
+                                        setRunningScenario(false);
+                                    })
+                                    .catch((err)=>{
+                                        console.log(err);
+                                        message.error("Failed");
+                                        setRunningScenario(false);
+                                    });  
+                                }, 5000);
+                               
                             //     setTimeout(function(){ }, 1000);   
                             // }    
                             })  
                             .catch((err)=>{
-                                message.success("Failed to complete scenario");
+                                message.error(err.message);
                             });  
                         })
                         .catch((err)=>{
-                            message.success("Failed to complete scenario");
+                            message.error(err.message);
                         }); 
                     })  
                     .catch((err)=>{
-                        message.success("Failed to complete scenario");
+                        message.error(err.message);
                     });  
           
     }
@@ -1036,11 +1066,7 @@ const DnDFlow = () => {
             <Link to="/scenario"><h4 >Scenario</h4></Link>
             </Col>
             <Col span={2} >
-            <Dropdown overlay={menu}>
-            <h4 className="ant-dropdown-link" onClick={e => e.preventDefault()}style={{color: 'black'}} >
-            Workspaces <DownOutlined />
-            </h4>
-            </Dropdown>
+         
             </Col>
             <Col span={4} style={{float: 'right' , marginLeft: '40%'}}>
             <SearchUser/>
@@ -1098,6 +1124,7 @@ const DnDFlow = () => {
                      required
                      name="first"
                      placeholder="first set"
+                     defaultValue={cc.first}
                      onChange={(e)=>{firstEdgeSet(statement.statements.indexOf(d),
                         d.conditions.indexOf(cc),e)}}
                    />
@@ -1106,8 +1133,8 @@ const DnDFlow = () => {
                 <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
                Token's Type
            </h5>
-           <Select className="select_modal" onChange={(e)=>{onChangeSelectFirstToken(cc,e)}} 
-           defaultValue={""} style={{ width: '80%' ,textAlign: 'left'}}>
+           <Select className="select_modal"  onChange={(e)=>{onChangeSelectFirstToken(cc,e)}} 
+           defaultValue={cc.first_token} style={{ width: '80%' ,textAlign: 'left'}}>
                             <Option value="str">string</Option>
                             <Option value="num">number</Option>
                             <Option value="timestamp">timestamp</Option>
@@ -1120,7 +1147,7 @@ const DnDFlow = () => {
             <h5 style={{textAlign: 'left',marginLeft: '11%',marginTop: '3%'}}>
                Operator
            </h5>
-           <Select onChange={(e)=>{edgeOperatorSet(cc,e)}} defaultValue={""}  style={{ width: '81%' ,textAlign: 'left',marginLeft: '2%'}}>
+           <Select onChange={(e)=>{edgeOperatorSet(cc,e)}} defaultValue={cc.operator}  style={{ width: '81%' ,textAlign: 'left',marginLeft: '2%'}}>
                             <Option value="equal">equal</Option>
                             <Option value="exist">exist</Option>
                             <Option value="start_with">starts with</Option>
@@ -1137,7 +1164,7 @@ const DnDFlow = () => {
                    required
                      name="second"
                      placeholder="second set"
-                     
+                     defaultValue={cc.second}
                      onChange={(e)=>{secondEdgeSet(cc,e)}}
                    />
                 </Col>
@@ -1145,7 +1172,7 @@ const DnDFlow = () => {
                 <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
                Token's Type
            </h5>
-           <Select defaultValue={""} onChange={(e)=>{onChangeSelectSecondToken(cc,e)}} style={{ width: '80%' ,textAlign: 'left'}}>
+           <Select defaultValue={cc.second_token} onChange={(e)=>{onChangeSelectSecondToken(cc,e)}} style={{ width: '80%' ,textAlign: 'left'}}>
                             <Option value="str">string</Option>
                             <Option value="num">number</Option>
                             <Option value="timestamp">timestamp</Option>
