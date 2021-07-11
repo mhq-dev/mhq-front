@@ -6,6 +6,13 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import axios from 'axios';
 
 function Login() {
+
+    React.useState(() => {
+        if (localStorage.getItem("token") !== null) {
+            window.location = '/dashboard';
+        }
+      });
+
     const onFinish = values => {
         console.log('Received values of form: ', values);
         axios.post('http://37.152.180.213/api/auth/token/login/',{

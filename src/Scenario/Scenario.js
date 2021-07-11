@@ -76,7 +76,7 @@ axios.get('http://37.152.180.213/api/collection/user/'+localStorage.getItem('use
             }
         })
         .catch((err)=>{
-            message.error(err.message);
+            //message.error(err.message);
         });
 
 
