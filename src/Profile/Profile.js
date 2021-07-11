@@ -85,11 +85,7 @@ class Profile extends React.Component {
                 <Link to="/scenario"><h4 >Scenario</h4></Link>
                 </Col>
                 <Col span={2} >
-                <Dropdown overlay={menu}>
-            <h4 className="ant-dropdown-link" onClick={e => e.preventDefault()}style={{color: 'black'}} >
-            Workspaces <DownOutlined />
-            </h4>
-        </Dropdown>
+              
                 </Col>
                 <Col span={4} style={{float: 'right' , marginLeft: '40%'}}>
           <SearchUser/>
