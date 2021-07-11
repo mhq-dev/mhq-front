@@ -275,21 +275,32 @@ const DnDFlow = () => {
             
         setvisible_edge(true);
         };
+        const unshowModalEdge = () => {
+            
+            setvisible_edge(false);
+            };
         const showModalEdgeEdit = useCallback(() => {
                 setvisible_edge_edit(true);
             
           });
+          const unshowModalEdgeEdit = useCallback(() => {
+            setvisible_edge_edit(false);
+        
+      });
+        
 
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
     const [elements, setElements] = useState(initialElements);
     const [vis, setVis] = useState(false);
+    const [onestatus, set_onestatus] = useState(false);
+    const [twostatus, set_twostatus] = useState(false);
     const coditions = [{operator: "",first_token: "",
     first: "",second_token: "",second: ""}]
     const statem= {statements:[{conditions: coditions}]}
     const [statement, setstatement] = useState(statem);
     const [last, set_last] = useState(statem.statements[0].conditions[0]);
     const [statement_edit, setstatement_edit] = useState(statem);
-
+    
     const [scenarioModal, setScenarioModal] = useState(false);
     const [myRequests, setmyRequests] = useState([]);
     const [myCols, setmyCols] = useState(initialCols);
@@ -310,12 +321,28 @@ const DnDFlow = () => {
     const [firsttoken_set, setfirsttoke_set] = useState("token");
     function onChangeSelectFirstToken (cc,value){
         cc.first_token=value;
+        if(value==='status_code')
+        {
+            set_onestatus(true)
+            cc.first=''
+        }
+        else{
+            set_onestatus(false)
+        }
         //setfirsttoke_set(value);
     }
     const [secondtoken_set, setsecondtoke_set] = useState("token");
     function onChangeSelectSecondToken (cc, value){
         //setsecondtoke_set(value);
         cc.second_token=value
+        if(value==='status_code')
+        {
+            set_twostatus(true)
+            cc.second=''
+        }
+        else{
+            set_twostatus(false)
+        }
     }
 
     const getId = () => `${id+1}`;
@@ -449,6 +476,7 @@ const DnDFlow = () => {
     };
     function firstEdgeSet_edit (cc,e) {
         cc.first=e.target.value
+        
         //setfirstedge_set(e.target.value);
     };
     function secondEdgeSet (cc,e) {
@@ -1034,7 +1062,7 @@ const DnDFlow = () => {
                 <Input id="new_scenario_name" placeholder="New scenario's name"></Input>
             </Col>
             <Col span={4}>
-                <button className="create-scenario-button" key="Create" type="primary" onClick={createScenarioModal}>
+                <button className="create-scenario-button"   key="Create" type="primary" onClick={createScenarioModal}>
                 Create
                 </button>
             </Col>                
@@ -1101,8 +1129,12 @@ const DnDFlow = () => {
                 title="Set Statements"
                 style={{height: '30vh'}}
                 footer={[
-                <Button key="ok" className="btn btn-primary" onClick={edgeOk} >Set
-                </Button>
+                <Button key="ok" className="btn btn-primary" style={{backgroundColor: '#1890ff',color: 'white'}} onClick={edgeOk} >Set
+                </Button>,
+                <button className="cancel-account-button"   key="cancel" type="secondary" onClick={ unshowModalEdge}>
+                Cancel
+            </button>,
+                
                 ]}
             >
         <div //className="andor"
@@ -1121,6 +1153,7 @@ const DnDFlow = () => {
            </h5>
            <Input
                    style={{width: '80%'}}
+                   disabled={onestatus}
                      required
                      name="first"
                      placeholder="first set"
@@ -1161,6 +1194,7 @@ const DnDFlow = () => {
                 </h5>
                 <Input
                    style={{width: '80%'}}
+                   disabled={twostatus}
                    required
                      name="second"
                      placeholder="second set"
@@ -1211,8 +1245,11 @@ const DnDFlow = () => {
                 title="Edit Statements"
                 style={{height: '30vh'}}
                 footer={[
-                <Button key="ok" className="btn btn-primary" onClick={edgeOk_edit} >Set
-                </Button>
+                <Button key="ok" className="btn btn-primary" style={{backgroundColor: '#1890ff',color: 'white'}} onClick={edgeOk_edit} >Set
+                </Button>,
+                <button className="cancel-account-button" key="cancel" type="secondary" onClick={ unshowModalEdgeEdit}>
+                Cancel
+            </button>,
                 ]}
             >
         <div //className="andor"
@@ -1235,6 +1272,8 @@ const DnDFlow = () => {
                      name="first"
                      placeholder="first set"
                      defaultValue={cc.first}
+                     disabled={onestatus}
+
                      onChange={(e)=>{firstEdgeSet_edit(cc,e)}}
                    />
                 </Col>
@@ -1273,6 +1312,7 @@ const DnDFlow = () => {
                      name="second"
                      placeholder="second set"
                      defaultValue={cc.second}
+                     disabled={twostatus}
 
                      onChange={(e)=>{secondEdgeSet(cc,e)}}
                    />
