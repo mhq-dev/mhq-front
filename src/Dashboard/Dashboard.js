@@ -417,6 +417,9 @@ onChangeInputUrl = (input)=>{
     });
   };
   componentDidMount() {
+    if (localStorage.getItem("token") === null) {
+      window.location = '/login';
+  }
     Axios.get('http://37.152.180.213/api/request/history/',
         {headers:{
           'Content-Type' : 'application/json',
