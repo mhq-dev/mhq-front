@@ -45,8 +45,7 @@ const menu = (
 const panes = [
   { title: 'Overview', content: '',closable: false ,key: '1' },
   { title: 'Create a collection', content: <CreateCollection/>, key: '2' ,closable: false },
-  { title: 'Create an API', content: '', key: '3',closable: false },
-  { title: 'Create an environment', content: '', key: '4',closable: false },
+
 ];
   let isPublic= false;
   let isEditor= false;
@@ -431,7 +430,7 @@ onChangeInputUrl = (input)=>{
             this.setState(({initialHistory:His}))
         })
         .catch((err)=>{
-            message.error(err.message);
+            //message.error(err.message);
         });
     this.getCollection()
   }
@@ -497,11 +496,7 @@ onChangeInputUrl = (input)=>{
           <Link to="/scenario"><h4 >Scenario</h4></Link>
           </Col>
           <Col span={2} >
-          <Dropdown overlay={menu}>
-    <h4 className="ant-dropdown-link" onClick={e => e.preventDefault()}style={{color: 'black'}} >
-      Workspaces <DownOutlined />
-    </h4>
-  </Dropdown>
+        
           </Col>
           <Col span={4} style={{float: 'right' , marginLeft: '40%'}}>
           <SearchUser/>
@@ -537,32 +532,11 @@ onChangeInputUrl = (input)=>{
           )}
         /> }
                 </SubMenu>
-                <SubMenu key="sub2" icon={<ApiOutlined/>}  title={"APIs"}>
-                  <Menu.Item onClick={()=>this.addClick("API One")} >
-                    API one
-                    </Menu.Item>
-                    <Menu.Item onClick={()=>this.addClick("API Two")} >
-                      API two
-                    </Menu.Item>
-                </SubMenu>
-                <SubMenu key="sub3" icon={<BorderOutlined />}  title={"Environments"}>
-                  <Menu.Item >
-                    Environment1
-                    </Menu.Item>
-                    <Menu.Item >
-                      Environment2
-                    </Menu.Item>
-                </SubMenu>
-                <SubMenu key="sub4" icon={<FundProjectionScreenOutlined />}  title={"Monitors"}>
-                  <Menu.Item >
-                    Some items
-                    </Menu.Item>
-                    <Menu.Item >
-                      some other items
-                    </Menu.Item>
-                </SubMenu>
+                
+               
+               
                 <SubMenu
-                 style={{overflow:'auto', maxHeight:'200px', margin:0}}
+                 style={{overflowY:'auto',overflowX: 'hidden', maxHeight:'200px', margin:0}}
                  key="sub5" icon={<ClockCircleOutlined />}  title={"History"}>
                 {this.state.initialHistory.map(history=>
                   <Menu.Item onClick={()=>this.historyClicked(history)}>
