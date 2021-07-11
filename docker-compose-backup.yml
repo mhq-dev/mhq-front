@@ -1,0 +1,13 @@
+version: "3"
+services:
+    react-app:
+        build:
+            conntext: .
+            dockerfile: Dockerfile.dev
+        ports:
+            - "3000:3000"
+        volumes:
+            - ./src:/app/src
+        environment:
+            - CHOKIDAR_USEPOLLING=true
+            #- REACT_APP_NAME=MHQ

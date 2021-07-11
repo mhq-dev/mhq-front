@@ -1,0 +1,93 @@
+.profile-text {
+    width: 100%;
+    position: absolute;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 48px;
+}
+
+.image-tag-profile {
+    -webkit-border-radius: 50px;
+    -webkit-background-clip: padding-box;
+    -moz-border-radius: 50px;
+    -moz-background-clip: padding;
+    border-radius: 50px;
+    background-clip: padding-box;
+    background-size: cover;
+}
+
+.lock-icon {
+    width: 150px;
+    height: 150px;
+    background-size: cover;
+}
+
+.name-profile {
+    width: 300px;
+    margin-bottom: 2px;
+    color: rgb(255, 255, 255);
+    text-align: left;
+}
+
+.profile-form {
+    width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.input-profile {
+    color: #FFFFFF;
+    font-family: Verdana;
+    font-weight: bold;
+    font-size: 12px;
+    background-color: #282c34;
+    border-color: rgb(87, 87, 87);
+}
+
+.profile-update-button {
+    padding-left: 10px;
+    padding-right: 10px;
+    background-color: rgb(35, 134, 54);
+    text-align: left;
+    border-color: #282c34;
+    border-radius: 5px;
+    color: white;
+    margin-top: 30px;
+}
+
+.profile-photo-button {
+    padding-left: 10px;
+    padding-right: 10px;
+    background-color: #282c34;
+    text-align: left;
+    border-color: rgb(87, 87, 87);
+    border-radius: 5px;
+    color: white;
+    margin-top: 5px;
+}
+
+.change-password-button {
+    padding-left: 10px;
+    padding-right: 10px;
+    background-color: rgb(240, 98, 41);
+    text-align: left;
+    border-color: #282c34;
+    border-radius: 5px;
+    color: white;
+    margin-top: 30px;
+}
+
+.LeftDivOptions {
+    width: 300px !important;
+    color: white;
+    border-style: outset;
+    border-radius: 5px;
+}
+
+.LeftOption {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    width: 100%;
+    background-color: rgb(40, 44, 52);
+}

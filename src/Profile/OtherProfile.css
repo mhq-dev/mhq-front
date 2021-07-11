@@ -1,0 +1,33 @@
+.OtherProfile-image {
+    -webkit-border-radius: 50px;
+    -webkit-background-clip: padding-box;
+    -moz-border-radius: 300px;
+    -moz-background-clip: padding;
+    border-radius: 50px;
+    background-clip: padding-box;
+    background-size: cover;
+}
+
+.LeftPage {
+    padding: 20px;
+}
+
+.RightPage {
+    background-color: rebeccapurple;
+}
+
+.TotalProfile {
+    height: 100%;
+}
+
+.other-profile-name {
+    text-align: left;
+}
+
+.other-profile-unfollow-button {
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius: 10px;
+    width: 100%;
+    background-color: #21262d;
+}
