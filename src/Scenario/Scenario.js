@@ -4,6 +4,7 @@ import ReactFlow, {
     addEdge,
     removeElements,
     Controls,
+    updateEdge
 } from 'react-flow-renderer';
 import ConnectionLine from './ConnectionLine';
 import './dnd.css';
@@ -103,23 +104,46 @@ const DnDFlow = () => {
     const [edge_id, setedge_id] = useState("");
     const [all_edges, setall_edges] = useState([]);
     const [visible_edge, setvisible_edge] = useState(false);
+    const [edit_st, setedit_st] = useState(-1);
+    const [edit_s, setedit_s] = useState(-1);
+    const [edit_t, setedit_t] = useState(-1);
+
     const [visible_edge_edit, setvisible_edge_edit] = useState(false);
     function onAnd(st_index) {
         sets_count(s_count+1)
         setss_count((s)=>s.concat(s_count))
         ands.push("and")
 
-        const secondcoditions = {operator: "operator",first_token: "token",first: "",second_token: "token",second: ""}
+        const secondcoditions = {operator: "",first_token: "",first: "",second_token: "",second: ""}
         statement.statements[st_index].conditions.push(secondcoditions)
+        //alert(JSON.stringify(statement))
+    }
+    function onAnd_edit(st_index) {
+        sets_count(s_count+1)
+        setss_count((s)=>s.concat(s_count))
+        ands.push("and")
+
+        const secondcoditions = {operator: "",first_token: "",first: "",second_token: "",second: ""}
+        statement_edit.statements[st_index].conditions.push(secondcoditions)
         //alert(JSON.stringify(statement))
     }
     const onOr = () => {
         sets_count(s_count+1)
         setss_count((s)=>s.concat(s_count))
         ands.push("or")
-        const secondcoditions = [{operator: "operator",first_token: "token",first: "",second_token: "token",second: ""}]
+        const secondcoditions = [{operator: "",first_token: "",first: "",second_token: "",second: ""}]
          const secondstatem= {conditions: secondcoditions}
         statement.statements.push(secondstatem)
+        //alert(JSON.stringify(statement))
+
+    };
+    const onOr_edit = () => {
+        sets_count(s_count+1)
+        setss_count((s)=>s.concat(s_count))
+        ands.push("or")
+        const secondcoditions = [{operator: "",first_token: "",first: "",second_token: "",second: ""}]
+         const secondstatem= {conditions: secondcoditions}
+        statement_edit.statements.push(secondstatem)
         //alert(JSON.stringify(statement))
 
     };
@@ -139,7 +163,7 @@ const DnDFlow = () => {
         });
         //alert(t)
         
-        
+        set_last(statement.statements[0].conditions[0])
         axios.post('http://37.152.180.213/api/edge/',{
         source: s, dist: t ,statements: statement.statements
         },{headers:{
@@ -155,13 +179,14 @@ const DnDFlow = () => {
           setElements((els) => addEdge(param_set, els));
           //alert(JSON.stringify(elements))
           message.success("The edge is created successfully")
+          //setstatement(statem)
 
         }
         else{
           message.error("Please fill all of the fields correctly!")
         }})
-        const twocoditions = [{operator: "",first_token: '',
-        first: "",second_token: '',second: ""}]
+        const twocoditions = [{operator: last.operator,first_token: last.first_token,
+        first: last.first,second_token: last.second_token,second: last.second}]
         const twostatem= {statements:[{conditions: twocoditions}]}
         setstatement(twostatem);
         const data={source: source_set ,target: target_set , condition: condition_set,
@@ -177,6 +202,72 @@ const DnDFlow = () => {
         setfirstedge_set("");
         setsecondedge_set("");
         };
+        const edgeOk_edit = () => {
+            if(edit_st===-1)
+            {
+
+                
+            axios.post('http://37.152.180.213/api/edge/',{
+            source: edit_s, dist: edit_t ,statements: statement_edit.statements
+            },{headers:{
+            'Content-Type' : 'application/json',
+            'Authorization' :`Token ${localStorage.getItem('token')}`
+            }})
+            .then((response)=>{
+            if (response.status === 201){
+              //message.success("Collection created successfully")
+             
+              const newelm= {id: response.data.id , source: edit_s,dist: edit_t}
+              all_edges.push(newelm)
+              message.success("The edge is updated successfully")
+             // setstatement(statem)
+    
+            }
+            else{
+              message.error("Please fill all of the fields correctly!")
+            }})
+        }
+        else{
+            axios.put('http://37.152.180.213/api/edge/'+edit_st,{
+            source: edit_s, dist: edit_t ,statements: statement_edit.statements
+            },{headers:{
+            'Content-Type' : 'application/json',
+            'Authorization' :`Token ${localStorage.getItem('token')}`
+            }})
+            .then((response)=>{
+            if (response.status === 200){
+              //message.success("Collection created successfully")
+
+              message.success("The edge is updated successfully")
+              //setstatement(statem)
+    
+            }
+            else{
+              message.error("Please fill all of the fields correctly!")
+            }})
+        }
+        const twocoditions = [{operator: last.operator,first_token: last.first_token,
+            first: last.first,second_token: last.second_token,second: last.second}]
+            const twostatem= {statements:[{conditions: twocoditions}]}
+            setstatement(twostatem);
+            const data={source: source_set ,target: target_set , condition: condition_set,
+                first: firstedge_set, operator: edge_operator , second: secondedge_set}
+            //const newone = localforage.getItem("edge_data")
+            edge_data.push(data)
+            //alert(JSON.stringify(edge_data))
+            setvisible_edge(false) ;
+            setvisible_edge_edit(false) ;
+            setedit_s(-1)
+            setedit_st(-1)
+            setedit_t(-1)
+            setstatement_edit(statem)
+            setsource_set("");
+            settarget_set("");
+            setcondition_set("");
+            setedge_operator("");
+            setfirstedge_set("");
+            setsecondedge_set("");
+            };
         const edgeEditOk = () => {
             setvisible_edge_edit(false) ;
         };
@@ -196,6 +287,8 @@ const DnDFlow = () => {
     first: "",second_token: "",second: ""}]
     const statem= {statements:[{conditions: coditions}]}
     const [statement, setstatement] = useState(statem);
+    const [last, set_last] = useState(statem.statements[0].conditions[0]);
+    const [statement_edit, setstatement_edit] = useState(statem);
 
     const [scenarioModal, setScenarioModal] = useState(false);
     const [myRequests, setmyRequests] = useState([]);
@@ -233,17 +326,118 @@ const DnDFlow = () => {
             animated: true,
             arrowHeadType: 'arrow',
             style: {strokeWidth:3},
-            // label:'Setting',
-            // labelStyle:{fill:'#fff',fontWeight: 800},
-            // labelShowBg:false,
+             label:'updatable edge',
+            labelStyle:{fill: 'transparent'},
+            labelShowBg:false,
         }
         setparam_set(params)
         setsource_set(params.source)
         settarget_set(params.target)
         conditionEmpty();
+        const twocoditions = [{operator: last.operator,first_token: last.first_token,
+            first: last.first,second_token: last.second_token,second: last.second}]
+            const twostatem= {statements:[{conditions: twocoditions}]}
+            setstatement(twostatem);
         showModalEdge();
     
     }
+    const UpdatableEdge = () => {
+        
+        const [elements, setElements] = useState(initialElements);
+    }
+      
+        // gets called after end of edge gets dragged to another source or target
+        const onEdgeUpdate = (oldEdge, newConnection) =>
+        {
+            const e = oldEdge
+            const n = newConnection
+                        let s1 = "0"
+                        let t1 = "1"
+                        let s2 = "0"
+                        let t2 = "1"
+                        node_numbers.forEach(element => {
+                            if(element.first_id==e.source-1)
+                    {
+                        s1 = element.second_id
+                    }
+                    if(element.first_id==e.target-1)
+                    {
+                        t1 = element.second_id
+                    }
+                    if(element.first_id==n.target-1)
+                    {
+                        t2 = element.second_id
+                    }
+                    if(element.first_id==n.source-1)
+                    {
+                        s2 = element.second_id
+                    }
+                    
+                    
+                        });
+                        let id= -1;
+                        let all_edges2=[]
+                    all_edges.forEach(el => {
+                        if(el.source===s1&&el.dist===t1)
+                        {
+                            id=el.id
+                            axios.get('http://37.152.180.213/api/edge/'+el.id,
+                            {headers:{
+                      'Content-Type' : 'application/json',
+                      'Authorization' :`Token ${localStorage.getItem('token')}`
+                        }}).then((resDimo)=>{
+                        //alert(JSON.stringify(resDimo.data.statements))
+                        setstatement_edit(resDimo.data);
+                        if(oldEdge.source === newConnection.source && oldEdge.target === newConnection.target)
+                        {
+                            //alert(JSON.stringify(oldEdge))
+                            //alert(JSON.stringify(newConnection))
+                            setedit_st(id)
+                            setedit_s(s2)
+                            setedit_t(t2)
+                        }
+                        else
+                        {
+                            setedit_st(-1)
+                            setedit_t(t2)
+                            setedit_s(s2)
+                        axios.delete('http://37.152.180.213/api/edge/'+el.id,
+                            {headers:{
+                      'Content-Type' : 'application/json',
+                      'Authorization' :`Token ${localStorage.getItem('token')}`
+                    }}).then((resDimo)=>{
+                        
+                    })
+                    .catch((err)=>{
+                    });
+                                
+                        }
+                        
+                        showModalEdgeEdit();
+                        
+                    })
+                    .catch((err)=>{
+                    });
+        
+                        }
+                        else{
+                            const newelm= {id: el.id , source: el.source,dist: el.dist}
+                            all_edges2.push(newelm);
+                        }
+                    
+                    });
+                    
+                    if(edit_st===-1)
+                    {
+                        setall_edges(all_edges2)
+                    }
+                    else
+                    {
+                        
+                    }
+                    
+          setElements((els) => updateEdge(oldEdge, newConnection, els));
+        }
     const conditionSet = (e) => {
         setcondition_set(e.target.value);
       };
@@ -251,6 +445,10 @@ const DnDFlow = () => {
     function firstEdgeSet (d,cc,e) {
         statement.statements[d].conditions[cc].first
         =e.target.value
+        //setfirstedge_set(e.target.value);
+    };
+    function firstEdgeSet_edit (cc,e) {
+        cc.first=e.target.value
         //setfirstedge_set(e.target.value);
     };
     function secondEdgeSet (cc,e) {
@@ -673,9 +871,9 @@ const DnDFlow = () => {
                         animated: true,
                         arrowHeadType: 'arrow',
                         style: {strokeWidth:3},
-                        // label:'Setting',
-                        // labelStyle:{fill:'#fff',fontWeight: 800},
-                        // labelShowBg:false,
+                        label:'updatable edge',
+                         labelStyle:{fill:'transparent',fontWeight: 800},
+                        labelShowBg:false,
                     }
 
                     setElements((els) => addEdge(params, els));
@@ -769,40 +967,46 @@ const DnDFlow = () => {
                 'Content-Type' : 'application/json',
                 'Authorization' :`Token ${localStorage.getItem('token')}`
                 }}).then((resDimo)=>{
-                    setRunningScenario(true);
                     axios.get('http://37.152.180.213/api/scenario/'+selectedScenario+"/execute",
                         {headers:{
                         'Content-Type' : 'application/json',
                         'Authorization' :`Token ${localStorage.getItem('token')}`
                         }}).then((runScenario)=>{
-                            message.success("Ran successfully");
-                            setRunningScenario(false);
+                            setRunningScenario(true);
                             // while(runningScenario){
-                                // axios.get('http://37.152.180.213/api/scenario/history/'+runScenario.data.scenario_history+"/",
-                                // {headers:{
-                                // 'Content-Type' : 'application/json',
-                                // 'Authorization' :`Token ${localStorage.getItem('token')}`
-                                // }}).then((runScenario)=>{
-                                //     message.success("Runned successfully");
-                                //     setRunningScenario(false);
-                                // })
-                                // .catch((err)=>{
-                                //     message.success("Failed to complete scenario");
-                                //     setRunningScenario(false);
-                                // });  
+                                console.log("Dimo");
+                                console.log(resDimo.data);
+                                setTimeout(function(){ 
+                                    axios.get('http://37.152.180.213/api/scenario/history/'+runScenario.data.scenario_history+"/",
+                                    {headers:{
+                                    'Content-Type' : 'application/json',
+                                    'Authorization' :`Token ${localStorage.getItem('token')}`
+                                    }}).then((runScenarioo)=>{      
+                                        var percent = parseInt((runScenarioo.data.requests.length / resDimo.data.nodes.length)*100);
+                                        console.log(runScenarioo.data);
+                                        message.success(percent+"% of nodes ran successfully");
+                                        setRunningScenario(false);
+                                    })
+                                    .catch((err)=>{
+                                        console.log(err);
+                                        message.error("Failed");
+                                        setRunningScenario(false);
+                                    });  
+                                }, 5000);
+                               
                             //     setTimeout(function(){ }, 1000);   
                             // }    
                             })  
                             .catch((err)=>{
-                                message.success("Failed to complete scenario");
+                                message.error(err.message);
                             });  
                         })
                         .catch((err)=>{
-                            message.success("Failed to complete scenario");
+                            message.error(err.message);
                         }); 
                     })  
                     .catch((err)=>{
-                        message.success("Failed to complete scenario");
+                        message.error(err.message);
                     });  
           
     }
@@ -862,11 +1066,7 @@ const DnDFlow = () => {
             <Link to="/scenario"><h4 >Scenario</h4></Link>
             </Col>
             <Col span={2} >
-            <Dropdown overlay={menu}>
-            <h4 className="ant-dropdown-link" onClick={e => e.preventDefault()}style={{color: 'black'}} >
-            Workspaces <DownOutlined />
-            </h4>
-            </Dropdown>
+         
             </Col>
             <Col span={4} style={{float: 'right' , marginLeft: '40%'}}>
             <SearchUser/>
@@ -898,7 +1098,7 @@ const DnDFlow = () => {
                 <div className="dndflow" id="dndflow">
                 <Modal width={"36vw"}
                 visible={visible_edge}
-                title="Set condition"
+                title="Set Statements"
                 style={{height: '30vh'}}
                 footer={[
                 <Button key="ok" className="btn btn-primary" onClick={edgeOk} >Set
@@ -910,7 +1110,7 @@ const DnDFlow = () => {
         
                 
         {statement.statements.map(d=>(
-            <div style={{border: '1px solid gray',marginTop: '2%'}}>
+                <div style={{border: '1px solid gray',marginTop: '2%'}}>
                 {d.conditions.map(cc=>(
                     <div className="andor"
             style={{alignContent: 'center' ,marginLeft: 'auto',marginRight: 'auto',alignItems: 'center',textAlign: 'center'}}>
@@ -924,6 +1124,7 @@ const DnDFlow = () => {
                      required
                      name="first"
                      placeholder="first set"
+                     defaultValue={cc.first}
                      onChange={(e)=>{firstEdgeSet(statement.statements.indexOf(d),
                         d.conditions.indexOf(cc),e)}}
                    />
@@ -932,7 +1133,8 @@ const DnDFlow = () => {
                 <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
                Token's Type
            </h5>
-           <Select className="select_modal" onChange={(e)=>{onChangeSelectFirstToken(cc,e)}}  style={{ width: '80%' ,textAlign: 'left'}}>
+           <Select className="select_modal"  onChange={(e)=>{onChangeSelectFirstToken(cc,e)}} 
+           defaultValue={cc.first_token} style={{ width: '80%' ,textAlign: 'left'}}>
                             <Option value="str">string</Option>
                             <Option value="num">number</Option>
                             <Option value="timestamp">timestamp</Option>
@@ -945,7 +1147,7 @@ const DnDFlow = () => {
             <h5 style={{textAlign: 'left',marginLeft: '11%',marginTop: '3%'}}>
                Operator
            </h5>
-           <Select onChange={(e)=>{edgeOperatorSet(cc,e)}}  style={{ width: '81%' ,textAlign: 'left',marginLeft: '2%'}}>
+           <Select onChange={(e)=>{edgeOperatorSet(cc,e)}} defaultValue={cc.operator}  style={{ width: '81%' ,textAlign: 'left',marginLeft: '2%'}}>
                             <Option value="equal">equal</Option>
                             <Option value="exist">exist</Option>
                             <Option value="start_with">starts with</Option>
@@ -962,7 +1164,7 @@ const DnDFlow = () => {
                    required
                      name="second"
                      placeholder="second set"
-                     
+                     defaultValue={cc.second}
                      onChange={(e)=>{secondEdgeSet(cc,e)}}
                    />
                 </Col>
@@ -970,7 +1172,7 @@ const DnDFlow = () => {
                 <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
                Token's Type
            </h5>
-           <Select onChange={(e)=>{onChangeSelectSecondToken(cc,e)}} style={{ width: '80%' ,textAlign: 'left'}}>
+           <Select defaultValue={cc.second_token} onChange={(e)=>{onChangeSelectSecondToken(cc,e)}} style={{ width: '80%' ,textAlign: 'left'}}>
                             <Option value="str">string</Option>
                             <Option value="num">number</Option>
                             <Option value="timestamp">timestamp</Option>
@@ -996,48 +1198,124 @@ const DnDFlow = () => {
                        </Col>
                    </Row>
            </div>
-                ))}</div>
+                ))
                 
             
             
-        ))}
+                     }</div>))}
          
         </div>
       </Modal>
-                <Modal
+      <Modal width={"36vw"}
                 visible={visible_edge_edit}
-                title="Edit Edges"
-                style={{height: '36vh'}}
+                title="Edit Statements"
+                style={{height: '30vh'}}
                 footer={[
-                <Button key="ok" className="btn btn-primary" onClick={edgeEditOk} >Done
+                <Button key="ok" className="btn btn-primary" onClick={edgeOk_edit} >Set
                 </Button>
                 ]}
             >
-        <div style={{alignContent: 'center' ,marginLeft: 'auto',marginRight: 'auto',alignItems: 'center',textAlign: 'center'}}>
-        {edge_data.length===0?
-        <h5>There is no edge in this scenario</h5>:
-        edge_data.map(e=>(
-            <Row>
-                <Col span={4}><h5>Source : {e.source}</h5></Col>
-                <Col span={4}><h5>Target : {e.target}</h5></Col>
-                <Col span={4}><h5>Condition : </h5></Col>
-
-                <Col span = {8}><Input
-                  required
-                  name="edit_condition"
-                  defaultValue={e.condition}
-                  onChange={(er) => editCondition(e,er)}
-                  style={{height: '3vh'}}
-                />
-                </Col>
-                <Col span={4}><Button style={{backgroundColor: '#1890ff',color: 'white',
-                border: 'none',lineHeight: '0.5',width: '90%',height: '3vh'}}>Edit</Button></Col>
+        <div //className="andor"
+         style={{alignContent: 'center' ,marginLeft: 'auto',marginRight: 'auto',alignItems: 'center',textAlign: 'center'}}>
+        
                 
+        {statement_edit.statements.map(d=>(
+                <div style={{border: '1px solid gray',marginTop: '2%'}}>
+                {d.conditions.map(cc=>(
+                    <div className="andor"
+            style={{alignContent: 'center' ,marginLeft: 'auto',marginRight: 'auto',alignItems: 'center',textAlign: 'center'}}>
+            <Row style={{width: '90%',marginLeft: '6%'}}>
+                <Col span={12}>
+                <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
+               First Operand
+           </h5>
+           <Input
+                   style={{width: '80%'}}
+                     required
+                     name="first"
+                     placeholder="first set"
+                     defaultValue={cc.first}
+                     onChange={(e)=>{firstEdgeSet_edit(cc,e)}}
+                   />
+                </Col>
+                <Col span={12}>
+                <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
+               Token's Type
+           </h5>
+           <Select className="select_modal" defaultValue={cc.first_token} onChange={(e)=>{onChangeSelectFirstToken(cc,e)}}  style={{ width: '80%' ,textAlign: 'left'}}>
+                            <Option value="str">string</Option>
+                            <Option value="num">number</Option>
+                            <Option value="timestamp">timestamp</Option>
+                            <Option value="body">body</Option>
+                            <Option value="status_code">status code</Option>
+
+                        </Select>
+                </Col>
             </Row>
-        ))
-        }
+            <h5 style={{textAlign: 'left',marginLeft: '11%',marginTop: '3%'}}>
+               Operator
+           </h5>
+           <Select onChange={(e)=>{edgeOperatorSet(cc,e)}} defaultValue={cc.operator} style={{ width: '81%' ,textAlign: 'left',marginLeft: '2%'}}>
+                            <Option value="equal">equal</Option>
+                            <Option value="exist">exist</Option>
+                            <Option value="start_with">starts with</Option>
+                            <Option value="contains">contains</Option>
+                        </Select> 
+         
+            <Row style={{width: '90%',marginLeft: '6%'}}>
+                <Col span={12}>
+                <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
+                    Second Operand
+                </h5>
+                <Input
+                   style={{width: '80%'}}
+                   required
+                     name="second"
+                     placeholder="second set"
+                     defaultValue={cc.second}
+
+                     onChange={(e)=>{secondEdgeSet(cc,e)}}
+                   />
+                </Col>
+                <Col span={12}>
+                <h5 style={{textAlign: 'left',marginLeft: '10%',marginTop: '3%'}}>
+               Token's Type
+           </h5>
+           <Select onChange={(e)=>{onChangeSelectSecondToken(cc,e)}} defaultValue={cc.second_token} style={{ width: '80%' ,textAlign: 'left'}}>
+                            <Option value="str">string</Option>
+                            <Option value="num">number</Option>
+                            <Option value="timestamp">timestamp</Option>
+                            <Option value="body">body</Option>
+                            <Option value="status_code">status code</Option>
+
+                        </Select> 
+                </Col>
+            </Row>
+          
+           
+                   <Row style={{marginTop: '4%'}}>
+                       <Col span="6">
+   
+                       </Col>
+                       <Col span="6">
+                       <Button style={{backgroundColor: '#1890ff',color: 'white',
+                   border: 'none',lineHeight: '0.5',width: '100%',height: '3vh'}} onClick={()=>{onAnd_edit(statement_edit.statements.indexOf(d))}}>AND</Button>
+                       </Col>
+                       <Col span="6">
+                       <Button style={{backgroundColor: '#1890ff',color: 'white',
+                   border: 'none',lineHeight: '0.5',width: '100%',height: '3vh',marginLeft: '10%'}}onClick={onOr_edit}>OR</Button>
+                       </Col>
+                   </Row>
+           </div>
+                ))
+                
+            
+            
+                }</div>))}
+         
         </div>
       </Modal>
+
                 <Modal
                 visible={vis}
                 title="Enter your api information"
@@ -1078,6 +1356,9 @@ const DnDFlow = () => {
                         onNodeContextMenu={onNodeContextMenu}
                         connectionLineComponent={ConnectionLine}
                         nodeTypes={nodeTypes}
+                        onEdgeUpdate={onEdgeUpdate}
+                        
+
                     >
                         <Controls />
                     </ReactFlow>

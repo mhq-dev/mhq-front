@@ -43,7 +43,7 @@ class Signup extends React.Component {
             })
             .catch(err =>
             {
-                message.error(err.message);
+                //message.error(err.message);
             });
             return "Correct";
 

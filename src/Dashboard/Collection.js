@@ -343,9 +343,9 @@ class Collection extends React.Component {
         <Row style={{marginTop: '3%' ,marginLeft: '40%'}}>
           <Col span={8}>
             {this.state.power==="owner"?
-              <Button style={{backgroundColor: 'red',color: 'white',border: 'none',width: '90%'}} onClick={()=>{this.deleCollection(item)}}>Delete</Button>
+              <Button style={{backgroundColor: '#1890ff',color: 'white',border: 'none',width: '90%'}} onClick={()=>{this.deleCollection(item)}}>Delete</Button>
               :
-              <Button style={{backgroundColor: 'red',color: 'white',border: 'none',width: '90%'}} onClick={()=>{this.leaveCollection(item)}}>Leave</Button>
+              <Button style={{backgroundColor: '#1890ff',color: 'white',border: 'none',width: '90%'}} onClick={()=>{this.leaveCollection(item)}}>Leave</Button>
             }
           </Col>
         </Row>
@@ -374,19 +374,19 @@ class Collection extends React.Component {
                 <h5 style={{fontSize: '16px'}}>{user.role==="owner"?<CrownOutlined style={{color: 'yellow',fontSize: '17px',paddingRight: '2px'}}></CrownOutlined>:''}
               {user.role==="editor"?<EditOutlined style={{color: '#f19813',fontSize: '17px',paddingRight: '3px'}}></EditOutlined>:''}
               {user.role==="visitor"?<EyeOutlined style={{color: '#5ef113',fontSize: '15px',paddingRight: '3px'}}></EyeOutlined>:''}             
-              {user.user===localStorage.getItem('user')?this.power=user.role:user.role}</h5>
+              {user.user===localStorage.getItem('username')?this.power=user.role:user.role}</h5>
               </Col>
               <Col span={12}>
-                <Button  hidden={this.state.power==='visitor'||user.role==='owner'||this.state.power==='editor'} style={{backgroundColor: 'red',border: 'none',color: 'white',width: '80%'}} onClick={()=>this.Removeuser(user,item)}> remove </Button>
+                <Button  hidden={this.state.power==='visitor'||user.role==='owner'||this.state.power==='editor'} style={{backgroundColor: '#1890ff',border: 'none',color: 'white',textAlign: 'center',marginLeft: '1%'}} onClick={()=>this.Removeuser(user,item)}> remove </Button>
 
                 </Col>
               </Row>
-              {localStorage.getItem('user')===user.user?'':<Row style={{marginTop: '2%'}}>
+              {localStorage.getItem('username')===user.user?'':<Row style={{marginTop: '2%'}}>
                 <Col span={12}>
-                <Button hidden={this.state.power==='visitor'||user.role==='owner'||this.state.power==='editor'} style={{backgroundColor: 'green',border: 'none',color: 'white'}} onClick={()=>this.Promote(user,item)}>promote</Button>
+                <Button hidden={this.state.power==='visitor'||user.role==='owner'||this.state.power==='editor'} style={{backgroundColor: '#1890ff',textAlign: 'center',border: 'none',color: 'white',width: '100%'}} onClick={()=>this.Promote(user,item)}>promote</Button>
                 </Col>
                 <Col span={12}>
-              <Button hidden={this.state.power==='visitor'||user.role==='owner'||user.role==='visitor'||this.state.power==='editor'} style={{backgroundColor: '#ff5200',border: 'none',color: 'white'}} onClick={()=>this.Demote(user,item)}>demote</Button>
+              <Button hidden={this.state.power==='visitor'||user.role==='owner'||user.role==='visitor'||this.state.power==='editor'} style={{backgroundColor: '#1890ff',border: 'none',color: 'white',textAlign: 'center',marginLeft: '1%'}} onClick={()=>this.Demote(user,item)}>demote</Button>
               </Col>
                 </Row>}  
             </div>
