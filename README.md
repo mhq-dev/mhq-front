@@ -1,5 +1,5 @@
 # MHQ APP
-Software Engineering Spring 2021 Project, IUST
+Software Engineering Spring 2021 Project
 
 ## Description
 This App is a Collaboration Platform for API Development & Automation. 
