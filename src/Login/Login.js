@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import 'antd/dist/antd.css';
 import './Login.css';
 import { Form, Input, Button, Checkbox, Typography, Card, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import axios from 'axios';
+import React, {  useState } from 'react';
 
 function Login() {
     const onFinish = values => {
