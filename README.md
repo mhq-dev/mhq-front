@@ -1,9 +1,10 @@
-# MHQ APP
-Software Engineering Spring 2021 Project
+# MHQ-Front
+
+MHQ-Front is a frontend using React for a web application that aims to combine Integromat and Postman. It is developed by MHQ team.
 
 ## Description
-This App is a Collaboration Platform for API Development & Automation. 
-it Simplifies each step of building an API, creating scenarios for your APIs and so much more.
+
+MHQ-Front mimics the functionality of Integromat, which is a automation platform that connects apps and services together, and Postman, which is an API platform for developers to design, build, test and iterate their APIs.
 
 ## Features
 - Create Collections
@@ -38,12 +39,3 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-
-## License
-
-**Feel free to use it!**
-
-   [ReactJS]: <https://reactjs.org/>
-   [npm.js]: <https://www.npmjs.com/>
-   [Ant Design]: <https://ant.design/>
